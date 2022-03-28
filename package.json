@@ -1,0 +1,69 @@
+{
+  "name": "@noriginmedia/norigin-spatial-navigation",
+  "version": "1.0.0",
+  "description": "React hooks based Spatial Navigation solution",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "eslint": "eslint src",
+    "start": "webpack-dev-server --config webpack.config.dev.js",
+    "build": "webpack --config webpack.config.prod.js",
+    "prepublishOnly": "npm run eslint",
+    "prepare": "npm run build",
+    "publish": "npm publish --access public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NoriginMedia/react-spatial-navigation.git"
+  },
+  "keywords": [
+    "react",
+    "react-hooks",
+    "spatial-navigation",
+    "remote-control-navigation",
+    "tv-navigation"
+  ],
+  "author": "Dmitriy Bryokhin <dmitriy.bryokhin@noriginmedia.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/NoriginMedia/react-spatial-navigation/issues"
+  },
+  "homepage": "https://github.com/NoriginMedia/react-spatial-navigation#readme",
+  "peerDependencies": {
+    "react": ">=16.8.0"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.179",
+    "@types/react": "^17.0.39",
+    "@types/react-dom": "^17.0.11",
+    "@types/styled-components": "^5.1.24",
+    "@typescript-eslint/eslint-plugin": "^5.12.1",
+    "@typescript-eslint/parser": "^5.12.1",
+    "eslint": "^8.9.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-airbnb-typescript": "^16.1.0",
+    "eslint-config-prettier": "^8.4.0",
+    "eslint-plugin-import": "^2.25.4",
+    "file-loader": "^6.2.0",
+    "html-webpack-plugin": "^5.5.0",
+    "pre-commit": "^1.2.2",
+    "prettier": "^2.5.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "styled-components": "^5.3.3",
+    "ts-loader": "^9.2.6",
+    "typescript": "^4.5.5",
+    "webpack": "^5.69.1",
+    "webpack-cli": "^4.9.2",
+    "webpack-dev-server": "^4.7.4"
+  },
+  "pre-commit": [
+    "eslint"
+  ]
+}

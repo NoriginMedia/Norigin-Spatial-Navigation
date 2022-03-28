@@ -1,0 +1,16 @@
+# IntelliJ project files
+.idea
+
+### Node template
+# Logs
+npm-debug.log*
+
+# Dependency directory
+# https://docs.npmjs.com/misc/faq#should-i-check-my-node-modules-folder-into-git
+node_modules
+
+# Mac OSX specific
+.DS_Store
+
+# Build folder
+dist
