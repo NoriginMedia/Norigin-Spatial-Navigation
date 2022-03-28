@@ -17,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/NoriginMedia/react-spatial-navigation.git"
+    "url": "git+https://github.com/NoriginMedia/norigin-spatial-navigation.git"
   },
   "keywords": [
     "react",
@@ -29,9 +29,9 @@
   "author": "Dmitriy Bryokhin <dmitriy.bryokhin@noriginmedia.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/NoriginMedia/react-spatial-navigation/issues"
+    "url": "https://github.com/NoriginMedia/norigin-spatial-navigation/issues"
   },
-  "homepage": "https://github.com/NoriginMedia/react-spatial-navigation#readme",
+  "homepage": "https://github.com/NoriginMedia/norigin-spatial-navigation#readme",
   "peerDependencies": {
     "react": ">=16.8.0"
   },
