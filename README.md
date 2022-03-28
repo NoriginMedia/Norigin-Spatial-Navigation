@@ -32,7 +32,6 @@ This library is actively used and continuously tested on many devices and update
 
 # Related Blogs
 1. Use & benefits of using the Norigin Spatial Navigation library on Smart TVs [here](https://medium.com/p/77ed944d7be7).
-2. Natively supported key-navigation for AndroidTV with React Native, see our blog for [Android Focus Navigation](https://noriginmedia.com/2021/03/10/focus-navigation-in-androidtv-with-react-native).
 
 # Changelog
 A list of changes for all the versions for the Norigin Spatial Navigation:
