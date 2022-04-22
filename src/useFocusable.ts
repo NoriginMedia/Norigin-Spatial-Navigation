@@ -158,9 +158,24 @@ const useFocusableHook = ({
       node,
       preferredChildFocusKey,
       focusable,
-      isFocusBoundary
+      isFocusBoundary,
+      onEnterPress: onEnterPressHandler,
+      onEnterRelease: onEnterReleaseHandler,
+      onArrowPress: onArrowPressHandler,
+      onFocus: onFocusHandler,
+      onBlur: onBlurHandler
     });
-  }, [focusKey, preferredChildFocusKey, focusable, isFocusBoundary]);
+  }, [
+    focusKey,
+    preferredChildFocusKey,
+    focusable,
+    isFocusBoundary,
+    onEnterPressHandler,
+    onEnterReleaseHandler,
+    onArrowPressHandler,
+    onFocusHandler,
+    onBlurHandler
+  ]);
 
   return {
     ref,

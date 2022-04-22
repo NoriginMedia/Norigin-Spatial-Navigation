@@ -85,6 +85,11 @@ interface FocusableComponentUpdatePayload {
   preferredChildFocusKey?: string;
   focusable: boolean;
   isFocusBoundary: boolean;
+  onEnterPress: (details?: KeyPressDetails) => void;
+  onEnterRelease: () => void;
+  onArrowPress: (direction: string, details: KeyPressDetails) => boolean;
+  onFocus: (layout: FocusableComponentLayout, details: FocusDetails) => void;
+  onBlur: (layout: FocusableComponentLayout, details: FocusDetails) => void;
 }
 
 interface FocusableComponentRemovePayload {
@@ -1356,7 +1361,12 @@ class SpatialNavigationService {
       node,
       preferredChildFocusKey,
       focusable,
-      isFocusBoundary
+      isFocusBoundary,
+      onEnterPress,
+      onEnterRelease,
+      onArrowPress,
+      onFocus,
+      onBlur
     }: FocusableComponentUpdatePayload
   ) {
     if (this.nativeMode) {
@@ -1369,7 +1379,11 @@ class SpatialNavigationService {
       component.preferredChildFocusKey = preferredChildFocusKey;
       component.focusable = focusable;
       component.isFocusBoundary = isFocusBoundary;
-
+      component.onEnterPress = onEnterPress;
+      component.onEnterRelease = onEnterRelease;
+      component.onArrowPress = onArrowPress;
+      component.onFocus = onFocus;
+      component.onBlur = onBlur;
       if (node) {
         component.node = node;
       }
