@@ -1,11 +1,23 @@
+const ELEMENT_NODE = 1;
+
 const getRect = (node: HTMLElement) => {
-  const rect = node.getBoundingClientRect();
+  let offsetParent = node.offsetParent as HTMLElement;
+  const height = node.offsetHeight;
+  const width = node.offsetWidth;
+  let left = node.offsetLeft;
+  let top = node.offsetTop;
+
+  while (offsetParent && offsetParent.nodeType === ELEMENT_NODE) {
+    left += offsetParent.offsetLeft - offsetParent.scrollLeft;
+    top += offsetParent.offsetTop - offsetParent.scrollTop;
+    (offsetParent = offsetParent.offsetParent as HTMLElement);
+  }
 
   return {
-    height: Math.ceil(rect.height),
-    left: Math.ceil(rect.left),
-    top: Math.ceil(rect.top),
-    width: Math.ceil(rect.width)
+    height,
+    left,
+    top,
+    width
   };
 };
 

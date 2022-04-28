@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# [1.0.2]
+## Changed
+- Changed `measureLayout` back to calculate coords based on `offsetTop/Left/Width/Height` instead of `getClientBoundRect`.
+The reason is that `getClientBoundRect` is less performant and calculates coordinates AFTER all the CSS transformations,
+which is undesirable for scaled or transformed elements.
+
 # [1.0.1]
 ## Changed
 - Updated Github path in `package.json`
