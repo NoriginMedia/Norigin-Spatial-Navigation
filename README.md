@@ -309,6 +309,8 @@ Receives `extraProps` (see below) as argument.
 ##### `onArrowPress` (function)
 Callback that is called when component is focused and any Arrow key is pressed.
 Receives `direction` (`left`, `right`, `up`, `down`), `extraProps` (see below) and `KeyPressDetails` as arguments.
+This callback HAS to return `true` if you want to proceed with the default directional navigation behavior, or `false`
+if you want to block the navigation in the specified direction.
 
 ##### `onFocus` (function)
 Callback that is called when component gets focus.
