@@ -15,7 +15,7 @@ import {
 } from './SpatialNavigation';
 import { useFocusContext } from './useFocusedContext';
 
-export interface UseFocusableConfig {
+export interface UseFocusableConfig<P = object> {
   focusable?: boolean;
   saveLastFocusedChild?: boolean;
   trackChildren?: boolean;
@@ -23,24 +23,24 @@ export interface UseFocusableConfig {
   isFocusBoundary?: boolean;
   focusKey?: string;
   preferredChildFocusKey?: string;
-  onEnterPress?: (props: object, details: KeyPressDetails) => void;
-  onEnterRelease?: (props: object) => void;
+  onEnterPress?: (props: P, details: KeyPressDetails) => void;
+  onEnterRelease?: (props: P) => void;
   onArrowPress?: (
     direction: string,
-    props: object,
+    props: P,
     details: KeyPressDetails
   ) => boolean;
   onFocus?: (
     layout: FocusableComponentLayout,
-    props: object,
+    props: P,
     details: FocusDetails
   ) => void;
   onBlur?: (
     layout: FocusableComponentLayout,
-    props: object,
+    props: P,
     details: FocusDetails
   ) => void;
-  extraProps?: object;
+  extraProps?: P;
 }
 
 export interface UseFocusableResult {
@@ -56,7 +56,7 @@ export interface UseFocusableResult {
   updateAllLayouts: () => void;
 }
 
-const useFocusableHook = ({
+const useFocusableHook = <P>({
   focusable = true,
   saveLastFocusedChild = true,
   trackChildren = false,
@@ -70,7 +70,7 @@ const useFocusableHook = ({
   onFocus = noop,
   onBlur = noop,
   extraProps
-}: UseFocusableConfig = {}): UseFocusableResult => {
+}: UseFocusableConfig<P> = {}): UseFocusableResult => {
   const onEnterPressHandler = useCallback(
     (details: KeyPressDetails) => {
       onEnterPress(extraProps, details);
