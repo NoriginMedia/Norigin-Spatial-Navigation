@@ -15,6 +15,31 @@ import {
 } from './SpatialNavigation';
 import { useFocusContext } from './useFocusedContext';
 
+export type EnterPressHandler<P = object> = (
+  props: P,
+  details: KeyPressDetails
+) => void;
+
+export type EnterReleaseHandler<P = object> = (props: P) => void;
+
+export type ArrowPressHandler<P = object> = (
+  direction: string,
+  props: P,
+  details: KeyPressDetails
+) => boolean;
+
+export type FocusHandler<P = object> = (
+  layout: FocusableComponentLayout,
+  props: P,
+  details: FocusDetails
+) => void;
+
+export type BlurHandler<P = object> = (
+  layout: FocusableComponentLayout,
+  props: P,
+  details: FocusDetails
+) => void;
+
 export interface UseFocusableConfig<P = object> {
   focusable?: boolean;
   saveLastFocusedChild?: boolean;
@@ -23,23 +48,11 @@ export interface UseFocusableConfig<P = object> {
   isFocusBoundary?: boolean;
   focusKey?: string;
   preferredChildFocusKey?: string;
-  onEnterPress?: (props: P, details: KeyPressDetails) => void;
-  onEnterRelease?: (props: P) => void;
-  onArrowPress?: (
-    direction: string,
-    props: P,
-    details: KeyPressDetails
-  ) => boolean;
-  onFocus?: (
-    layout: FocusableComponentLayout,
-    props: P,
-    details: FocusDetails
-  ) => void;
-  onBlur?: (
-    layout: FocusableComponentLayout,
-    props: P,
-    details: FocusDetails
-  ) => void;
+  onEnterPress?: EnterPressHandler<P>;
+  onEnterRelease?: EnterReleaseHandler<P>;
+  onArrowPress?: ArrowPressHandler<P>;
+  onFocus?: FocusHandler<P>;
+  onBlur?: BlurHandler<P>;
   extraProps?: P;
 }
 
