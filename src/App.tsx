@@ -7,7 +7,7 @@ import React, { useCallback, useEffect, useState, useRef } from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import ReactDOM from 'react-dom';
 // eslint-disable-next-line import/no-extraneous-dependencies
-import styled, { createGlobalStyle } from 'styled-components';
+import styled from 'styled-components';
 import { shuffle } from 'lodash';
 import {
   useFocusable,
@@ -419,16 +419,9 @@ const AppContainer = styled.div`
   flex-direction: row;
 `;
 
-const GlobalStyle = createGlobalStyle`
-  ::-webkit-scrollbar {
-    display: none;
-  }
-`;
-
 function App() {
   return (
     <AppContainer>
-      <GlobalStyle />
       <Menu focusKey="MENU" />
       <Content />
     </AppContainer>

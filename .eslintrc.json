@@ -1,11 +1,10 @@
 {
-  "extends": [
-    "airbnb",
-    "airbnb/hooks",
-    "airbnb-typescript",
-    "prettier"
-  ],
+  "extends": ["airbnb", "airbnb/hooks", "airbnb-typescript", "prettier"],
   "parserOptions": {
     "project": "./tsconfig.json"
+  },
+  "root": true,
+  "rules": {
+    "no-console": 0
   }
 }
