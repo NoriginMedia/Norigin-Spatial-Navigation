@@ -1,14 +1,12 @@
-import {
-  filter,
-  first,
-  sortBy,
-  findKey,
-  forEach,
-  forOwn,
-  throttle,
-  difference,
-  DebouncedFunc
-} from 'lodash';
+import { DebouncedFunc } from 'lodash';
+import filter from 'lodash/filter';
+import first from 'lodash/first';
+import sortBy from 'lodash/sortBy';
+import findKey from 'lodash/findKey';
+import forEach from 'lodash/forEach';
+import forOwn from 'lodash/forOwn';
+import throttle from 'lodash/throttle';
+import difference from 'lodash/difference';
 import measureLayout from './measureLayout';
 import VisualDebugger from './VisualDebugger';
 

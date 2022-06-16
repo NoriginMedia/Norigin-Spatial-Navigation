@@ -6,7 +6,8 @@ import {
   useEffect,
   useState
 } from 'react';
-import { uniqueId, noop } from 'lodash';
+import noop from 'lodash/noop';
+import uniqueId from 'lodash/uniqueId';
 import {
   SpatialNavigation,
   FocusableComponentLayout,

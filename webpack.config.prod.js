@@ -15,12 +15,12 @@ module.exports = {
   resolve: {
     extensions: ['.tsx', '.ts', '.js', '.jsx']
   },
-  externals: ['react', 'lodash'],
+  externals: ['react', /^lodash(\/.+)?$/],
   output: {
     filename: 'index.js',
     path: path.resolve(__dirname, 'dist'),
     libraryTarget: 'umd',
     clean: true,
-    globalObject: 'this',
+    globalObject: 'this'
   }
 };

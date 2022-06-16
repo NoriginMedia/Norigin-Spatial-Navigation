@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# [1.0.5]
+## Added
+- Added generic P type for the props passed to `useFocusable` hook that is available in all callbacks that bounce props back.
+
+## Changed
+- Changed all `lodash` imports to cherry-picked ones to avoid the whole `lodash` lib to be bundled in the project.
+
 # [1.0.4]
 ## Added
 - Eslint dependencies required by `eslint-config-airbnb`
