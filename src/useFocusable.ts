@@ -70,6 +70,15 @@ export interface UseFocusableResult {
   updateAllLayouts: () => void;
 }
 
+const useEffectOnMount = (fn: () => void) => {
+  const flag = useRef(false);
+  useEffect(() => {
+    if (flag.current) { return }
+    fn()
+    flag.current = true;
+  })
+}
+
 const useFocusableHook = <P>({
   focusable = true,
   saveLastFocusedChild = true,
@@ -135,7 +144,7 @@ const useFocusableHook = <P>({
     SpatialNavigation.setFocus(focusKey);
   }, [focusKey]);
 
-  useEffect(() => {
+  useEffectOnMount(() => {
     const node = ref.current;
 
     SpatialNavigation.addFocusable({
@@ -163,7 +172,7 @@ const useFocusableHook = <P>({
         focusKey
       });
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const node = ref.current;

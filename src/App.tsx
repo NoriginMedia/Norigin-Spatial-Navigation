@@ -5,7 +5,7 @@
 
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
-import ReactDOM from 'react-dom';
+import ReactDOMClient from 'react-dom/client';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import styled, { createGlobalStyle } from 'styled-components';
 import shuffle from 'lodash/shuffle';
@@ -156,8 +156,11 @@ function Menu({ focusKey: focusKeyParam }: MenuProps) {
     extraProps: { foo: 'bar' }
   });
 
+  const focusedSelfFlag = useRef(false)
   useEffect(() => {
+    if (focusedSelfFlag.current) { return }
     focusSelf();
+    focusedSelfFlag.current = true
   }, [focusSelf]);
 
   return (
@@ -427,12 +430,15 @@ const GlobalStyle = createGlobalStyle`
 
 function App() {
   return (
+    <React.StrictMode>
     <AppContainer>
       <GlobalStyle />
       <Menu focusKey="MENU" />
       <Content />
     </AppContainer>
+    </React.StrictMode>
   );
 }
 
-ReactDOM.render(<App />, document.querySelector('#root'));
+const root = ReactDOMClient.createRoot(document.querySelector('#root'))
+root.render(<App />);
