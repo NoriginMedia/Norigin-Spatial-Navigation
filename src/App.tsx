@@ -281,7 +281,7 @@ function ContentRow({
   const scrollingRef = useRef(null);
 
   const onAssetFocus = useCallback(
-    ({ x }) => {
+    ({ x }: { x: number }) => {
       scrollingRef.current.scrollTo({
         left: x,
         behavior: 'smooth'
@@ -366,12 +366,12 @@ function Content() {
 
   const [selectedAsset, setSelectedAsset] = useState(null);
 
-  const onAssetPress = useCallback((asset) => {
+  const onAssetPress = useCallback((asset: any) => {
     setSelectedAsset(asset);
   }, []);
 
   const onRowFocus = useCallback(
-    ({ y }) => {
+    ({ y }: { y: number }) => {
       ref.current.scrollTo({
         top: y,
         behavior: 'smooth'
