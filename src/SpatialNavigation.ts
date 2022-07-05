@@ -941,6 +941,8 @@ class SpatialNavigationService {
 
   log(functionName: string, debugString: string, ...rest: any[]) {
     if (this.debug) {
+      // debug mode intentionally logs a bunch of things to the console. Therefore, this console is okay.
+      // eslint-disable-next-line no-console
       console.log(
         `%c${functionName}%c${debugString}`,
         `background: ${
