@@ -120,9 +120,9 @@ export interface FocusDetails {
   event?: KeyboardEvent;
 }
 
-export type KeyMap = { [index: string]: number[] };
+export type BackwardsCompatibleKeyMap = { [index: string]: number | number[] };
 
-export type LegacyKeyMap = { [index: string]: number };
+export type KeyMap = { [index: string]: number[] };
 
 const getChildClosestToOrigin = (children: FocusableComponent[]) => {
   const childrenClosestToOrigin = sortBy(
@@ -134,10 +134,10 @@ const getChildClosestToOrigin = (children: FocusableComponent[]) => {
 };
 
 /**
- * Takes either a KeyMap or a LegacyKeyMap and transforms it into a the new KeyMap format
+ * Takes either a BackwardsCompatibleKeyMap and transforms it into a the new KeyMap format
  * to ensure backwards compatibility.
  */
-const normalizeLegacyKeyMap = (keyMap: KeyMap | LegacyKeyMap) => {
+const normalizeKeyMap = (keyMap: BackwardsCompatibleKeyMap) => {
   const newKeyMap: KeyMap = {};
 
   Object.entries(keyMap).forEach(([key, value]) => {
@@ -1276,10 +1276,10 @@ class SpatialNavigationService {
     return this.keyMap;
   }
 
-  setKeyMap(keyMap: KeyMap | LegacyKeyMap) {
+  setKeyMap(keyMap: BackwardsCompatibleKeyMap) {
     this.keyMap = {
       ...this.getKeyMap(),
-      ...normalizeLegacyKeyMap(keyMap)
+      ...normalizeKeyMap(keyMap)
     };
   }
 
