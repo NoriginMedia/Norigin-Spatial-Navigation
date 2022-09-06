@@ -139,7 +139,8 @@ function Menu({ focusKey: focusKeyParam }: MenuProps) {
     // navigateByDirection, -- to manually navigate by direction
     // pause, -- to pause all navigation events
     // resume, -- to resume all navigation events
-    // updateAllLayouts -- to force update all layouts when needed
+    // updateAllLayouts, -- to force update all layouts when needed
+    // getCurrentFocusKey -- to get the current focus key
   } = useFocusable({
     focusable: true,
     saveLastFocusedChild: false,
