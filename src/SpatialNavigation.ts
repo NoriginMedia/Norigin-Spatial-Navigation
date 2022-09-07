@@ -17,11 +17,11 @@ const DIRECTION_DOWN = 'down';
 const KEY_ENTER = 'enter';
 
 const DEFAULT_KEY_MAP = {
-  [DIRECTION_LEFT]: 37,
-  [DIRECTION_UP]: 38,
-  [DIRECTION_RIGHT]: 39,
-  [DIRECTION_DOWN]: 40,
-  [KEY_ENTER]: 13
+  [DIRECTION_LEFT]: [37],
+  [DIRECTION_UP]: [38],
+  [DIRECTION_RIGHT]: [39],
+  [DIRECTION_DOWN]: [40],
+  [KEY_ENTER]: [13]
 };
 
 export const ROOT_FOCUS_KEY = 'SN:ROOT';
@@ -120,7 +120,9 @@ export interface FocusDetails {
   event?: KeyboardEvent;
 }
 
-export type KeyMap = { [index: string]: number };
+export type BackwardsCompatibleKeyMap = { [index: string]: number | number[] };
+
+export type KeyMap = { [index: string]: number[] };
 
 const getChildClosestToOrigin = (children: FocusableComponent[]) => {
   const childrenClosestToOrigin = sortBy(
@@ -129,6 +131,24 @@ const getChildClosestToOrigin = (children: FocusableComponent[]) => {
   );
 
   return first(childrenClosestToOrigin);
+};
+
+/**
+ * Takes either a BackwardsCompatibleKeyMap and transforms it into a the new KeyMap format
+ * to ensure backwards compatibility.
+ */
+const normalizeKeyMap = (keyMap: BackwardsCompatibleKeyMap) => {
+  const newKeyMap: KeyMap = {};
+
+  Object.entries(keyMap).forEach(([key, value]) => {
+    if (typeof value === 'number') {
+      newKeyMap[key] = [value];
+    } else if (Array.isArray(value)) {
+      newKeyMap[key] = value;
+    }
+  });
+
+  return newKeyMap;
 };
 
 class SpatialNavigationService {
@@ -589,7 +609,7 @@ class SpatialNavigationService {
   }
 
   getEventType(keyCode: number) {
-    return findKey(this.getKeyMap(), (code) => keyCode === code);
+    return findKey(this.getKeyMap(), (codeList) => codeList.includes(keyCode));
   }
 
   bindEventHandlers() {
@@ -787,9 +807,8 @@ class SpatialNavigationService {
       this.visualDebugger.clear();
     }
 
-    const direction = findKey(
-      this.getKeyMap(),
-      (code) => event.keyCode === code
+    const direction = findKey(this.getKeyMap(), (codeList) =>
+      codeList.includes(event.keyCode)
     );
 
     this.smartNavigate(direction, null, { event });
@@ -1265,10 +1284,10 @@ class SpatialNavigationService {
     return this.keyMap;
   }
 
-  setKeyMap(keyMap: KeyMap) {
+  setKeyMap(keyMap: BackwardsCompatibleKeyMap) {
     this.keyMap = {
       ...this.getKeyMap(),
-      ...keyMap
+      ...normalizeKeyMap(keyMap)
     };
   }
 

@@ -245,11 +245,23 @@ When this feature is enabled, it will also throttle rapidly fired key presses (r
 Method to set custom key codes. I.e. when the device key codes differ from a standard browser arrow key codes.
 ```jsx
 setKeyMap({
-  'left': 9001,
-  'up': 9002,
-  'right': 9003,
-  'down': 9004,
-  'enter': 9005
+  left: 9001,
+  up: 9002,
+  right: 9003,
+  down: 9004,
+  enter: 9005
+});
+```
+
+There is also support for mapping multiple key codes to a single direction. This can be useful when working with gamepads that utilize a joystick and a directional pad and you want to make use of both.
+
+```jsx
+setKeyMap({
+  left: [205, 214],
+  up: [203, 211],
+  right: [206, 213],
+  down: [204, 212],
+  enter: [195]
 });
 ```
 
