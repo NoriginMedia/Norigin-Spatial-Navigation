@@ -358,6 +358,9 @@ Only works when `trackChildren` is enabled!
 String that contains the focus key for the component. It is either the same as `focusKey` passed to the hook params,
 or an automatically generated one.
 
+#### `getCurrentFocusKey` (function) `() => string`
+Returns the currently focused component's focus key.
+
 ##### `navigateByDirection` (function) `(direction: string, focusDetails: FocusDetails) => void`
 Method to manually navigation to a certain direction. I.e. you can assign a mouse-wheel to navigate Up and Down.
 Also useful when you have some "Arrow-like" UI in the app that is meant to navigate in certain direction when pressed

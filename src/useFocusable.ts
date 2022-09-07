@@ -68,6 +68,7 @@ export interface UseFocusableResult {
   pause: () => void;
   resume: () => void;
   updateAllLayouts: () => void;
+  getCurrentFocusKey: () => string;
 }
 
 const useFocusableHook = <P>({
@@ -203,7 +204,8 @@ const useFocusableHook = <P>({
     navigateByDirection: SpatialNavigation.navigateByDirection,
     pause: SpatialNavigation.pause,
     resume: SpatialNavigation.resume,
-    updateAllLayouts: SpatialNavigation.updateAllLayouts
+    updateAllLayouts: SpatialNavigation.updateAllLayouts,
+    getCurrentFocusKey: SpatialNavigation.getCurrentFocusKey
   };
 };
 
