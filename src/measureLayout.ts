@@ -10,7 +10,7 @@ const getRect = (node: HTMLElement) => {
   while (offsetParent && offsetParent.nodeType === ELEMENT_NODE) {
     left += offsetParent.offsetLeft - offsetParent.scrollLeft;
     top += offsetParent.offsetTop - offsetParent.scrollTop;
-    (offsetParent = offsetParent.offsetParent as HTMLElement);
+    offsetParent = offsetParent.offsetParent as HTMLElement;
   }
 
   return {

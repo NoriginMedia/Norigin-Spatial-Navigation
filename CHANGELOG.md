@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 # [1.0.6]
 ## Added
 - Function (`getCurrentFocusKey`) for retrieving the currently focused component's focus key
+- Support for passing multiple key codes per direction in `setKeyMap`
 
 # [1.0.5]
 ## Added
