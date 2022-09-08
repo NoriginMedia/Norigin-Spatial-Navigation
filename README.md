@@ -205,7 +205,7 @@ function Button() {
 }
 ```
 IMPORTANT TO NOTE:
-- [Native mode](#nativemode-boolean-default-false) needs to be **enabled** during initializing when using the library in a React Native environment
+- [Native mode](#nativemode-boolean-default-false) needs to be **enabled** during initialization when using the library in a React Native environment
 - In order to "sync" the focus events coming from the native focus engine to the hook, the `onFocus` callback needs to be linked with the `focusSelf` method. This way the hook will know that the component became focused and will set the `focused` flag accordingly.
 
 # API
