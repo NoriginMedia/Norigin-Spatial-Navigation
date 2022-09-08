@@ -15,6 +15,7 @@ import {
   KeyPressDetails
 } from './SpatialNavigation';
 import { useFocusContext } from './useFocusedContext';
+import useEffectOnce from './useEffectOnce';
 
 export type EnterPressHandler<P = object> = (
   props: P,
@@ -136,7 +137,7 @@ const useFocusableHook = <P>({
     SpatialNavigation.setFocus(focusKey);
   }, [focusKey]);
 
-  useEffect(() => {
+  useEffectOnce(() => {
     const node = ref.current;
 
     SpatialNavigation.addFocusable({
@@ -164,7 +165,7 @@ const useFocusableHook = <P>({
         focusKey
       });
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  });
 
   useEffect(() => {
     const node = ref.current;

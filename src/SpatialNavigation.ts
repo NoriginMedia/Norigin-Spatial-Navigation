@@ -961,6 +961,7 @@ class SpatialNavigationService {
 
   log(functionName: string, debugString: string, ...rest: any[]) {
     if (this.debug) {
+      // eslint-disable-next-line no-console
       console.log(
         `%c${functionName}%c${debugString}`,
         `background: ${

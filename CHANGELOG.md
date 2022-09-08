@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# [1.1.0]
+## Added
+- Support for React v18 StrictMode. Added `useEffectOnce` to avoid multiple effect runs on mount that was breaking the
+generation of the `focusKey`s.
+
+## Fixed
+- Few TS errors that somehow not being checked when the app is built and published ¯\_(ツ)_/¯.
+
 # [1.0.6]
 ## Added
 - Function (`getCurrentFocusKey`) for retrieving the currently focused component's focus key
