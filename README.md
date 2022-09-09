@@ -187,9 +187,6 @@ In React Native environment the navigation between focusable (Touchable) compone
 native focusable engine. This library is NOT doing any coordinates measurements or navigation decisions in the native environment.
 But it can still be used to keep the currently focused element node reference and its focused state, which can be used to
 highlight components based on the `focused` or `hasFocusedChild` flags.
-IMPORTANT: in order to "sync" the focus events coming from the native focus engine to the hook, you have to link
-`onFocus` callback with the `focusSelf` method. This way, the hook will know that the component became focused, and will
-set the `focused` flag accordingly.
 
 ```jsx
 import { TouchableOpacity, Text } from 'react-native';
@@ -207,6 +204,9 @@ function Button() {
   </TouchableOpacity>);
 }
 ```
+IMPORTANT TO NOTE:
+- [Native mode](#nativemode-boolean-default-false) needs to be **enabled** during initialization when using the library in a React Native environment
+- In order to "sync" the focus events coming from the native focus engine to the hook the `onFocus` callback needs to be linked with the `focusSelf` method. This way the hook will know that the component became focused and will set the `focused` flag accordingly.
 
 # API
 ## Top Level exports
