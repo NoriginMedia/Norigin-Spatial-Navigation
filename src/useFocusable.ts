@@ -133,9 +133,12 @@ const useFocusableHook = <P>({
     [propFocusKey]
   );
 
-  const focusSelf = useCallback(() => {
-    SpatialNavigation.setFocus(focusKey);
-  }, [focusKey]);
+  const focusSelf = useCallback(
+    (focusDetails: FocusDetails = {}) => {
+      SpatialNavigation.setFocus(focusKey, focusDetails);
+    },
+    [focusKey]
+  );
 
   useEffectOnce(() => {
     const node = ref.current;
