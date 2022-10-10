@@ -13,7 +13,7 @@ Norigin Spatial Navigation can be used while working with Key Navigation and Rea
 This library allows you to navigate across or focus on all navigable components while browsing.
 For example: hyperlinks, buttons, menu items or any interactible part of the User Interface according to the spatial location on the screen.
 
-![Example](readme-assets/norigin-spatial-navigation/norigin-spatial-navigation.gif)
+![Example](/readme-assets/norigin-spatial-navigation/norigin-spatial-navigation.gif)
 
 [Example Source](https://github.com/NoriginMedia/Norigin-Spatial-Navigation/blob/master/src/App.tsx)
 
