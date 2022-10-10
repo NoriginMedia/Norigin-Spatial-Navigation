@@ -1,0 +1,62 @@
+name: dev-portal
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  replicate-file:
+    runs-on: ubuntu-latest
+    name: Replicate Readme Files
+
+    steps:
+      - name: Checkout Project A
+        uses: actions/checkout@v2
+        with:
+          path: ./projectA
+
+      - name: Checkout Project B
+        uses: actions/checkout@master
+        with:
+          repository: Norigin/dev-portal
+          token: ${{ secrets.NM_GH_TOKEN }}
+          path: ./projectB
+
+      - name: Move files
+        run: |
+          REPO_NAME=`basename "$PWD"`
+          [ "$README_ASSETS" == "" ] && IMAGES_FOLDER=readme-assets || IMAGES_FOLDER="$README_ASSETS"
+          echo "Using IMAGES_FOLDER = $IMAGES_FOLDER"
+
+          echo "Creating folder /docs/$REPO_NAME/"
+          mkdir -p ./projectB/docs/$REPO_NAME/
+          rm -rf ./projectB/docs/$REPO_NAME/*
+          mkdir -p ./temp
+          find ./projectA -name '*.md' | cpio -pdm ./temp
+          mv ./temp/projectA/* ./projectB/docs/$REPO_NAME/
+          echo "Readme files moved to /docs/$REPO_NAME/"
+
+          mkdir -p ./projectB/static/$IMAGES_FOLDER
+          mkdir -p ./projectA/$IMAGES_FOLDER
+          if [[ `ls ./projectA/$IMAGES_FOLDER` != "" ]]
+          then
+            cp -rf ./projectA/$IMAGES_FOLDER/* ./projectB/static/$IMAGES_FOLDER
+            echo "Images moved to /static/$IMAGES_FOLDER"
+          fi
+
+      - name: Push Project B
+        run: |
+          REPO_NAME=`basename "$PWD"`
+          cd ./projectB
+          if [[ -z $(git status -s) ]]
+          then
+            echo "Tree is clean. Nothing to commit"
+          else
+            git add .
+            git config user.name github-actions
+            git config user.email github-actions@github.com
+            git commit -am "Replicated from $REPO_NAME"
+            git push
+            exit
+          fi
