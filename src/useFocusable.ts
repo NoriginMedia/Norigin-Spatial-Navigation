@@ -15,6 +15,7 @@ import {
   KeyPressDetails
 } from './SpatialNavigation';
 import { useFocusContext } from './useFocusedContext';
+import useEffectOnce from './useEffectOnce';
 
 export type EnterPressHandler<P = object> = (
   props: P,
@@ -68,6 +69,7 @@ export interface UseFocusableResult {
   pause: () => void;
   resume: () => void;
   updateAllLayouts: () => void;
+  getCurrentFocusKey: () => string;
 }
 
 const useFocusableHook = <P>({
@@ -135,7 +137,7 @@ const useFocusableHook = <P>({
     SpatialNavigation.setFocus(focusKey);
   }, [focusKey]);
 
-  useEffect(() => {
+  useEffectOnce(() => {
     const node = ref.current;
 
     SpatialNavigation.addFocusable({
@@ -163,7 +165,7 @@ const useFocusableHook = <P>({
         focusKey
       });
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  });
 
   useEffect(() => {
     const node = ref.current;
@@ -203,7 +205,8 @@ const useFocusableHook = <P>({
     navigateByDirection: SpatialNavigation.navigateByDirection,
     pause: SpatialNavigation.pause,
     resume: SpatialNavigation.resume,
-    updateAllLayouts: SpatialNavigation.updateAllLayouts
+    updateAllLayouts: SpatialNavigation.updateAllLayouts,
+    getCurrentFocusKey: SpatialNavigation.getCurrentFocusKey
   };
 };
 

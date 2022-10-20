@@ -539,6 +539,7 @@ class SpatialNavigationService {
     this.navigateByDirection = this.navigateByDirection.bind(this);
     this.init = this.init.bind(this);
     this.setKeyMap = this.setKeyMap.bind(this);
+    this.getCurrentFocusKey = this.getCurrentFocusKey.bind(this);
 
     this.debug = false;
     this.visualDebugger = null;
@@ -960,6 +961,7 @@ class SpatialNavigationService {
 
   log(functionName: string, debugString: string, ...rest: any[]) {
     if (this.debug) {
+      // eslint-disable-next-line no-console
       console.log(
         `%c${functionName}%c${debugString}`,
         `background: ${
@@ -969,6 +971,13 @@ class SpatialNavigationService {
         ...rest
       );
     }
+  }
+
+  /**
+   * Returns the current focus key
+   */
+  getCurrentFocusKey(): string {
+    return this.focusKey;
   }
 
   /**

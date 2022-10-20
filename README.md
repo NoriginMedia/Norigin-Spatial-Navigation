@@ -13,7 +13,7 @@ Norigin Spatial Navigation can be used while working with Key Navigation and Rea
 This library allows you to navigate across or focus on all navigable components while browsing.
 For example: hyperlinks, buttons, menu items or any interactible part of the User Interface according to the spatial location on the screen.
 
-![Example](norigin-spatial-navigation.gif)
+![Example](/readme-assets/norigin-spatial-navigation/norigin-spatial-navigation.gif)
 
 [Example Source](https://github.com/NoriginMedia/Norigin-Spatial-Navigation/blob/master/src/App.tsx)
 
@@ -187,9 +187,6 @@ In React Native environment the navigation between focusable (Touchable) compone
 native focusable engine. This library is NOT doing any coordinates measurements or navigation decisions in the native environment.
 But it can still be used to keep the currently focused element node reference and its focused state, which can be used to
 highlight components based on the `focused` or `hasFocusedChild` flags.
-IMPORTANT: in order to "sync" the focus events coming from the native focus engine to the hook, you have to link
-`onFocus` callback with the `focusSelf` method. This way, the hook will know that the component became focused, and will
-set the `focused` flag accordingly.
 
 ```jsx
 import { TouchableOpacity, Text } from 'react-native';
@@ -207,6 +204,9 @@ function Button() {
   </TouchableOpacity>);
 }
 ```
+IMPORTANT TO NOTE:
+- [Native mode](#nativemode-boolean-default-false) needs to be **enabled** during initialization when using the library in a React Native environment
+- In order to "sync" the focus events coming from the native focus engine to the hook the `onFocus` callback needs to be linked with the `focusSelf` method. This way the hook will know that the component became focused and will set the `focused` flag accordingly.
 
 # API
 ## Top Level exports
@@ -369,6 +369,9 @@ Only works when `trackChildren` is enabled!
 ##### `focusKey` (string)
 String that contains the focus key for the component. It is either the same as `focusKey` passed to the hook params,
 or an automatically generated one.
+
+#### `getCurrentFocusKey` (function) `() => string`
+Returns the currently focused component's focus key.
 
 ##### `navigateByDirection` (function) `(direction: string, focusDetails: FocusDetails) => void`
 Method to manually navigation to a certain direction. I.e. you can assign a mouse-wheel to navigate Up and Down.
