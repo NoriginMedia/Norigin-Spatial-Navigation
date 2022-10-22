@@ -3,12 +3,16 @@ const path = require('path');
 module.exports = {
   mode: 'production',
   entry: './src/index.ts',
-  target: ['web', 'es5'],
+  target: ['web','es5'],
   module: {
     rules: [
       {
         test: /\.tsx?$/,
-        use: 'ts-loader',
+        use: [
+          {
+            loader: 'babel-loader'
+          }
+        ],
         exclude: /node_modules/
       }
     ]
