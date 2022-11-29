@@ -538,6 +538,7 @@ class SpatialNavigationService {
     this.updateAllLayouts = this.updateAllLayouts.bind(this);
     this.navigateByDirection = this.navigateByDirection.bind(this);
     this.init = this.init.bind(this);
+    this.destroy = this.destroy.bind(this);
     this.setKeyMap = this.setKeyMap.bind(this);
     this.getCurrentFocusKey = this.getCurrentFocusKey.bind(this);
 
