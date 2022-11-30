@@ -1137,7 +1137,13 @@ class SpatialNavigationService {
     const componentToRemove = this.focusableComponents[focusKey];
 
     if (componentToRemove) {
-      const { parentFocusKey } = componentToRemove;
+      const { parentFocusKey, onUpdateFocus } = componentToRemove;
+
+      /**
+       * Not sure why `focused` state of `useFocusable` hook gets stuck with `true` value
+       * between rerenders in `<StrictMode>`, but it does
+       */
+      onUpdateFocus(false);
 
       Reflect.deleteProperty(this.focusableComponents, focusKey);
 
