@@ -117,7 +117,9 @@ export interface KeyPressDetails {
  * Extra details passed from outside to be bounced back on other callbacks
  */
 export interface FocusDetails {
-  event?: KeyboardEvent;
+  event?: Event;
+  nativeEvent?: Event;
+  [key: string]: any;
 }
 
 export type BackwardsCompatibleKeyMap = { [index: string]: number | number[] };
