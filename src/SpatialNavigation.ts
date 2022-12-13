@@ -117,7 +117,9 @@ export interface KeyPressDetails {
  * Extra details passed from outside to be bounced back on other callbacks
  */
 export interface FocusDetails {
-  event?: KeyboardEvent;
+  event?: Event;
+  nativeEvent?: Event;
+  [key: string]: any;
 }
 
 export type BackwardsCompatibleKeyMap = { [index: string]: number | number[] };
@@ -675,7 +677,7 @@ class SpatialNavigationService {
       this.keyUpEventListener = (event: KeyboardEvent) => {
         const eventType = this.getEventType(event.keyCode);
 
-        Reflect.deleteProperty(this.pressedKeys, eventType);
+        delete this.pressedKeys[eventType];
 
         if (this.throttle && !this.throttleKeypresses) {
           this.keyDownEventListenerThrottled.cancel();
@@ -1140,7 +1142,7 @@ class SpatialNavigationService {
     if (componentToRemove) {
       const { parentFocusKey } = componentToRemove;
 
-      Reflect.deleteProperty(this.focusableComponents, focusKey);
+      delete this.focusableComponents[focusKey];
 
       const parentComponent = this.focusableComponents[parentFocusKey];
       const isFocused = focusKey === this.focusKey;
