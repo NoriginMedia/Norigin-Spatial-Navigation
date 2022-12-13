@@ -59,11 +59,11 @@ export interface UseFocusableConfig<P = object> {
 
 export interface UseFocusableResult {
   ref: RefObject<any>; // <any> since we don't know which HTML tag is passed here
-  focusSelf: () => void;
+  focusSelf: (focusDetails?: FocusDetails) => void;
   focused: boolean;
   hasFocusedChild: boolean;
   focusKey: string;
-  setFocus: (focusKey: string) => void;
+  setFocus: (focusKey: string, focusDetails?: FocusDetails) => void;
   navigateByDirection: (direction: string, focusDetails: FocusDetails) => void;
   pause: () => void;
   resume: () => void;
@@ -132,9 +132,12 @@ const useFocusableHook = <P>({
     [propFocusKey]
   );
 
-  const focusSelf = useCallback(() => {
-    SpatialNavigation.setFocus(focusKey);
-  }, [focusKey]);
+  const focusSelf = useCallback(
+    (focusDetails: FocusDetails = {}) => {
+      SpatialNavigation.setFocus(focusKey, focusDetails);
+    },
+    [focusKey]
+  );
 
   useEffect(() => {
     const node = ref.current;
