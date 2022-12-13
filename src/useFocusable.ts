@@ -167,7 +167,7 @@ const useFocusableHook = <P>({
         focusKey
       });
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [focusKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const node = ref.current;
