@@ -1158,6 +1158,13 @@ class SpatialNavigationService {
         return;
       }
 
+      forEach(this.focusableComponents, (component) => {
+        if (component.parentFocusKey === focusKey && component.focusable) {
+          // eslint-disable-next-line no-param-reassign
+          component.parentFocusKey = parentFocusKey;
+        }
+      });
+
       /**
        * If the component was also focused at this time, focus another one
        */
