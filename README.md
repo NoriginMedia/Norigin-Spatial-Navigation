@@ -265,6 +265,16 @@ setKeyMap({
 });
 ```
 
+### `setThrottle`
+A method for dynamically updating `throttle` and `throttleKeypresses` values. This might be useful if you want to throttle listeners under specific sections or pages.
+
+```jsx
+setThrottle({
+  throttle: 500,
+  throttleKeypresses: true
+});
+```
+
 ### `destroy`
 Resets all the settings and the storage of focusable components. Disables the navigation service.
 

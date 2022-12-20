@@ -540,6 +540,7 @@ class SpatialNavigationService {
     this.updateAllLayouts = this.updateAllLayouts.bind(this);
     this.navigateByDirection = this.navigateByDirection.bind(this);
     this.init = this.init.bind(this);
+    this.setThrottle = this.setThrottle.bind(this);
     this.destroy = this.destroy.bind(this);
     this.setKeyMap = this.setKeyMap.bind(this);
     this.getCurrentFocusKey = this.getCurrentFocusKey.bind(this);
@@ -574,6 +575,21 @@ class SpatialNavigationService {
           this.startDrawLayouts();
         }
       }
+    }
+  }
+
+  setThrottle({
+    throttle: throttleParam = 0,
+    throttleKeypresses = false
+  } = {}) {
+    this.throttleKeypresses = throttleKeypresses;
+
+    if (!this.nativeMode) {
+      this.unbindEventHandlers();
+      if (Number.isInteger(throttleParam)) {
+        this.throttle = throttleParam;
+      }
+      this.bindEventHandlers();
     }
   }
 
@@ -701,13 +717,15 @@ class SpatialNavigationService {
   unbindEventHandlers() {
     // We check both because the React Native remote debugger implements window, but not window.removeEventListener.
     if (typeof window !== 'undefined' && window.removeEventListener) {
-      window.removeEventListener('keydown', this.keyDownEventListener);
-      this.keyDownEventListener = null;
+      window.removeEventListener('keyup', this.keyUpEventListener);
+      this.keyUpEventListener = null;
 
-      if (this.throttle) {
-        window.removeEventListener('keyup', this.keyUpEventListener);
-        this.keyUpEventListener = null;
-      }
+      const listener = this.throttle
+        ? this.keyDownEventListenerThrottled
+        : this.keyDownEventListener;
+
+      window.removeEventListener('keydown', listener);
+      this.keyDownEventListener = null;
     }
   }
 
@@ -1438,4 +1456,4 @@ class SpatialNavigationService {
 /** @internal */
 export const SpatialNavigation = new SpatialNavigationService();
 
-export const { init, destroy, setKeyMap } = SpatialNavigation;
+export const { init, setThrottle, destroy, setKeyMap } = SpatialNavigation;
