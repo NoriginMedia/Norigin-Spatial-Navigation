@@ -29,6 +29,11 @@ export type ArrowPressHandler<P = object> = (
   props: P,
   details: KeyPressDetails
 ) => boolean;
+  
+export type BackPressHandler<P = object> = (
+  props: P,
+  details: KeyPressDetails
+) => void;
 
 export type FocusHandler<P = object> = (
   layout: FocusableComponentLayout,
@@ -53,6 +58,7 @@ export interface UseFocusableConfig<P = object> {
   onEnterPress?: EnterPressHandler<P>;
   onEnterRelease?: EnterReleaseHandler<P>;
   onArrowPress?: ArrowPressHandler<P>;
+  onBackPress?: EnterPressHandler<P>;
   onFocus?: FocusHandler<P>;
   onBlur?: BlurHandler<P>;
   extraProps?: P;
@@ -83,10 +89,14 @@ const useFocusableHook = <P>({
   onEnterPress = noop,
   onEnterRelease = noop,
   onArrowPress = () => true,
+  onBackPress = noop,
   onFocus = noop,
   onBlur = noop,
   extraProps
 }: UseFocusableConfig<P> = {}): UseFocusableResult => {
+
+  const parentFocusKey = useFocusContext();
+
   const onEnterPressHandler = useCallback(
     (details: KeyPressDetails) => {
       onEnterPress(extraProps, details);
@@ -102,6 +112,21 @@ const useFocusableHook = <P>({
     (direction: string, details: KeyPressDetails) =>
       onArrowPress(direction, extraProps, details),
     [extraProps, onArrowPress]
+  );
+
+  const onBackPressHandler = useCallback(
+    (details: KeyPressDetails) => {
+      if (onBackPress === noop) {
+        try {
+          SpatialNavigation.pressBackOnParent(details, parentFocusKey);
+        } catch (e) {
+          noop();
+        }
+        return;
+      }
+      onBackPress(extraProps, details);
+    },
+    [onBackPress, parentFocusKey, extraProps]
   );
 
   const onFocusHandler = useCallback(
@@ -122,8 +147,6 @@ const useFocusableHook = <P>({
 
   const [focused, setFocused] = useState(false);
   const [hasFocusedChild, setHasFocusedChild] = useState(false);
-
-  const parentFocusKey = useFocusContext();
 
   /**
    * Either using the propFocusKey passed in, or generating a random one
@@ -151,6 +174,7 @@ const useFocusableHook = <P>({
       onEnterPress: onEnterPressHandler,
       onEnterRelease: onEnterReleaseHandler,
       onArrowPress: onArrowPressHandler,
+      onBackPress: onEnterPressHandler,
       onFocus: onFocusHandler,
       onBlur: onBlurHandler,
       onUpdateFocus: (isFocused = false) => setFocused(isFocused),
@@ -181,6 +205,7 @@ const useFocusableHook = <P>({
       onEnterPress: onEnterPressHandler,
       onEnterRelease: onEnterReleaseHandler,
       onArrowPress: onArrowPressHandler,
+      onBackPress: onBackPressHandler,
       onFocus: onFocusHandler,
       onBlur: onBlurHandler
     });
@@ -192,6 +217,7 @@ const useFocusableHook = <P>({
     onEnterPressHandler,
     onEnterReleaseHandler,
     onArrowPressHandler,
+    onBackPressHandler,
     onFocusHandler,
     onBlurHandler
   ]);

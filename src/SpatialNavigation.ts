@@ -15,13 +15,15 @@ const DIRECTION_RIGHT = 'right';
 const DIRECTION_UP = 'up';
 const DIRECTION_DOWN = 'down';
 const KEY_ENTER = 'enter';
+const KEY_BACK = 'back';
 
 const DEFAULT_KEY_MAP = {
   [DIRECTION_LEFT]: [37],
   [DIRECTION_UP]: [38],
   [DIRECTION_RIGHT]: [39],
   [DIRECTION_DOWN]: [40],
-  [KEY_ENTER]: [13]
+  [KEY_ENTER]: [13],
+  [KEY_BACK]: [27]
 };
 
 export const ROOT_FOCUS_KEY = 'SN:ROOT';
@@ -63,6 +65,7 @@ interface FocusableComponent {
   onEnterPress: (details?: KeyPressDetails) => void;
   onEnterRelease: () => void;
   onArrowPress: (direction: string, details: KeyPressDetails) => boolean;
+  onBackPress: (details?: KeyPressDetails) => void;
   onFocus: (layout: FocusableComponentLayout, details: FocusDetails) => void;
   onBlur: (layout: FocusableComponentLayout, details: FocusDetails) => void;
   onUpdateFocus: (focused: boolean) => void;
@@ -86,6 +89,7 @@ interface FocusableComponentUpdatePayload {
   onEnterPress: (details?: KeyPressDetails) => void;
   onEnterRelease: () => void;
   onArrowPress: (direction: string, details: KeyPressDetails) => boolean;
+  onBackPress: (details?: KeyPressDetails) => void;
   onFocus: (layout: FocusableComponentLayout, details: FocusDetails) => void;
   onBlur: (layout: FocusableComponentLayout, details: FocusDetails) => void;
 }
@@ -666,6 +670,12 @@ class SpatialNavigationService {
           return;
         }
 
+        if (eventType === KEY_BACK && this.focusKey) {
+          this.onBackPress(keysDetails);
+
+          return;
+        }
+
         const preventDefaultNavigation =
           this.onArrowPress(eventType, keysDetails) === false;
 
@@ -791,6 +801,50 @@ class SpatialNavigationService {
       component.onArrowPress &&
       component.onArrowPress(direction, keysDetails)
     );
+  }
+
+  onBackPress(keysDetails: KeyPressDetails) {
+    const component = this.focusableComponents[this.focusKey];
+
+    /* Guard against last-focused component being unmounted at time of onEnterPress (e.g due to UI fading out) */
+    if (!component) {
+      this.log('onBackPress', 'noComponent');
+
+      return;
+    }
+
+    /* Suppress onBackPress if the last-focused item happens to lose its 'focused' status. */
+    if (!component.focusable) {
+      this.log('onBackPress', 'componentNotFocusable');
+
+      return;
+    }
+
+    if (component.onBackPress) {
+      component.onBackPress(keysDetails);
+    }
+  }
+
+  pressBackOnParent(keysDetails: KeyPressDetails, focusKey: string) {
+    const component = this.focusableComponents[focusKey];
+
+    /* Guard against last-focused component being unmounted at time of onEnterPress (e.g due to UI fading out) */
+    if (!component) {
+      this.log('pressBackOnParent', 'noComponent');
+
+      return;
+    }
+
+    /* Suppress onEnterPress if the last-focused item happens to lose its 'focused' status. */
+    if (!component.focusable) {
+      this.log('pressBackOnParent', 'componentNotFocusable');
+
+      return;
+    }
+
+    if (component.onBackPress) {
+      component.onBackPress(keysDetails);
+    }
   }
 
   /**
@@ -1095,6 +1149,7 @@ class SpatialNavigationService {
     onEnterPress,
     onEnterRelease,
     onArrowPress,
+    onBackPress,
     onFocus,
     onBlur,
     saveLastFocusedChild,
@@ -1113,6 +1168,7 @@ class SpatialNavigationService {
       onEnterPress,
       onEnterRelease,
       onArrowPress,
+      onBackPress,
       onFocus,
       onBlur,
       onUpdateFocus,
@@ -1419,6 +1475,7 @@ class SpatialNavigationService {
       onEnterPress,
       onEnterRelease,
       onArrowPress,
+      onBackPress,
       onFocus,
       onBlur
     }: FocusableComponentUpdatePayload
@@ -1436,6 +1493,7 @@ class SpatialNavigationService {
       component.onEnterPress = onEnterPress;
       component.onEnterRelease = onEnterRelease;
       component.onArrowPress = onArrowPress;
+      component.onBackPress = onBackPress;
       component.onFocus = onFocus;
       component.onBlur = onBlur;
 
@@ -1447,6 +1505,12 @@ class SpatialNavigationService {
 
   isNativeMode() {
     return this.nativeMode;
+  }
+
+  getParentComponent(key: string = this.focusKey): FocusableComponent {
+    const component = this.focusableComponents[key];
+    const parentComponent = this.focusableComponents[component.parentFocusKey];
+    return parentComponent;
   }
 }
 

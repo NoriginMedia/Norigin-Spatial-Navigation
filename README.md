@@ -249,7 +249,8 @@ setKeyMap({
   up: 9002,
   right: 9003,
   down: 9004,
-  enter: 9005
+  enter: 9005,
+  back: 9006
 });
 ```
 
@@ -261,7 +262,8 @@ setKeyMap({
   up: [203, 211],
   right: [206, 213],
   down: [204, 212],
-  enter: [195]
+  enter: [195],
+  back: [196]
 });
 ```
 
@@ -322,6 +324,11 @@ I.e. when you have a Popup and you want some specific button to be focused inste
 
 ##### `onEnterPress` (function)
 Callback that is called when the component is focused and Enter key is pressed.
+Receives `extraProps` (see below) and `KeyPressDetails` as arguments.
+
+##### `onBackPress` (function)
+Callback that is called when the component is focused and Back key is pressed.
+If no callback was provided to the focused component, the event will go up through the Focusable Tree as long as a one was finded or the top was reached up.
 Receives `extraProps` (see below) and `KeyPressDetails` as arguments.
 
 ##### `onEnterRelease` (function)

@@ -3,7 +3,7 @@
  * Disabling ESLint rules for these dependencies since we know it is only for development purposes
  */
 
-import React, { useCallback, useEffect, useState, useRef } from 'react';
+import React, { useCallback, useEffect, useState, useRef, useMemo } from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import ReactDOMClient from 'react-dom/client';
 // eslint-disable-next-line import/no-extraneous-dependencies
@@ -152,6 +152,7 @@ function Menu({ focusKey: focusKeyParam }: MenuProps) {
     onEnterPress: () => {},
     onEnterRelease: () => {},
     onArrowPress: () => true,
+    onBackPress: () => {},
     onFocus: () => {},
     onBlur: () => {},
     extraProps: { foo: 'bar' }
@@ -217,9 +218,13 @@ interface AssetProps {
 }
 
 function Asset({ title, color, onEnterPress, onFocus }: AssetProps) {
+  const withBackPress = useMemo(() => title === 'Asset 3', [title]);
   const { ref, focused } = useFocusable({
     onEnterPress,
     onFocus,
+    onBackPress: withBackPress? () => {
+      alert('Custom Back action');
+    }: undefined,
     extraProps: {
       title,
       color
@@ -229,7 +234,7 @@ function Asset({ title, color, onEnterPress, onFocus }: AssetProps) {
   return (
     <AssetWrapper ref={ref}>
       <AssetBox color={color} focused={focused} />
-      <AssetTitle>{title}</AssetTitle>
+      <AssetTitle>{withBackPress ? 'Asset 3 with Back' : title}</AssetTitle>
     </AssetWrapper>
   );
 }
@@ -363,7 +368,11 @@ const ScrollingRows = styled.div`
 `;
 
 function Content() {
-  const { ref, focusKey } = useFocusable();
+  const { ref, focusKey, setFocus } = useFocusable({
+    onBackPress(){
+      setFocus("MENU");
+    }
+  });
 
   const [selectedAsset, setSelectedAsset] = useState(null);
 
