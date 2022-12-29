@@ -806,16 +806,8 @@ class SpatialNavigationService {
   onBackPress(keysDetails: KeyPressDetails) {
     const component = this.focusableComponents[this.focusKey];
 
-    /* Guard against last-focused component being unmounted at time of onEnterPress (e.g due to UI fading out) */
     if (!component) {
       this.log('onBackPress', 'noComponent');
-
-      return;
-    }
-
-    /* Suppress onBackPress if the last-focused item happens to lose its 'focused' status. */
-    if (!component.focusable) {
-      this.log('onBackPress', 'componentNotFocusable');
 
       return;
     }
@@ -828,16 +820,8 @@ class SpatialNavigationService {
   pressBackOnParent(keysDetails: KeyPressDetails, focusKey: string) {
     const component = this.focusableComponents[focusKey];
 
-    /* Guard against last-focused component being unmounted at time of onEnterPress (e.g due to UI fading out) */
     if (!component) {
       this.log('pressBackOnParent', 'noComponent');
-
-      return;
-    }
-
-    /* Suppress onEnterPress if the last-focused item happens to lose its 'focused' status. */
-    if (!component.focusable) {
-      this.log('pressBackOnParent', 'componentNotFocusable');
 
       return;
     }
