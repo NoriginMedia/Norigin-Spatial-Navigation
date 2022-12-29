@@ -328,7 +328,7 @@ Receives `extraProps` (see below) and `KeyPressDetails` as arguments.
 
 ##### `onBackPress` (function)
 Callback that is called when the component is focused and Back key is pressed.
-If no callback was provided to the focused component, the event will go up through the Focusable Tree as long as a one was finded or the top was reached up.
+If no callback was provided to the focused component, the event will go up through the Focusable Tree as long as a one was found or the top was reached up.
 Receives `extraProps` (see below) and `KeyPressDetails` as arguments.
 
 ##### `onEnterRelease` (function)
