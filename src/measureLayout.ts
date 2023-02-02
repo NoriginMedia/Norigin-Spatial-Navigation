@@ -1,42 +1,14 @@
-const ELEMENT_NODE = 1;
-
-const getRect = (node: HTMLElement) => {
-  let offsetParent = node.offsetParent as HTMLElement;
-  const height = node.offsetHeight;
-  const width = node.offsetWidth;
-  let left = node.offsetLeft;
-  let top = node.offsetTop;
-
-  while (offsetParent && offsetParent.nodeType === ELEMENT_NODE) {
-    left += offsetParent.offsetLeft - offsetParent.scrollLeft;
-    top += offsetParent.offsetTop - offsetParent.scrollTop;
-    offsetParent = offsetParent.offsetParent as HTMLElement;
-  }
-
-  return {
-    height,
-    left,
-    top,
-    width
-  };
-};
-
 const measureLayout = (node: HTMLElement) => {
-  const relativeNode = node && node.parentElement;
-
-  if (node && relativeNode) {
-    const relativeRect = getRect(relativeNode);
-    const { height, left, top, width } = getRect(node);
-    const x = left - relativeRect.left;
-    const y = top - relativeRect.top;
+  if (node && node.getBoundingClientRect) {
+    const rect = node.getBoundingClientRect();
 
     return {
-      x,
-      y,
-      width,
-      height,
-      left,
-      top
+      x: rect.x,
+      y: rect.y,
+      width: rect.width,
+      height: rect.height,
+      left: rect.left,
+      top: rect.top
     };
   }
 
