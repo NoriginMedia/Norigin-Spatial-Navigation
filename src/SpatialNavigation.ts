@@ -69,6 +69,7 @@ interface FocusableComponent {
   onUpdateHasFocusedChild: (hasFocusedChild: boolean) => void;
   saveLastFocusedChild: boolean;
   trackChildren: boolean;
+  trackFocused: boolean;
   preferredChildFocusKey?: string;
   focusable: boolean;
   isFocusBoundary: boolean;
@@ -82,6 +83,8 @@ interface FocusableComponentUpdatePayload {
   node: HTMLElement;
   preferredChildFocusKey?: string;
   focusable: boolean;
+  trackChildren: boolean,
+  trackFocused: boolean,
   isFocusBoundary: boolean;
   onEnterPress: (details?: KeyPressDetails) => void;
   onEnterRelease: () => void;
@@ -1099,6 +1102,7 @@ class SpatialNavigationService {
     onBlur,
     saveLastFocusedChild,
     trackChildren,
+    trackFocused,
     onUpdateFocus,
     onUpdateHasFocusedChild,
     preferredChildFocusKey,
@@ -1119,6 +1123,7 @@ class SpatialNavigationService {
       onUpdateHasFocusedChild,
       saveLastFocusedChild,
       trackChildren,
+      trackFocused,
       preferredChildFocusKey,
       focusable,
       isFocusBoundary,
@@ -1215,7 +1220,9 @@ class SpatialNavigationService {
 
       this.saveLastFocusedChildKey(parentComponent, this.focusKey);
 
-      oldComponent.onUpdateFocus(false);
+      if (oldComponent.trackFocused) {
+        oldComponent.onUpdateFocus(false);
+      }
       oldComponent.onBlur(
         this.getNodeLayoutByFocusKey(this.focusKey),
         focusDetails
@@ -1227,7 +1234,9 @@ class SpatialNavigationService {
     if (this.isFocusableComponent(this.focusKey)) {
       const newComponent = this.focusableComponents[this.focusKey];
 
-      newComponent.onUpdateFocus(true);
+      if (newComponent.trackFocused) {
+        newComponent.onUpdateFocus(true);
+      }
       newComponent.onFocus(
         this.getNodeLayoutByFocusKey(this.focusKey),
         focusDetails

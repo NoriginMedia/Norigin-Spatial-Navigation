@@ -302,6 +302,11 @@ If this feature is disabled, the focus will be always on the first available chi
 This flag controls the feature of updating the `hasFocusedChild` flag returned to the hook output.
 Since you don't always need `hasFocusedChild` value, this feature is disabled by default for optimization purposes.
 
+##### `trackFocused` (default: true)
+This flag controls the feature of updating the `focused` flag returned to the hook output.
+Sometimes a component doesn't change when it is focused (for example, if it holds other focusable
+components), so if you don't use `focused` value, disable this feature for optimization purposes.
+
 ##### `autoRestoreFocus` (default: true)
 By default, when the currently focused component is unmounted (deleted), navigation service will try to restore the focus
 on the nearest available sibling of that component. If this behavior is undesirable, you can disable it by setting this
