@@ -241,6 +241,13 @@ Enables throttling of the key event listener.
 Works only in combination with `throttle` > 0. By default, `throttle` only throttles key down events (i.e. when you press and hold the button).
 When this feature is enabled, it will also throttle rapidly fired key presses (rapid "key down + key up" events).
 
+##### `useGetBoundingClientRect`: boolean (default: false)
+This flag enables using `getBoundingClientRect` for measuring element sizes and positions. Default behavior is using DOM `offset` values.
+The difference is that `getBoundingClientRect` will measure coordinates and sizes post CSS transforms, while `offset` measurement will measure them pre CSS transforms.
+For example if you have an element with `translateX(50)`, the X position with the default measurement will still be 0, while `getBoundingClientRect` measurement will result in X being 50.
+The choice depends on how often you are using transforms, and whether you want it to result into coordinates shift or not.
+Sometimes you would want element to be *visually* translated, but its coordinates to be calculated as it was before the translation.
+
 ### `setKeyMap`
 Method to set custom key codes. I.e. when the device key codes differ from a standard browser arrow key codes.
 ```jsx
