@@ -198,6 +198,11 @@ class SpatialNavigationService {
    */
   private paused: boolean;
 
+  /**
+   * Enables/disables getBoundingClientRect
+   */
+  private useGetBoundingClientRect: boolean;
+
   private keyDownEventListener: (event: KeyboardEvent) => void;
 
   private keyDownEventListenerThrottled: DebouncedFunc<
@@ -1406,7 +1411,7 @@ class SpatialNavigationService {
 
     const { node } = component;
 
-    const leyout = this.useGetBoundingClientRect
+    const layout = this.useGetBoundingClientRect
       ? getBoundingClientRect(node)
       : measureLayout(node);
 
