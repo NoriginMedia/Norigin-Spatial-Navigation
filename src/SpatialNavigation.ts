@@ -7,7 +7,7 @@ import forEach from 'lodash/forEach';
 import forOwn from 'lodash/forOwn';
 import throttle from 'lodash/throttle';
 import difference from 'lodash/difference';
-import measureLayout from './measureLayout';
+import measureLayout, { getBoundingClientRect } from './measureLayout';
 import VisualDebugger from './VisualDebugger';
 
 const DIRECTION_LEFT = 'left';
@@ -201,6 +201,11 @@ class SpatialNavigationService {
    * Flag used to block key events from this service
    */
   private paused: boolean;
+
+  /**
+   * Enables/disables getBoundingClientRect
+   */
+  private useGetBoundingClientRect: boolean;
 
   private keyDownEventListener: (event: KeyboardEvent) => void;
 
@@ -524,6 +529,7 @@ class SpatialNavigationService {
     this.nativeMode = false;
     this.throttle = 0;
     this.throttleKeypresses = false;
+    this.useGetBoundingClientRect = false;
 
     this.pressedKeys = {};
 
@@ -560,12 +566,14 @@ class SpatialNavigationService {
     visualDebug = false,
     nativeMode = false,
     throttle: throttleParam = 0,
-    throttleKeypresses = false
+    throttleKeypresses = false,
+    useGetBoundingClientRect = false
   } = {}) {
     if (!this.enabled) {
       this.enabled = true;
       this.nativeMode = nativeMode;
       this.throttleKeypresses = throttleKeypresses;
+      this.useGetBoundingClientRect = useGetBoundingClientRect;
 
       this.debug = debug;
 
@@ -1443,8 +1451,12 @@ class SpatialNavigationService {
 
     const { node } = component;
 
+    const layout = this.useGetBoundingClientRect
+      ? getBoundingClientRect(node)
+      : measureLayout(node);
+
     component.layout = {
-      ...measureLayout(node),
+      ...layout,
       node
     };
   }
