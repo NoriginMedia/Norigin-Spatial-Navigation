@@ -163,6 +163,8 @@ class SpatialNavigationService {
    */
   private focusKey: string;
 
+  private shouldFocusDOMNode: boolean;
+
   /**
    * This collection contains focus keys of the elements that are having a child focused
    * Might be handy for styling of certain parent components if their child is focused.
@@ -526,6 +528,7 @@ class SpatialNavigationService {
     this.throttle = 0;
     this.throttleKeypresses = false;
     this.useGetBoundingClientRect = false;
+    this.shouldFocusDOMNode = false;
 
     this.pressedKeys = {};
 
@@ -563,13 +566,15 @@ class SpatialNavigationService {
     nativeMode = false,
     throttle: throttleParam = 0,
     throttleKeypresses = false,
-    useGetBoundingClientRect = false
+    useGetBoundingClientRect = false,
+    shouldFocusDOMNode = false
   } = {}) {
     if (!this.enabled) {
       this.enabled = true;
       this.nativeMode = nativeMode;
       this.throttleKeypresses = throttleKeypresses;
       this.useGetBoundingClientRect = useGetBoundingClientRect;
+      this.shouldFocusDOMNode = shouldFocusDOMNode && !nativeMode;
 
       this.debug = debug;
 
@@ -1234,6 +1239,10 @@ class SpatialNavigationService {
 
     if (this.isFocusableComponent(this.focusKey)) {
       const newComponent = this.focusableComponents[this.focusKey];
+
+      if (this.shouldFocusDOMNode && newComponent.node) {
+        newComponent.node.focus();
+      }
 
       newComponent.onUpdateFocus(true);
       newComponent.onFocus(
