@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# [1.3.1]
+## Added
+- Extra debug logs, printing focusable components data in addition to DOM nodes.
+- Extra call to set `focused` state to `false` on unmount. This is to support "double-mount" in Strict mode in React 18.
+
+## Changed
+- [Potentially Breaking] Auto restore focus when the item is removed is now happening with a slight debounced delay.
+
+## Removed
+- Custom `useEffectOnce` hook that introduced issues with unmounted components being remained as focusable.
+
 # [1.3.0]
 ## Added
 - new `init` config option `shouldFocusDOMNode` that focuses the underlying _accessible_ DOM node too.
