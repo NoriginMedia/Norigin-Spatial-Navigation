@@ -6,6 +6,7 @@ import findKey from 'lodash/findKey';
 import forEach from 'lodash/forEach';
 import forOwn from 'lodash/forOwn';
 import throttle from 'lodash/throttle';
+import debounce from 'lodash/debounce';
 import difference from 'lodash/difference';
 import measureLayout, { getBoundingClientRect } from './measureLayout';
 import VisualDebugger from './VisualDebugger';
@@ -38,6 +39,8 @@ const DIAGONAL_SLICE_WEIGHT = 1;
  * Main coordinate distance is 5 times more important
  */
 const MAIN_COORDINATE_WEIGHT = 5;
+
+const AUTO_RESTORE_FOCUS_DELAY = 300;
 
 const DEBUG_FN_COLORS = ['#0FF', '#FF0', '#F0F'];
 
@@ -218,6 +221,8 @@ class SpatialNavigationService {
   private debug: boolean;
 
   private logIndex: number;
+
+  private setFocusDebounced: DebouncedFunc<any>;
 
   /**
    * Used to determine the coordinate that will be used to filter items that are over the "edge"
@@ -554,6 +559,11 @@ class SpatialNavigationService {
     this.setKeyMap = this.setKeyMap.bind(this);
     this.getCurrentFocusKey = this.getCurrentFocusKey.bind(this);
 
+    this.setFocusDebounced = debounce(this.setFocus, AUTO_RESTORE_FOCUS_DELAY, {
+      leading: false,
+      trailing: true
+    });
+
     this.debug = false;
     this.visualDebugger = null;
 
@@ -879,7 +889,8 @@ class SpatialNavigationService {
       'smartNavigate',
       'currentComponent',
       currentComponent ? currentComponent.focusKey : undefined,
-      currentComponent ? currentComponent.node : undefined
+      currentComponent ? currentComponent.node : undefined,
+      currentComponent
     );
 
     if (currentComponent) {
@@ -935,7 +946,8 @@ class SpatialNavigationService {
           'siblings',
           `${siblings.length} elements:`,
           siblings.map((sibling) => sibling.focusKey).join(', '),
-          siblings.map((sibling) => sibling.node)
+          siblings.map((sibling) => sibling.node),
+          siblings.map((sibling) => sibling)
         );
       }
 
@@ -963,7 +975,8 @@ class SpatialNavigationService {
         'smartNavigate',
         'nextComponent',
         nextComponent ? nextComponent.focusKey : undefined,
-        nextComponent ? nextComponent.node : undefined
+        nextComponent ? nextComponent.node : undefined,
+        nextComponent
       );
 
       if (nextComponent) {
@@ -1159,6 +1172,12 @@ class SpatialNavigationService {
 
     this.updateLayout(focusKey);
 
+    this.log(
+      'addFocusable',
+      'Component added: ',
+      this.focusableComponents[focusKey]
+    );
+
     /**
      * If for some reason this component was already focused before it was added, call the update
      */
@@ -1171,7 +1190,11 @@ class SpatialNavigationService {
     const componentToRemove = this.focusableComponents[focusKey];
 
     if (componentToRemove) {
-      const { parentFocusKey } = componentToRemove;
+      const { parentFocusKey, onUpdateFocus } = componentToRemove;
+
+      onUpdateFocus(false);
+
+      this.log('removeFocusable', 'Component removed: ', componentToRemove);
 
       delete this.focusableComponents[focusKey];
 
@@ -1189,18 +1212,21 @@ class SpatialNavigationService {
         return;
       }
 
-      forEach(this.focusableComponents, (component) => {
-        if (component.parentFocusKey === focusKey && component.focusable) {
-          // eslint-disable-next-line no-param-reassign
-          component.parentFocusKey = parentFocusKey;
-        }
-      });
-
       /**
-       * If the component was also focused at this time, focus another one
+       * If the component was also focused at this time, focus its parent -> it will focus another child
        */
       if (isFocused && parentComponent && parentComponent.autoRestoreFocus) {
-        this.setFocus(parentFocusKey);
+        this.log(
+          'removeFocusable',
+          'Auto restoring focus to: ',
+          parentFocusKey
+        );
+
+        /**
+         * Focusing parent with a slight delay
+         * This is to avoid multiple focus restorations if multiple children getting unmounted in one render cycle
+         */
+        this.setFocusDebounced(parentFocusKey);
       }
     }
   }
@@ -1233,6 +1259,8 @@ class SpatialNavigationService {
         this.getNodeLayoutByFocusKey(this.focusKey),
         focusDetails
       );
+
+      this.log('setCurrentFocusedKey', 'onBlur', oldComponent);
     }
 
     this.focusKey = newFocusKey;
@@ -1249,6 +1277,8 @@ class SpatialNavigationService {
         this.getNodeLayoutByFocusKey(this.focusKey),
         focusDetails
       );
+
+      this.log('setCurrentFocusedKey', 'onFocus', newComponent);
     }
   }
 
@@ -1385,6 +1415,9 @@ class SpatialNavigationService {
   }
 
   setFocus(focusKey: string, focusDetails: FocusDetails = {}) {
+    // Cancel any pending auto-restore focus calls if we are setting focus manually
+    this.setFocusDebounced.cancel();
+
     if (!this.enabled) {
       return;
     }
