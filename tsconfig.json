@@ -9,13 +9,14 @@
     "target": "ES5",
     "jsx": "react",
     "allowSyntheticDefaultImports": true,
+    "strict": true,
     "lib": [
       "es5",
       "es2015",
       "dom"
     ]
   },
-  "exclude": [
-    "node_modules"
+  "include": [
+    "src/**/*"
   ]
 }

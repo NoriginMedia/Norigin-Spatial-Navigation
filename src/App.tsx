@@ -14,9 +14,9 @@ import {
   init,
   FocusContext,
   FocusDetails,
-  FocusableComponentLayout,
   KeyPressDetails
 } from './index';
+import { FocusableEventLayout } from './SpatialNavigation';
 
 const logo = require('../logo.png').default;
 
@@ -148,7 +148,7 @@ function Menu({ focusKey: focusKeyParam }: MenuProps) {
     autoRestoreFocus: true,
     isFocusBoundary: false,
     focusKey: focusKeyParam,
-    preferredChildFocusKey: null,
+    preferredChildFocusKey: undefined,
     onEnterPress: () => {},
     onEnterRelease: () => {},
     onArrowPress: () => true,
@@ -208,10 +208,13 @@ const AssetTitle = styled.div`
 interface AssetProps {
   title: string;
   color: string;
-  onEnterPress: (props: object, details: KeyPressDetails) => void;
+  onEnterPress: (
+    props: Pick<AssetProps, 'title' | 'color'>,
+    details: KeyPressDetails
+  ) => void;
   onFocus: (
-    layout: FocusableComponentLayout,
-    props: object,
+    layout: FocusableEventLayout,
+    props: Pick<AssetProps, 'title' | 'color'>,
     details: FocusDetails
   ) => void;
 }
@@ -262,9 +265,9 @@ const ContentRowScrollingContent = styled.div`
 
 interface ContentRowProps {
   title: string;
-  onAssetPress: (props: object, details: KeyPressDetails) => void;
+  onAssetPress: AssetProps['onEnterPress'];
   onFocus: (
-    layout: FocusableComponentLayout,
+    layout: FocusableEventLayout,
     props: object,
     details: FocusDetails
   ) => void;
@@ -275,16 +278,15 @@ function ContentRow({
   onAssetPress,
   onFocus
 }: ContentRowProps) {
-  const { ref, focusKey } = useFocusable({
-    onFocus
-  });
+  const { ref, focusKey } = useFocusable({ onFocus });
 
-  const scrollingRef = useRef(null);
+  const scrollingRef = useRef<HTMLDivElement | null>(null);
 
   const onAssetFocus = useCallback(
-    ({ x }: { x: number }) => {
-      scrollingRef.current.scrollTo({
-        left: x,
+    (layout: FocusableEventLayout) => {
+      if (!layout) return;
+      scrollingRef.current?.scrollTo({
+        left: layout.x,
         behavior: 'smooth'
       });
     },
@@ -365,16 +367,20 @@ const ScrollingRows = styled.div`
 function Content() {
   const { ref, focusKey } = useFocusable();
 
-  const [selectedAsset, setSelectedAsset] = useState(null);
+  const [selectedAsset, setSelectedAsset] = useState<Pick<
+    AssetProps,
+    'title' | 'color'
+  > | null>(null);
 
-  const onAssetPress = useCallback((asset: AssetProps) => {
+  const onAssetPress = useCallback((asset: typeof selectedAsset) => {
     setSelectedAsset(asset);
   }, []);
 
   const onRowFocus = useCallback(
-    ({ y }: { y: number }) => {
+    (layout: FocusableEventLayout) => {
+      if (!layout) return;
       ref.current.scrollTo({
-        top: y,
+        top: layout.y,
         behavior: 'smooth'
       });
     },
@@ -438,5 +444,6 @@ function App() {
   );
 }
 
+// @ts-ignore / root is always defined
 const root = ReactDOMClient.createRoot(document.querySelector('#root'));
 root.render(<App />);

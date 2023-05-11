@@ -4,18 +4,18 @@ import {
   useMemo,
   useRef,
   useEffect,
-  useState
+  useState,
+  useLayoutEffect
 } from 'react';
 import noop from 'lodash/noop';
 import uniqueId from 'lodash/uniqueId';
 import {
   SpatialNavigation,
-  FocusableComponentLayout,
   FocusDetails,
-  KeyPressDetails
+  KeyPressDetails,
+  FocusableEventLayout
 } from './SpatialNavigation';
 import { useFocusContext } from './useFocusedContext';
-import useEffectOnce from './useEffectOnce';
 
 export type EnterPressHandler<P = object> = (
   props: P,
@@ -31,13 +31,13 @@ export type ArrowPressHandler<P = object> = (
 ) => boolean;
 
 export type FocusHandler<P = object> = (
-  layout: FocusableComponentLayout,
+  layout: FocusableEventLayout,
   props: P,
   details: FocusDetails
 ) => void;
 
 export type BlurHandler<P = object> = (
-  layout: FocusableComponentLayout,
+  layout: FocusableEventLayout,
   props: P,
   details: FocusDetails
 ) => void;
@@ -50,12 +50,12 @@ export interface UseFocusableConfig<P = object> {
   isFocusBoundary?: boolean;
   focusKey?: string;
   preferredChildFocusKey?: string;
+  extraProps?: P;
   onEnterPress?: EnterPressHandler<P>;
   onEnterRelease?: EnterReleaseHandler<P>;
   onArrowPress?: ArrowPressHandler<P>;
   onFocus?: FocusHandler<P>;
   onBlur?: BlurHandler<P>;
-  extraProps?: P;
 }
 
 export interface UseFocusableResult {
@@ -69,7 +69,7 @@ export interface UseFocusableResult {
   pause: () => void;
   resume: () => void;
   updateAllLayouts: () => void;
-  getCurrentFocusKey: () => string;
+  getCurrentFocusKey: () => string | null;
 }
 
 const useFocusableHook = <P>({
@@ -85,7 +85,7 @@ const useFocusableHook = <P>({
   onArrowPress = () => true,
   onFocus = noop,
   onBlur = noop,
-  extraProps
+  extraProps = {} as P
 }: UseFocusableConfig<P> = {}): UseFocusableResult => {
   const onEnterPressHandler = useCallback(
     (details: KeyPressDetails) => {
@@ -105,20 +105,20 @@ const useFocusableHook = <P>({
   );
 
   const onFocusHandler = useCallback(
-    (layout: FocusableComponentLayout, details: FocusDetails) => {
+    (layout: FocusableEventLayout, details: FocusDetails) => {
       onFocus(layout, extraProps, details);
     },
     [extraProps, onFocus]
   );
 
   const onBlurHandler = useCallback(
-    (layout: FocusableComponentLayout, details: FocusDetails) => {
+    (layout: FocusableEventLayout, details: FocusDetails) => {
       onBlur(layout, extraProps, details);
     },
     [extraProps, onBlur]
   );
 
-  const ref = useRef(null);
+  const ref = useRef<HTMLElement | null>(null);
 
   const [focused, setFocused] = useState(false);
   const [hasFocusedChild, setHasFocusedChild] = useState(false);
@@ -140,7 +140,7 @@ const useFocusableHook = <P>({
     [focusKey]
   );
 
-  useEffectOnce(() => {
+  useLayoutEffect(() => {
     const node = ref.current;
 
     SpatialNavigation.addFocusable({
@@ -168,13 +168,11 @@ const useFocusableHook = <P>({
         focusKey
       });
     };
-  });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    const node = ref.current;
-
     SpatialNavigation.updateFocusable(focusKey, {
-      node,
+      node: ref.current,
       preferredChildFocusKey,
       focusable,
       isFocusBoundary,

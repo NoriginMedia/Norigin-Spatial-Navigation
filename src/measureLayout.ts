@@ -22,9 +22,9 @@ const getRect = (node: HTMLElement) => {
 };
 
 const measureLayout = (node: HTMLElement) => {
-  const relativeNode = node && node.parentElement;
+  const relativeNode = node.parentElement;
 
-  if (node && relativeNode) {
+  if (relativeNode) {
     const relativeRect = getRect(relativeNode);
     const { height, left, top, width } = getRect(node);
     const x = left - relativeRect.left;
@@ -46,7 +46,7 @@ const measureLayout = (node: HTMLElement) => {
 export default measureLayout;
 
 export const getBoundingClientRect = (node: HTMLElement) => {
-  if (node && node.getBoundingClientRect) {
+  if (node.getBoundingClientRect) {
     const rect = node.getBoundingClientRect();
 
     return {

@@ -248,6 +248,14 @@ For example if you have an element with `translateX(50)`, the X position with th
 The choice depends on how often you are using transforms, and whether you want it to result into coordinates shift or not.
 Sometimes you would want element to be *visually* translated, but its coordinates to be calculated as it was before the translation.
 
+##### `shouldFocusDOMNode`: boolean (default: false)
+This flag makes the underlying _accessible_ DOM node to become focused as well. This is useful for [_accessible_](https://developer.mozilla.org/en-US/docs/Web/Accessibility) web applications.
+Note that it is the developer's responsibility to make the elements accessible! There are [many resources](https://www.google.com/search?q=web+accessibility) online on the subject. [HTML Semantics and Accessibility Cheat Sheet](https://webaim.org/resources/htmlcheatsheet/) is perhaps a good start,
+as it dives directly into the various html tags and how it complies with accessibility. Non-accessible tags like `<div>` needs to have the [tabindex](https://developer.mozilla.org/en-US/docs/Web/Accessibility/Keyboard-navigable_JavaScript_widgets) attribute set.
+Also consider `role` and `aria-label` attributes. But that depends on the application.
+
+The flag is ignored if `nativeMode` is set.
+
 ### `setKeyMap`
 Method to set custom key codes. I.e. when the device key codes differ from a standard browser arrow key codes.
 ```jsx
