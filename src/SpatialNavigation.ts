@@ -59,6 +59,8 @@ export interface FocusableComponentLayout {
   node: HTMLElement;
 }
 
+export type CustomFocusBoundary = Record<string, boolean>
+
 interface FocusableComponent {
   focusKey: string;
   node: HTMLElement;
@@ -74,7 +76,7 @@ interface FocusableComponent {
   trackChildren: boolean;
   preferredChildFocusKey?: string;
   focusable: boolean;
-  isFocusBoundary: boolean;
+  isFocusBoundary: boolean | CustomFocusBoundary;
   autoRestoreFocus: boolean;
   lastFocusedChildKey?: string;
   layout?: FocusableComponentLayout;
@@ -85,7 +87,7 @@ interface FocusableComponentUpdatePayload {
   node: HTMLElement;
   preferredChildFocusKey?: string;
   focusable: boolean;
-  isFocusBoundary: boolean;
+  isFocusBoundary: boolean | CustomFocusBoundary;
   onEnterPress: (details?: KeyPressDetails) => void;
   onEnterRelease: () => void;
   onArrowPress: (direction: string, details: KeyPressDetails) => boolean;
@@ -155,6 +157,12 @@ const normalizeKeyMap = (keyMap: BackwardsCompatibleKeyMap) => {
 
   return newKeyMap;
 };
+
+const getFocusBoundary = (direction: string, isFocusBoundary: boolean | CustomFocusBoundary ) => {
+  if(typeof isFocusBoundary === "boolean")
+    return isFocusBoundary
+  return isFocusBoundary[direction] ?? false
+}
 
 class SpatialNavigationService {
   private focusableComponents: { [index: string]: FocusableComponent };
@@ -986,7 +994,7 @@ class SpatialNavigationService {
 
         this.saveLastFocusedChildKey(parentComponent, focusKey);
 
-        if (!parentComponent || !parentComponent.isFocusBoundary) {
+        if (!parentComponent || !getFocusBoundary(direction, parentComponent.isFocusBoundary)) {
           this.smartNavigate(direction, parentFocusKey, focusDetails);
         }
       }

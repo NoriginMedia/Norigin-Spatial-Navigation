@@ -12,7 +12,8 @@ import {
   SpatialNavigation,
   FocusableComponentLayout,
   FocusDetails,
-  KeyPressDetails
+  KeyPressDetails,
+  CustomFocusBoundary
 } from './SpatialNavigation';
 import { useFocusContext } from './useFocusedContext';
 
@@ -46,7 +47,7 @@ export interface UseFocusableConfig<P = object> {
   saveLastFocusedChild?: boolean;
   trackChildren?: boolean;
   autoRestoreFocus?: boolean;
-  isFocusBoundary?: boolean;
+  isFocusBoundary?: boolean | CustomFocusBoundary;
   focusKey?: string;
   preferredChildFocusKey?: string;
   onEnterPress?: EnterPressHandler<P>;

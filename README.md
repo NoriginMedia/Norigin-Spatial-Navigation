@@ -160,7 +160,7 @@ function Menu() {
 
 ## Restricting focus to a certain component boundaries
 Sometimes you don't want the focus to leave your component, for example when displaying a Popup, you don't want the focus to go to
-a component underneath the Popup. This can be enabled with `isFocusBoundary` flag passed to the `useFocusable` hook.
+a component underneath the Popup. This can be enabled with `isFocusBoundary` prop passed to the `useFocusable` hook.
 
 ```jsx
 import React, { useEffect } from 'react';
@@ -180,6 +180,11 @@ function Popup() {
     </div>
   </FocusContext.Provider>);
 }
+```
+
+It is also possible to restrict the isFocusBoundary to certain directions by enabling the corresponding directions:
+```tsx
+const { ref, focusKey, focusSelf } = useFocusable({isFocusBoundary: {left: true}});
 ```
 
 ## Using the library in React Native environment
@@ -326,6 +331,8 @@ flag to `false`.
 This flag makes the Focusable Container keep the focus inside its boundaries. It will only block the focus from leaving
 the Container via directional navigation. You can still set the focus manually anywhere via `setFocus`.
 Useful when i.e. you have a modal Popup and you don't want the focus to leave it.
+By setting the `isFocusBoundary` to a specific direction, e.g. `isFocusBoundary: {up: true, down: true}`, will restrict
+exiting the FocusableContext via these directions only.
 
 ##### `focusKey` (optional)
 If you want your component to have a persistent focus key, it can be set via this property. Otherwise, it will be auto generated.
