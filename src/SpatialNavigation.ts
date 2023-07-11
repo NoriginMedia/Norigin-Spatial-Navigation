@@ -983,9 +983,6 @@ class SpatialNavigationService {
         this.setFocus(nextComponent.focusKey, focusDetails);
       } else {
         const parentComponent = this.focusableComponents[parentFocusKey];
-
-        this.saveLastFocusedChildKey(parentComponent, focusKey);
-
         if (!parentComponent || !parentComponent.isFocusBoundary) {
           this.smartNavigate(direction, parentFocusKey, focusDetails);
         }
@@ -1249,11 +1246,6 @@ class SpatialNavigationService {
       newFocusKey !== this.focusKey
     ) {
       const oldComponent = this.focusableComponents[this.focusKey];
-      const parentComponent =
-        this.focusableComponents[oldComponent.parentFocusKey];
-
-      this.saveLastFocusedChildKey(parentComponent, this.focusKey);
-
       oldComponent.onUpdateFocus(false);
       oldComponent.onBlur(
         this.getNodeLayoutByFocusKey(this.focusKey),
@@ -1424,14 +1416,13 @@ class SpatialNavigationService {
 
     this.log('setFocus', 'focusKey', focusKey);
 
-    const lastFocusedKey = this.focusKey;
     const newFocusKey = this.getNextFocusKey(focusKey);
 
     this.log('setFocus', 'newFocusKey', newFocusKey);
 
     this.setCurrentFocusedKey(newFocusKey, focusDetails);
     this.updateParentsHasFocusedChild(newFocusKey, focusDetails);
-    this.updateParentsLastFocusedChild(lastFocusedKey);
+    this.updateParentsLastFocusedChild(newFocusKey);
   }
 
   updateAllLayouts() {
