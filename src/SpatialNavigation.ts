@@ -1184,6 +1184,19 @@ class SpatialNavigationService {
     if (focusKey === this.focusKey) {
       this.setFocus(focusKey);
     }
+
+    /**
+     * Parent nodes are created after children, and child may focus itself.
+     * If so, it's required to check if parent lies on a path to focused child.
+     */
+    let currentComponent = this.focusableComponents[this.focusKey];
+    while (currentComponent) {
+      if (currentComponent.parentFocusKey === focusKey) {
+        this.updateParentsHasFocusedChild(this.focusKey, {});
+        break;
+      }
+      currentComponent = this.focusableComponents[currentComponent.parentFocusKey];
+    }
   }
 
   removeFocusable({ focusKey }: FocusableComponentRemovePayload) {
