@@ -14,7 +14,7 @@ import {
   FocusDetails,
   KeyPressDetails
 } from './SpatialNavigation';
-import { useFocusContext } from './useFocusedContext';
+import { useFocusContext } from './useFocusContext';
 
 export type EnterPressHandler<P = object> = (
   props: P,

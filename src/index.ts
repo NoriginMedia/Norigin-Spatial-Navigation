@@ -1,3 +1,3 @@
 export * from './useFocusable';
-export * from './useFocusedContext';
+export * from './useFocusContext';
 export * from './SpatialNavigation';
