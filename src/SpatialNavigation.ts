@@ -1192,7 +1192,8 @@ class SpatialNavigationService {
         this.updateParentsHasFocusedChild(this.focusKey, {});
         break;
       }
-      currentComponent = this.focusableComponents[currentComponent.parentFocusKey];
+      currentComponent =
+        this.focusableComponents[currentComponent.parentFocusKey];
     }
   }
 
@@ -1207,6 +1208,11 @@ class SpatialNavigationService {
       this.log('removeFocusable', 'Component removed: ', componentToRemove);
 
       delete this.focusableComponents[focusKey];
+
+      const hadFocusedChild = this.parentsHavingFocusedChild.includes(focusKey);
+      this.parentsHavingFocusedChild = this.parentsHavingFocusedChild.filter(
+        (parentWithFocusedChild) => parentWithFocusedChild !== focusKey
+      );
 
       const parentComponent = this.focusableComponents[parentFocusKey];
       const isFocused = focusKey === this.focusKey;
@@ -1223,11 +1229,19 @@ class SpatialNavigationService {
       }
 
       /**
-       * If the component was also focused at this time, focus its parent -> it will focus another child
+       * If the component was also focused at this time, OR had focused child, focus its parent -> it will focus another child
+       * Normally the order of components unmount is children -> parents, but sometimes parent can be removed before the child
+       * So we need to check not only for the current Leaf component focus state, but also if it was a Parent that had focused child
        */
-      if (isFocused && parentComponent && parentComponent.autoRestoreFocus) {
+      if (
+        (isFocused || hadFocusedChild) &&
+        parentComponent &&
+        parentComponent.autoRestoreFocus
+      ) {
         this.log(
           'removeFocusable',
+          'Component removed: ',
+          isFocused ? 'Leaf component' : 'Container component',
           'Auto restoring focus to: ',
           parentFocusKey
         );
