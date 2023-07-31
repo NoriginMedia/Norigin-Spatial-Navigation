@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# [1.3.2]
+## Fixed
+- Fixed a bug where parents were not updating their `hasFocusedChild` when new child is created and focused right away
+- Fixed a bug where `lastFocusedChild` was updated only on blur, but not on manual focus, resulting in a wrong key being stored
+
+## Changed
+- Renamed `useFocusedContext` file to `useFocusContext` to match the export name
+
 # [1.3.1]
 ## Added
 - Extra debug logs, printing focusable components data in addition to DOM nodes.
