@@ -10,6 +10,7 @@ import debounce from 'lodash/debounce';
 import difference from 'lodash/difference';
 import measureLayout, { getBoundingClientRect } from './measureLayout';
 import VisualDebugger from './VisualDebugger';
+import WritingDirection from './WritingDirection';
 
 const DIRECTION_LEFT = 'left';
 const DIRECTION_RIGHT = 'right';
@@ -52,6 +53,8 @@ const THROTTLE_OPTIONS = {
 export interface FocusableComponentLayout {
   left: number;
   top: number;
+  readonly right: number;
+  readonly bottom: number;
   width: number;
   height: number;
   x: number;
@@ -129,10 +132,14 @@ export type BackwardsCompatibleKeyMap = { [index: string]: number | number[] };
 
 export type KeyMap = { [index: string]: number[] };
 
-const getChildClosestToOrigin = (children: FocusableComponent[]) => {
+const getChildClosestToOrigin = (children: FocusableComponent[], writingDirection: WritingDirection) => {
+  const comparator = writingDirection === WritingDirection.LTR
+    ? (({ layout }: FocusableComponent) => Math.abs(layout.left) + Math.abs(layout.top))
+    : (({ layout }: FocusableComponent) => Math.abs(window.innerWidth - layout.right) + Math.abs(layout.top));
+
   const childrenClosestToOrigin = sortBy(
     children,
-    ({ layout }) => Math.abs(layout.left) + Math.abs(layout.top)
+    comparator,
   );
 
   return first(childrenClosestToOrigin);
@@ -224,6 +231,8 @@ class SpatialNavigationService {
 
   private setFocusDebounced: DebouncedFunc<any>;
 
+  private writingDirection: WritingDirection;
+
   /**
    * Used to determine the coordinate that will be used to filter items that are over the "edge"
    */
@@ -231,24 +240,28 @@ class SpatialNavigationService {
     isVertical: boolean,
     isIncremental: boolean,
     isSibling: boolean,
-    layout: FocusableComponentLayout
+    layout: FocusableComponentLayout,
+    writingDirection: WritingDirection,
   ) {
-    const itemX = layout.left;
-    const itemY = layout.top;
-    const itemWidth = layout.width;
-    const itemHeight = layout.height;
+    const itemStart = isVertical
+      ? layout.top
+      : writingDirection === WritingDirection.LTR
+        ? layout.left
+        : layout.right;
 
-    const coordinate = isVertical ? itemY : itemX;
-    const itemSize = isVertical ? itemHeight : itemWidth;
+    const itemEnd = isVertical
+      ? layout.bottom
+      : writingDirection === WritingDirection.LTR
+        ? layout.right
+        : layout.left;
 
-    // eslint-disable-next-line no-nested-ternary
     return isIncremental
       ? isSibling
-        ? coordinate
-        : coordinate + itemSize
+        ? itemStart
+        : itemEnd
       : isSibling
-      ? coordinate + itemSize
-      : coordinate;
+        ? itemEnd
+        : itemStart;
   }
 
   /**
@@ -260,11 +273,6 @@ class SpatialNavigationService {
     isSibling: boolean,
     layout: FocusableComponentLayout
   ) {
-    const itemX = layout.left;
-    const itemY = layout.top;
-    const itemWidth = layout.width;
-    const itemHeight = layout.height;
-
     const result = {
       a: {
         x: 0,
@@ -278,15 +286,15 @@ class SpatialNavigationService {
 
     switch (direction) {
       case DIRECTION_UP: {
-        const y = isSibling ? itemY + itemHeight : itemY;
+        const y = isSibling ? layout.bottom : layout.top;
 
         result.a = {
-          x: itemX,
+          x: layout.left,
           y
         };
 
         result.b = {
-          x: itemX + itemWidth,
+          x: layout.right,
           y
         };
 
@@ -294,15 +302,15 @@ class SpatialNavigationService {
       }
 
       case DIRECTION_DOWN: {
-        const y = isSibling ? itemY : itemY + itemHeight;
+        const y = isSibling ? layout.top : layout.bottom;
 
         result.a = {
-          x: itemX,
+          x: layout.left,
           y
         };
 
         result.b = {
-          x: itemX + itemWidth,
+          x: layout.right,
           y
         };
 
@@ -310,32 +318,32 @@ class SpatialNavigationService {
       }
 
       case DIRECTION_LEFT: {
-        const x = isSibling ? itemX + itemWidth : itemX;
+        const x = isSibling ? layout.right : layout.left;
 
         result.a = {
           x,
-          y: itemY
+          y: layout.top
         };
 
         result.b = {
           x,
-          y: itemY + itemHeight
+          y: layout.bottom
         };
 
         break;
       }
 
       case DIRECTION_RIGHT: {
-        const x = isSibling ? itemX : itemX + itemWidth;
+        const x = isSibling ? layout.left : layout.right;
 
         result.a = {
           x,
-          y: itemY
+          y: layout.top
         };
 
         result.b = {
           x,
-          y: itemY + itemHeight
+          y: layout.bottom
         };
 
         break;
@@ -534,6 +542,7 @@ class SpatialNavigationService {
     this.throttleKeypresses = false;
     this.useGetBoundingClientRect = false;
     this.shouldFocusDOMNode = false;
+    this.writingDirection = WritingDirection.LTR;
 
     this.pressedKeys = {};
 
@@ -577,7 +586,8 @@ class SpatialNavigationService {
     throttle: throttleParam = 0,
     throttleKeypresses = false,
     useGetBoundingClientRect = false,
-    shouldFocusDOMNode = false
+    shouldFocusDOMNode = false,
+    rtl = false
   } = {}) {
     if (!this.enabled) {
       this.enabled = true;
@@ -585,6 +595,7 @@ class SpatialNavigationService {
       this.throttleKeypresses = throttleKeypresses;
       this.useGetBoundingClientRect = useGetBoundingClientRect;
       this.shouldFocusDOMNode = shouldFocusDOMNode && !nativeMode;
+      this.writingDirection = rtl ? WritingDirection.RTL : WritingDirection.LTR;
 
       this.debug = debug;
 
@@ -594,7 +605,7 @@ class SpatialNavigationService {
         }
         this.bindEventHandlers();
         if (visualDebug) {
-          this.visualDebugger = new VisualDebugger();
+          this.visualDebugger = new VisualDebugger(this.writingDirection);
           this.startDrawLayouts();
         }
       }
@@ -900,14 +911,15 @@ class SpatialNavigationService {
       const isVerticalDirection =
         direction === DIRECTION_DOWN || direction === DIRECTION_UP;
       const isIncrementalDirection =
-        direction === DIRECTION_DOWN || direction === DIRECTION_RIGHT;
+        direction === DIRECTION_DOWN || (this.writingDirection === WritingDirection.LTR ? direction === DIRECTION_RIGHT : direction === DIRECTION_LEFT);
 
       const currentCutoffCoordinate =
         SpatialNavigationService.getCutoffCoordinate(
           isVerticalDirection,
           isIncrementalDirection,
           false,
-          layout
+          layout,
+          this.writingDirection,
         );
 
       /**
@@ -924,12 +936,22 @@ class SpatialNavigationService {
               isVerticalDirection,
               isIncrementalDirection,
               true,
-              component.layout
+              component.layout,
+              this.writingDirection,
             );
 
-          return isIncrementalDirection
-            ? siblingCutoffCoordinate >= currentCutoffCoordinate
-            : siblingCutoffCoordinate <= currentCutoffCoordinate;
+          return isVerticalDirection
+            ? isIncrementalDirection
+              ? siblingCutoffCoordinate >= currentCutoffCoordinate // vertical next
+              : siblingCutoffCoordinate <= currentCutoffCoordinate // vertical previous
+            : this.writingDirection === WritingDirection.LTR
+              ? isIncrementalDirection
+                ? siblingCutoffCoordinate >= currentCutoffCoordinate // horizontal LTR next
+                : siblingCutoffCoordinate <= currentCutoffCoordinate // horizontal LTR previous
+              : isIncrementalDirection
+                ? siblingCutoffCoordinate <= currentCutoffCoordinate // horizontal RTL next
+                : siblingCutoffCoordinate >= currentCutoffCoordinate // horizontal RTL previous
+            ;
         }
 
         return false;
@@ -1096,7 +1118,7 @@ class SpatialNavigationService {
        * Otherwise, trying to focus something by coordinates
        */
       children.forEach((component) => this.updateLayout(component.focusKey));
-      const { focusKey: childKey } = getChildClosestToOrigin(children);
+      const { focusKey: childKey } = getChildClosestToOrigin(children, this.writingDirection);
 
       this.log('getNextFocusKey', 'childKey will be focused', childKey);
 
@@ -1154,6 +1176,8 @@ class SpatialNavigationService {
         height: 0,
         left: 0,
         top: 0,
+        right: 0,
+        bottom: 0,
 
         /**
          * Node ref is also duplicated in layout to be reported in onFocus callback
