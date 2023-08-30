@@ -76,6 +76,7 @@ interface FocusableComponent {
   focusable: boolean;
   isFocusBoundary: boolean;
   autoRestoreFocus: boolean;
+  forceFocus: boolean;
   lastFocusedChildKey?: string;
   layout?: FocusableComponentLayout;
   layoutUpdated?: boolean;
@@ -871,6 +872,11 @@ class SpatialNavigationService {
       return;
     }
 
+    const isVerticalDirection =
+      direction === DIRECTION_DOWN || direction === DIRECTION_UP;
+    const isIncrementalDirection =
+      direction === DIRECTION_DOWN || direction === DIRECTION_RIGHT;
+
     this.log('smartNavigate', 'direction', direction);
     this.log('smartNavigate', 'fromParentFocusKey', fromParentFocusKey);
     this.log('smartNavigate', 'this.focusKey', this.focusKey);
@@ -885,6 +891,15 @@ class SpatialNavigationService {
     const currentComponent =
       this.focusableComponents[fromParentFocusKey || this.focusKey];
 
+    /**
+     * When there's no currently focused component, an attempt is made, to force focus one of
+     * the Focusable Containers, that have "forceFocus" flag enabled.
+     */
+    if (!fromParentFocusKey && !currentComponent) {
+        this.setFocus(this.getForcedFocusKey());
+        return;
+    }
+
     this.log(
       'smartNavigate',
       'currentComponent',
@@ -896,11 +911,6 @@ class SpatialNavigationService {
     if (currentComponent) {
       this.updateLayout(currentComponent.focusKey);
       const { parentFocusKey, focusKey, layout } = currentComponent;
-
-      const isVerticalDirection =
-        direction === DIRECTION_DOWN || direction === DIRECTION_UP;
-      const isIncrementalDirection =
-        direction === DIRECTION_DOWN || direction === DIRECTION_RIGHT;
 
       const currentCutoffCoordinate =
         SpatialNavigationService.getCutoffCoordinate(
@@ -1025,6 +1035,30 @@ class SpatialNavigationService {
   }
 
   /**
+   * Returns the focus key to which focus can be forced if there are force-focusable components.
+   * A component closest to the top left viewport corner (0,0) is returned.
+   */
+  getForcedFocusKey(): string | undefined {
+    const forceFocusableComponents = filter(
+      this.focusableComponents,
+      (component) => component.focusable && component.forceFocus
+    );
+
+    /**
+     * Searching of the top level component that is closest to the top left viewport corner (0,0).
+     * To achieve meaningful and coherent results, 'down' direction is forced.
+     */
+    const sortedForceFocusableComponents = this.sortSiblingsByPriority(
+      forceFocusableComponents,
+      { x:0, y:0, width:0, height: 0, left: 0, top:0, node: null },
+      'down',
+      ROOT_FOCUS_KEY
+    );
+
+    return first(sortedForceFocusableComponents)?.focusKey;
+  }
+
+  /**
    * This function tries to determine the next component to Focus
    * It's either the target node OR the one down by the Tree if node has children components
    * Based on "targetFocusKey" which means the "intended component to focus"
@@ -1126,6 +1160,7 @@ class SpatialNavigationService {
     onUpdateHasFocusedChild,
     preferredChildFocusKey,
     autoRestoreFocus,
+    forceFocus,
     focusable,
     isFocusBoundary
   }: FocusableComponent) {
@@ -1146,6 +1181,7 @@ class SpatialNavigationService {
       focusable,
       isFocusBoundary,
       autoRestoreFocus,
+      forceFocus,
       lastFocusedChildKey: null,
       layout: {
         x: 0,
@@ -1442,6 +1478,16 @@ class SpatialNavigationService {
     }
 
     this.log('setFocus', 'focusKey', focusKey);
+
+    /**
+     * When focusKey is not provided or is equal to `ROOT_FOCUS_KEY`, an attempt is made,
+     * to force focus one of the Focusable Containers, that have "forceFocus" flag enabled.
+     * A component closest to the top left viewport corner (0,0) is force-focused.
+     */
+    if (!focusKey || focusKey === ROOT_FOCUS_KEY) {
+      // eslint-disable-next-line no-param-reassign
+      focusKey = this.getForcedFocusKey();
+    }
 
     const newFocusKey = this.getNextFocusKey(focusKey);
 
