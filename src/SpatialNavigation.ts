@@ -558,6 +558,7 @@ class SpatialNavigationService {
     this.destroy = this.destroy.bind(this);
     this.setKeyMap = this.setKeyMap.bind(this);
     this.getCurrentFocusKey = this.getCurrentFocusKey.bind(this);
+    this.doesFocusableExist = this.doesFocusableExist.bind(this);
 
     this.setFocusDebounced = debounce(this.setFocus, AUTO_RESTORE_FOCUS_DELAY, {
       leading: false,
@@ -823,7 +824,7 @@ class SpatialNavigationService {
    * navigateByDirection('right') // The focus is moved to right
    */
   navigateByDirection(direction: string, focusDetails: FocusDetails) {
-    if (this.paused === true || this.nativeMode) {
+    if (this.paused === true || !this.enabled || this.nativeMode) {
       return;
     }
 
@@ -1437,7 +1438,7 @@ class SpatialNavigationService {
     // Cancel any pending auto-restore focus calls if we are setting focus manually
     this.setFocusDebounced.cancel();
 
-    if (!this.enabled) {
+    if (!this.enabled || this.nativeMode) {
       return;
     }
 
@@ -1453,7 +1454,7 @@ class SpatialNavigationService {
   }
 
   updateAllLayouts() {
-    if (this.nativeMode) {
+    if (!this.enabled || this.nativeMode) {
       return;
     }
 
@@ -1520,6 +1521,10 @@ class SpatialNavigationService {
   isNativeMode() {
     return this.nativeMode;
   }
+
+  doesFocusableExist(focusKey: string) {
+    return !!this.focusableComponents[focusKey];
+  }
 }
 
 /**
@@ -1528,4 +1533,16 @@ class SpatialNavigationService {
 /** @internal */
 export const SpatialNavigation = new SpatialNavigationService();
 
-export const { init, setThrottle, destroy, setKeyMap } = SpatialNavigation;
+export const {
+  init,
+  setThrottle,
+  destroy,
+  setKeyMap,
+  setFocus,
+  navigateByDirection,
+  pause,
+  resume,
+  updateAllLayouts,
+  getCurrentFocusKey,
+  doesFocusableExist
+} = SpatialNavigation;

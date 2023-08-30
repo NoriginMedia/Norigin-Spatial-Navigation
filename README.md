@@ -112,10 +112,10 @@ It is useful when you first open the page, or i.e. when your modal Popup gets mo
 
 ```jsx
 import React, { useEffect } from 'react';
-import { useFocusable, FocusContext } from '@noriginmedia/norigin-spatial-navigation';
+import { useFocusable, FocusContext, setFocus } from '@noriginmedia/norigin-spatial-navigation';
 
 function Popup() {
-  const { ref, focusKey, focusSelf, setFocus } = useFocusable();
+  const { ref, focusKey, focusSelf } = useFocusable();
 
   // Focusing self will focus the Popup, which will pass the focus down to the first Child (ButtonPrimary)
   // Alternatively you can manually focus any other component by its 'focusKey'
@@ -293,6 +293,29 @@ setThrottle({
 ### `destroy`
 Resets all the settings and the storage of focusable components. Disables the navigation service.
 
+### `doesFocusableExist` (function) `(focusKey: string) => boolean`
+Returns `true` if Focusable Container with given `focusKey` is created, `false` otherwise.
+
+### `setFocus` (function) `(focusKey: string) => void`
+Method to manually set the focus to a component providing its `focusKey`.
+
+### `getCurrentFocusKey` (function) `() => string`
+Returns the currently focused component's focus key.
+
+### `navigateByDirection` (function) `(direction: string, focusDetails: FocusDetails) => void`
+Method to manually navigation to a certain direction. I.e. you can assign a mouse-wheel to navigate Up and Down.
+Also useful when you have some "Arrow-like" UI in the app that is meant to navigate in certain direction when pressed
+with the mouse or a "magic remote" on some TVs.
+
+### `pause` (function)
+Pauses all the key event handlers.
+
+### `resume` (function)
+Resumes all the key event handlers.
+
+### `updateAllLayouts` (function)
+Manually recalculate all the layouts. Rarely used.
+
 ### `useFocusable` hook
 This hook is the main link between the React component (its DOM element) and the navigation service.
 It is used to register the component in the service, get its `focusKey`, `focused` state etc.
@@ -381,9 +404,6 @@ function Button() {
 Method to set the focus on the current component. I.e. to set the focus to the Page (Container) when it is mounted, or
 the Popup component when it is displayed.
 
-##### `setFocus` (function) `(focusKey: string) => void`
-Method to manually set the focus to a component providing its `focusKey`.
-
 ##### `focused` (boolean)
 Flag that indicates that the current component is focused.
 
@@ -394,23 +414,6 @@ Only works when `trackChildren` is enabled!
 ##### `focusKey` (string)
 String that contains the focus key for the component. It is either the same as `focusKey` passed to the hook params,
 or an automatically generated one.
-
-#### `getCurrentFocusKey` (function) `() => string`
-Returns the currently focused component's focus key.
-
-##### `navigateByDirection` (function) `(direction: string, focusDetails: FocusDetails) => void`
-Method to manually navigation to a certain direction. I.e. you can assign a mouse-wheel to navigate Up and Down.
-Also useful when you have some "Arrow-like" UI in the app that is meant to navigate in certain direction when pressed
-with the mouse or a "magic remote" on some TVs.
-
-##### `pause` (function)
-Pauses all the key event handlers.
-
-##### `resume` (function)
-Resumes all the key event handlers.
-
-##### `updateAllLayouts` (function)
-Manually recalculate all the layouts. Rarely used.
 
 ### `FocusContext` (required for Focusable Containers)
 Used to provide the `focusKey` of the current Focusable Container down the Tree to the next child level. [See Example](#wrapping-leaf-components-with-a-focusable-container)
