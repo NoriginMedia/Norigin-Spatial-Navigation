@@ -12,7 +12,8 @@ import {
   SpatialNavigation,
   FocusableComponentLayout,
   FocusDetails,
-  KeyPressDetails
+  KeyPressDetails,
+  NavigationDirection
 } from './SpatialNavigation';
 import { useFocusContext } from './useFocusContext';
 
@@ -54,6 +55,7 @@ export interface UseFocusableConfig<P = object> {
   onArrowPress?: ArrowPressHandler<P>;
   onFocus?: FocusHandler<P>;
   onBlur?: BlurHandler<P>;
+  boundaryExcludedDirections?: NavigationDirection[]
   extraProps?: P;
 }
 
@@ -84,6 +86,7 @@ const useFocusableHook = <P>({
   onArrowPress = () => true,
   onFocus = noop,
   onBlur = noop,
+  boundaryExcludedDirections = [],
   extraProps
 }: UseFocusableConfig<P> = {}): UseFocusableResult => {
   const onEnterPressHandler = useCallback(
@@ -159,7 +162,8 @@ const useFocusableHook = <P>({
       trackChildren,
       isFocusBoundary,
       autoRestoreFocus,
-      focusable
+      focusable,
+      boundaryExcludedDirections
     });
 
     return () => {
@@ -181,19 +185,10 @@ const useFocusableHook = <P>({
       onEnterRelease: onEnterReleaseHandler,
       onArrowPress: onArrowPressHandler,
       onFocus: onFocusHandler,
-      onBlur: onBlurHandler
+      onBlur: onBlurHandler,
+      boundaryExcludedDirections
     });
-  }, [
-    focusKey,
-    preferredChildFocusKey,
-    focusable,
-    isFocusBoundary,
-    onEnterPressHandler,
-    onEnterReleaseHandler,
-    onArrowPressHandler,
-    onFocusHandler,
-    onBlurHandler
-  ]);
+  }, [focusKey, preferredChildFocusKey, focusable, isFocusBoundary, onEnterPressHandler, onEnterReleaseHandler, onArrowPressHandler, onFocusHandler, onBlurHandler, boundaryExcludedDirections]);
 
   return {
     ref,

@@ -25,6 +25,13 @@ const DEFAULT_KEY_MAP = {
   [KEY_ENTER]: [13]
 };
 
+export enum NavigationDirection {
+  LEFT = 'left',
+  RIGHT = 'right',
+  UP = 'up',
+  DOWN = 'down',
+}
+
 export const ROOT_FOCUS_KEY = 'SN:ROOT';
 
 const ADJACENT_SLICE_THRESHOLD = 0.2;
@@ -79,6 +86,7 @@ interface FocusableComponent {
   lastFocusedChildKey?: string;
   layout?: FocusableComponentLayout;
   layoutUpdated?: boolean;
+  boundaryExcludedDirections: NavigationDirection[]
 }
 
 interface FocusableComponentUpdatePayload {
@@ -86,6 +94,7 @@ interface FocusableComponentUpdatePayload {
   preferredChildFocusKey?: string;
   focusable: boolean;
   isFocusBoundary: boolean;
+  boundaryExcludedDirections: NavigationDirection[];
   onEnterPress: (details?: KeyPressDetails) => void;
   onEnterRelease: () => void;
   onArrowPress: (direction: string, details: KeyPressDetails) => boolean;
@@ -983,7 +992,7 @@ class SpatialNavigationService {
         this.setFocus(nextComponent.focusKey, focusDetails);
       } else {
         const parentComponent = this.focusableComponents[parentFocusKey];
-        if (!parentComponent || !parentComponent.isFocusBoundary) {
+        if (!parentComponent || !parentComponent.isFocusBoundary || (parentComponent.isFocusBoundary && parentComponent.boundaryExcludedDirections.includes(direction as NavigationDirection))) {
           this.smartNavigate(direction, parentFocusKey, focusDetails);
         }
       }
@@ -1127,7 +1136,8 @@ class SpatialNavigationService {
     preferredChildFocusKey,
     autoRestoreFocus,
     focusable,
-    isFocusBoundary
+    isFocusBoundary,
+    boundaryExcludedDirections = []
   }: FocusableComponent) {
     this.focusableComponents[focusKey] = {
       focusKey,
@@ -1145,6 +1155,7 @@ class SpatialNavigationService {
       preferredChildFocusKey,
       focusable,
       isFocusBoundary,
+      boundaryExcludedDirections,
       autoRestoreFocus,
       lastFocusedChildKey: null,
       layout: {
@@ -1488,6 +1499,7 @@ class SpatialNavigationService {
       preferredChildFocusKey,
       focusable,
       isFocusBoundary,
+      boundaryExcludedDirections,
       onEnterPress,
       onEnterRelease,
       onArrowPress,
@@ -1505,6 +1517,7 @@ class SpatialNavigationService {
       component.preferredChildFocusKey = preferredChildFocusKey;
       component.focusable = focusable;
       component.isFocusBoundary = isFocusBoundary;
+      component.boundaryExcludedDirections = boundaryExcludedDirections;
       component.onEnterPress = onEnterPress;
       component.onEnterRelease = onEnterRelease;
       component.onArrowPress = onArrowPress;
