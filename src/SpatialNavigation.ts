@@ -1190,6 +1190,7 @@ class SpatialNavigationService {
     while (currentComponent) {
       if (currentComponent.parentFocusKey === focusKey) {
         this.updateParentsHasFocusedChild(this.focusKey, {});
+        this.updateParentsLastFocusedChild(this.focusKey);
         break;
       }
       currentComponent =
