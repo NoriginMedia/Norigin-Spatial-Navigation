@@ -75,6 +75,7 @@ interface FocusableComponent {
   preferredChildFocusKey?: string;
   focusable: boolean;
   isFocusBoundary: boolean;
+  focusBoundaryDirections?: string[];
   autoRestoreFocus: boolean;
   lastFocusedChildKey?: string;
   layout?: FocusableComponentLayout;
@@ -86,6 +87,7 @@ interface FocusableComponentUpdatePayload {
   preferredChildFocusKey?: string;
   focusable: boolean;
   isFocusBoundary: boolean;
+  focusBoundaryDirections?: string[];
   onEnterPress: (details?: KeyPressDetails) => void;
   onEnterRelease: () => void;
   onArrowPress: (direction: string, details: KeyPressDetails) => boolean;
@@ -983,7 +985,12 @@ class SpatialNavigationService {
         this.setFocus(nextComponent.focusKey, focusDetails);
       } else {
         const parentComponent = this.focusableComponents[parentFocusKey];
-        if (!parentComponent || !parentComponent.isFocusBoundary) {
+
+        const focusBoundaryDirections = parentComponent?.isFocusBoundary
+          ? parentComponent.focusBoundaryDirections || [direction]
+          : [];
+
+        if (!parentComponent || !focusBoundaryDirections.includes(direction)) {
           this.smartNavigate(direction, parentFocusKey, focusDetails);
         }
       }
@@ -1127,7 +1134,8 @@ class SpatialNavigationService {
     preferredChildFocusKey,
     autoRestoreFocus,
     focusable,
-    isFocusBoundary
+    isFocusBoundary,
+    focusBoundaryDirections
   }: FocusableComponent) {
     this.focusableComponents[focusKey] = {
       focusKey,
@@ -1145,6 +1153,7 @@ class SpatialNavigationService {
       preferredChildFocusKey,
       focusable,
       isFocusBoundary,
+      focusBoundaryDirections,
       autoRestoreFocus,
       lastFocusedChildKey: null,
       layout: {
@@ -1489,6 +1498,7 @@ class SpatialNavigationService {
       preferredChildFocusKey,
       focusable,
       isFocusBoundary,
+      focusBoundaryDirections,
       onEnterPress,
       onEnterRelease,
       onArrowPress,
@@ -1506,6 +1516,7 @@ class SpatialNavigationService {
       component.preferredChildFocusKey = preferredChildFocusKey;
       component.focusable = focusable;
       component.isFocusBoundary = isFocusBoundary;
+      component.focusBoundaryDirections = focusBoundaryDirections;
       component.onEnterPress = onEnterPress;
       component.onEnterRelease = onEnterRelease;
       component.onArrowPress = onArrowPress;

@@ -162,12 +162,16 @@ function Menu() {
 Sometimes you don't want the focus to leave your component, for example when displaying a Popup, you don't want the focus to go to
 a component underneath the Popup. This can be enabled with `isFocusBoundary` flag passed to the `useFocusable` hook.
 
+Additionally `focusBoundaryDirections` array can be provided to restrict focus movement only in specific directions.
+That might be useful when defining focus container for menu bar. Please note, that `focusBoundaryDirections` requires
+`isFocusBoundary` to be set to `true`.
+
 ```jsx
 import React, { useEffect } from 'react';
 import { useFocusable, FocusContext } from '@noriginmedia/norigin-spatial-navigation';
 
 function Popup() {
-  const { ref, focusKey, focusSelf } = useFocusable({isFocusBoundary: true});
+  const { ref, focusKey, focusSelf } = useFocusable({isFocusBoundary: true, focusBoundaryDirections: ['up', 'down']});
 
   useEffect(() => {
     focusSelf();
@@ -326,6 +330,11 @@ flag to `false`.
 This flag makes the Focusable Container keep the focus inside its boundaries. It will only block the focus from leaving
 the Container via directional navigation. You can still set the focus manually anywhere via `setFocus`.
 Useful when i.e. you have a modal Popup and you don't want the focus to leave it.
+
+##### `focusBoundaryDirections` (optional)
+This flag sets in which directions focus is blocked from leaving Focusable Container via directional navigation.
+It accepts an array containing `left`, `right`, `up` and/or `down` values. If not specified, all directions are blocked.
+It requires `isFocusBoundary` to be enabled to take effect.
 
 ##### `focusKey` (optional)
 If you want your component to have a persistent focus key, it can be set via this property. Otherwise, it will be auto generated.
