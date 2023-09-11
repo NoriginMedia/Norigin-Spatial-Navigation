@@ -12,7 +12,8 @@ import {
   SpatialNavigation,
   FocusableComponentLayout,
   FocusDetails,
-  KeyPressDetails
+  KeyPressDetails,
+  Direction
 } from './SpatialNavigation';
 import { useFocusContext } from './useFocusContext';
 
@@ -48,7 +49,7 @@ export interface UseFocusableConfig<P = object> {
   autoRestoreFocus?: boolean;
   forceFocus?: boolean;
   isFocusBoundary?: boolean;
-  focusBoundaryDirections?: string[];
+  focusBoundaryDirections?: Direction[];
   focusKey?: string;
   preferredChildFocusKey?: string;
   onEnterPress?: EnterPressHandler<P>;

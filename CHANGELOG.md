@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# [2.0.0]
+## Added
+- New property for `useFocusable` - `focusBoundaryDirections`, array of directions to block when `isFocusBoundary` is enabled
+- New property `useFocusable` - `forceFocus` to mark the component to be the target for auto-restore focus logic when focus is lost
+- New global method `doesFocusableExist` to check if the focusable component exists before setting focus on it. Safety feature
+
+## Changed
+- [BREAKING] Top level exports `setFocus, getCurrentFocusKey, navigateByDirection, pause, resume, updateAllLayouts` are now exported from `SpatialNavigation` instead of `useFocusable` hook.
+
+## Fixed
+- Context display name is now called `FocusContext` in React Devtools
+- Updating `lastFocusedChildKey` for newly added parent components
+
 # [1.3.3]
 ## Fixed
 - Fixed the issue where component would have kept itself in the array of `parentsHavingFocusedChild` array after removal

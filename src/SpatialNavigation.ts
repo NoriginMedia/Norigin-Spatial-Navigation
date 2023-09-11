@@ -17,6 +17,8 @@ const DIRECTION_UP = 'up';
 const DIRECTION_DOWN = 'down';
 const KEY_ENTER = 'enter';
 
+export type Direction = 'up' | 'down' | 'left' | 'right';
+
 const DEFAULT_KEY_MAP = {
   [DIRECTION_LEFT]: [37],
   [DIRECTION_UP]: [38],
@@ -75,7 +77,7 @@ interface FocusableComponent {
   preferredChildFocusKey?: string;
   focusable: boolean;
   isFocusBoundary: boolean;
-  focusBoundaryDirections?: string[];
+  focusBoundaryDirections?: Direction[];
   autoRestoreFocus: boolean;
   forceFocus: boolean;
   lastFocusedChildKey?: string;
@@ -88,7 +90,7 @@ interface FocusableComponentUpdatePayload {
   preferredChildFocusKey?: string;
   focusable: boolean;
   isFocusBoundary: boolean;
-  focusBoundaryDirections?: string[];
+  focusBoundaryDirections?: Direction[];
   onEnterPress: (details?: KeyPressDetails) => void;
   onEnterRelease: () => void;
   onArrowPress: (direction: string, details: KeyPressDetails) => boolean;
