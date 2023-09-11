@@ -46,6 +46,7 @@ export interface UseFocusableConfig<P = object> {
   saveLastFocusedChild?: boolean;
   trackChildren?: boolean;
   autoRestoreFocus?: boolean;
+  forceFocus?: boolean;
   isFocusBoundary?: boolean;
   focusBoundaryDirections?: string[];
   focusKey?: string;
@@ -77,6 +78,7 @@ const useFocusableHook = <P>({
   saveLastFocusedChild = true,
   trackChildren = false,
   autoRestoreFocus = true,
+  forceFocus = false,
   isFocusBoundary = false,
   focusBoundaryDirections,
   focusKey: propFocusKey,
@@ -162,6 +164,7 @@ const useFocusableHook = <P>({
       isFocusBoundary,
       focusBoundaryDirections,
       autoRestoreFocus,
+      forceFocus,
       focusable
     });
 
