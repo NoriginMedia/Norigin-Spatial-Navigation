@@ -899,8 +899,8 @@ class SpatialNavigationService {
      * the Focusable Containers, that have "forceFocus" flag enabled.
      */
     if (!fromParentFocusKey && !currentComponent) {
-        this.setFocus(this.getForcedFocusKey());
-        return;
+      this.setFocus(this.getForcedFocusKey());
+      return;
     }
 
     this.log(
@@ -1058,7 +1058,7 @@ class SpatialNavigationService {
      */
     const sortedForceFocusableComponents = this.sortSiblingsByPriority(
       forceFocusableComponents,
-      { x:0, y:0, width:0, height: 0, left: 0, top:0, node: null },
+      { x: 0, y: 0, width: 0, height: 0, left: 0, top: 0, node: null },
       'down',
       ROOT_FOCUS_KEY
     );
