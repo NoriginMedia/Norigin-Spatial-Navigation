@@ -46,7 +46,9 @@ export interface UseFocusableConfig<P = object> {
   saveLastFocusedChild?: boolean;
   trackChildren?: boolean;
   autoRestoreFocus?: boolean;
+  forceFocus?: boolean;
   isFocusBoundary?: boolean;
+  focusBoundaryDirections?: string[];
   focusKey?: string;
   preferredChildFocusKey?: string;
   onEnterPress?: EnterPressHandler<P>;
@@ -70,7 +72,9 @@ const useFocusableHook = <P>({
   saveLastFocusedChild = true,
   trackChildren = false,
   autoRestoreFocus = true,
+  forceFocus = false,
   isFocusBoundary = false,
+  focusBoundaryDirections,
   focusKey: propFocusKey,
   preferredChildFocusKey,
   onEnterPress = noop,
@@ -152,7 +156,9 @@ const useFocusableHook = <P>({
       saveLastFocusedChild,
       trackChildren,
       isFocusBoundary,
+      focusBoundaryDirections,
       autoRestoreFocus,
+      forceFocus,
       focusable
     });
 
@@ -171,6 +177,7 @@ const useFocusableHook = <P>({
       preferredChildFocusKey,
       focusable,
       isFocusBoundary,
+      focusBoundaryDirections,
       onEnterPress: onEnterPressHandler,
       onEnterRelease: onEnterReleaseHandler,
       onArrowPress: onArrowPressHandler,
@@ -182,6 +189,7 @@ const useFocusableHook = <P>({
     preferredChildFocusKey,
     focusable,
     isFocusBoundary,
+    focusBoundaryDirections,
     onEnterPressHandler,
     onEnterReleaseHandler,
     onArrowPressHandler,

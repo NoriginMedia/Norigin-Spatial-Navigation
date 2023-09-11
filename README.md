@@ -162,12 +162,16 @@ function Menu() {
 Sometimes you don't want the focus to leave your component, for example when displaying a Popup, you don't want the focus to go to
 a component underneath the Popup. This can be enabled with `isFocusBoundary` flag passed to the `useFocusable` hook.
 
+Additionally `focusBoundaryDirections` array can be provided to restrict focus movement only in specific directions.
+That might be useful when defining focus container for menu bar. Please note, that `focusBoundaryDirections` requires
+`isFocusBoundary` to be set to `true`.
+
 ```jsx
 import React, { useEffect } from 'react';
 import { useFocusable, FocusContext } from '@noriginmedia/norigin-spatial-navigation';
 
 function Popup() {
-  const { ref, focusKey, focusSelf } = useFocusable({isFocusBoundary: true});
+  const { ref, focusKey, focusSelf } = useFocusable({isFocusBoundary: true, focusBoundaryDirections: ['up', 'down']});
 
   useEffect(() => {
     focusSelf();
@@ -297,7 +301,9 @@ Resets all the settings and the storage of focusable components. Disables the na
 Returns `true` if Focusable Container with given `focusKey` is created, `false` otherwise.
 
 ### `setFocus` (function) `(focusKey: string) => void`
-Method to manually set the focus to a component providing its `focusKey`.
+Method to manually set the focus to a component providing its `focusKey`. If `focusKey` is not provided or
+is equal to `ROOT_FOCUS_KEY`, an attempt of focusing one of the force-focusable components is made.
+See `useFocusable` hook  [`forceFocus`](#forcefocus-default-false) parameter for more details.
 
 ### `getCurrentFocusKey` (function) `() => string`
 Returns the currently focused component's focus key.
@@ -345,10 +351,23 @@ By default, when the currently focused component is unmounted (deleted), navigat
 on the nearest available sibling of that component. If this behavior is undesirable, you can disable it by setting this
 flag to `false`.
 
+##### `forceFocus` (default: false)
+This flag makes the Focusable Container force-focusable. When there's more than one force-focusable component,
+the closest to the top left viewport corner (0,0) is force-focused. Such containers can be force-focused when there's
+no currently focused component (or `focusKey` points to not existing component) when navigating with arrows.
+Also, when `focusKey` provided to `setFocus` is not defined or equal to `ROOT_FOCUS_KEY`.
+In other words, if focus is lost, it can be restored to one of force-focusable components by navigating with arrows
+or by focusing `ROOT_FOCUS_KEY`.
+
 ##### `isFocusBoundary` (default: false)
 This flag makes the Focusable Container keep the focus inside its boundaries. It will only block the focus from leaving
 the Container via directional navigation. You can still set the focus manually anywhere via `setFocus`.
 Useful when i.e. you have a modal Popup and you don't want the focus to leave it.
+
+##### `focusBoundaryDirections` (optional)
+This flag sets in which directions focus is blocked from leaving Focusable Container via directional navigation.
+It accepts an array containing `left`, `right`, `up` and/or `down` values. If not specified, all directions are blocked.
+It requires `isFocusBoundary` to be enabled to take effect.
 
 ##### `focusKey` (optional)
 If you want your component to have a persistent focus key, it can be set via this property. Otherwise, it will be auto generated.
