@@ -65,12 +65,6 @@ export interface UseFocusableResult {
   focused: boolean;
   hasFocusedChild: boolean;
   focusKey: string;
-  setFocus: (focusKey: string, focusDetails?: FocusDetails) => void;
-  navigateByDirection: (direction: string, focusDetails: FocusDetails) => void;
-  pause: () => void;
-  resume: () => void;
-  updateAllLayouts: () => void;
-  getCurrentFocusKey: () => string;
 }
 
 const useFocusableHook = <P>({
@@ -208,15 +202,7 @@ const useFocusableHook = <P>({
     focusSelf,
     focused,
     hasFocusedChild,
-    focusKey, // returns either the same focusKey as passed in, or generated one
-    setFocus: SpatialNavigation.isNativeMode()
-      ? noop
-      : SpatialNavigation.setFocus,
-    navigateByDirection: SpatialNavigation.navigateByDirection,
-    pause: SpatialNavigation.pause,
-    resume: SpatialNavigation.resume,
-    updateAllLayouts: SpatialNavigation.updateAllLayouts,
-    getCurrentFocusKey: SpatialNavigation.getCurrentFocusKey
+    focusKey // returns either the same focusKey as passed in, or generated one
   };
 };
 
