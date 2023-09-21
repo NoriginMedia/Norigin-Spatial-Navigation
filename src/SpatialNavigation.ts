@@ -132,7 +132,7 @@ export interface FocusDetails {
 
 export type BackwardsCompatibleKeyMap = { [index: string]: number | number[] };
 
-export type KeyMap = { [index: string]: number[] };
+export type KeyMap = { [index: string]: (string | number)[] };
 
 const getChildClosestToOrigin = (children: FocusableComponent[]) => {
   const childrenClosestToOrigin = sortBy(
@@ -652,7 +652,7 @@ class SpatialNavigationService {
     }
   }
 
-  getEventType(keyCode: number) {
+  getEventType(keyCode: number | string) {
     return findKey(this.getKeyMap(), (codeList) => codeList.includes(keyCode));
   }
 
