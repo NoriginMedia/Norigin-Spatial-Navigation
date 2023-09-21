@@ -20,11 +20,11 @@ const KEY_ENTER = 'enter';
 export type Direction = 'up' | 'down' | 'left' | 'right';
 
 const DEFAULT_KEY_MAP = {
-  [DIRECTION_LEFT]: [37],
-  [DIRECTION_UP]: [38],
-  [DIRECTION_RIGHT]: [39],
-  [DIRECTION_DOWN]: [40],
-  [KEY_ENTER]: [13]
+  [DIRECTION_LEFT]: [37, 'ArrowLeft'],
+  [DIRECTION_UP]: [38, 'ArrowUp'],
+  [DIRECTION_RIGHT]: [39, 'ArrowRight'],
+  [DIRECTION_DOWN]: [40, 'ArrowDown'],
+  [KEY_ENTER]: [13, 'Enter']
 };
 
 export const ROOT_FOCUS_KEY = 'SN:ROOT';
@@ -151,11 +151,7 @@ const normalizeKeyMap = (keyMap: BackwardsCompatibleKeyMap) => {
   const newKeyMap: KeyMap = {};
 
   Object.entries(keyMap).forEach(([key, value]) => {
-    if (typeof value === 'number') {
-      newKeyMap[key] = [value];
-    } else if (Array.isArray(value)) {
-      newKeyMap[key] = value;
-    }
+    newKeyMap[key] = Array.isArray(value) ? value : [value];
   });
 
   return newKeyMap;
@@ -660,6 +656,10 @@ class SpatialNavigationService {
     return findKey(this.getKeyMap(), (codeList) => codeList.includes(keyCode));
   }
 
+  static getKeyCode(event: KeyboardEvent) {
+    return event.keyCode || event.code;
+  }
+
   bindEventHandlers() {
     // We check both because the React Native remote debugger implements window, but not window.addEventListener.
     if (typeof window !== 'undefined' && window.addEventListener) {
@@ -672,7 +672,8 @@ class SpatialNavigationService {
           this.logIndex += 1;
         }
 
-        const eventType = this.getEventType(event.keyCode);
+        const keyCode = SpatialNavigationService.getKeyCode(event)
+        const eventType = this.getEventType(keyCode);
 
         if (!eventType) {
           return;
@@ -720,7 +721,8 @@ class SpatialNavigationService {
 
       // When throttling then make sure to only throttle key down and cancel any queued functions in case of key up
       this.keyUpEventListener = (event: KeyboardEvent) => {
-        const eventType = this.getEventType(event.keyCode);
+        const keyCode = SpatialNavigationService.getKeyCode(event)
+        const eventType = this.getEventType(keyCode);
 
         delete this.pressedKeys[eventType];
 
@@ -857,8 +859,9 @@ class SpatialNavigationService {
       this.visualDebugger.clear();
     }
 
+    const keyCode = SpatialNavigationService.getKeyCode(event)
     const direction = findKey(this.getKeyMap(), (codeList) =>
-      codeList.includes(event.keyCode)
+      codeList.includes(keyCode)
     );
 
     this.smartNavigate(direction, null, { event });
