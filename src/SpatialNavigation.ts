@@ -1,15 +1,15 @@
 import { DebouncedFunc } from 'lodash';
-import filter from 'lodash/filter';
-import first from 'lodash/first';
-import sortBy from 'lodash/sortBy';
-import findKey from 'lodash/findKey';
-import forEach from 'lodash/forEach';
-import forOwn from 'lodash/forOwn';
-import throttle from 'lodash/throttle';
 import debounce from 'lodash/debounce';
 import difference from 'lodash/difference';
-import measureLayout, { getBoundingClientRect } from './measureLayout';
+import filter from 'lodash/filter';
+import findKey from 'lodash/findKey';
+import first from 'lodash/first';
+import forEach from 'lodash/forEach';
+import forOwn from 'lodash/forOwn';
+import sortBy from 'lodash/sortBy';
+import throttle from 'lodash/throttle';
 import VisualDebugger from './VisualDebugger';
+import measureLayout, { getBoundingClientRect } from './measureLayout';
 
 const DIRECTION_LEFT = 'left';
 const DIRECTION_RIGHT = 'right';
@@ -130,7 +130,9 @@ export interface FocusDetails {
   [key: string]: any;
 }
 
-export type BackwardsCompatibleKeyMap = { [index: string]: number | number[] };
+export type BackwardsCompatibleKeyMap = {
+  [index: string]: string | number | (number | string)[];
+};
 
 export type KeyMap = { [index: string]: (string | number)[] };
 
@@ -672,7 +674,7 @@ class SpatialNavigationService {
           this.logIndex += 1;
         }
 
-        const keyCode = SpatialNavigationService.getKeyCode(event)
+        const keyCode = SpatialNavigationService.getKeyCode(event);
         const eventType = this.getEventType(keyCode);
 
         if (!eventType) {
@@ -721,7 +723,7 @@ class SpatialNavigationService {
 
       // When throttling then make sure to only throttle key down and cancel any queued functions in case of key up
       this.keyUpEventListener = (event: KeyboardEvent) => {
-        const keyCode = SpatialNavigationService.getKeyCode(event)
+        const keyCode = SpatialNavigationService.getKeyCode(event);
         const eventType = this.getEventType(keyCode);
 
         delete this.pressedKeys[eventType];
@@ -859,7 +861,7 @@ class SpatialNavigationService {
       this.visualDebugger.clear();
     }
 
-    const keyCode = SpatialNavigationService.getKeyCode(event)
+    const keyCode = SpatialNavigationService.getKeyCode(event);
     const direction = findKey(this.getKeyMap(), (codeList) =>
       codeList.includes(keyCode)
     );
