@@ -1227,7 +1227,7 @@ class SpatialNavigationService {
      * If for some reason this component was already focused before it was added, call the update
      */
     if (focusKey === this.focusKey) {
-      this.setFocus(focusKey);
+      this.setFocus(preferredChildFocusKey || focusKey);
     }
 
     /**
