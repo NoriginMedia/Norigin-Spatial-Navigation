@@ -1,15 +1,15 @@
 import { DebouncedFunc } from 'lodash';
-import filter from 'lodash/filter';
-import first from 'lodash/first';
-import sortBy from 'lodash/sortBy';
-import findKey from 'lodash/findKey';
-import forEach from 'lodash/forEach';
-import forOwn from 'lodash/forOwn';
-import throttle from 'lodash/throttle';
 import debounce from 'lodash/debounce';
 import difference from 'lodash/difference';
-import measureLayout, { getBoundingClientRect } from './measureLayout';
+import filter from 'lodash/filter';
+import findKey from 'lodash/findKey';
+import first from 'lodash/first';
+import forEach from 'lodash/forEach';
+import forOwn from 'lodash/forOwn';
+import sortBy from 'lodash/sortBy';
+import throttle from 'lodash/throttle';
 import VisualDebugger from './VisualDebugger';
+import measureLayout, { getBoundingClientRect } from './measureLayout';
 
 const DIRECTION_LEFT = 'left';
 const DIRECTION_RIGHT = 'right';
@@ -20,11 +20,11 @@ const KEY_ENTER = 'enter';
 export type Direction = 'up' | 'down' | 'left' | 'right';
 
 const DEFAULT_KEY_MAP = {
-  [DIRECTION_LEFT]: [37],
-  [DIRECTION_UP]: [38],
-  [DIRECTION_RIGHT]: [39],
-  [DIRECTION_DOWN]: [40],
-  [KEY_ENTER]: [13]
+  [DIRECTION_LEFT]: [37, 'ArrowLeft'],
+  [DIRECTION_UP]: [38, 'ArrowUp'],
+  [DIRECTION_RIGHT]: [39, 'ArrowRight'],
+  [DIRECTION_DOWN]: [40, 'ArrowDown'],
+  [KEY_ENTER]: [13, 'Enter']
 };
 
 export const ROOT_FOCUS_KEY = 'SN:ROOT';
@@ -130,9 +130,11 @@ export interface FocusDetails {
   [key: string]: any;
 }
 
-export type BackwardsCompatibleKeyMap = { [index: string]: number | number[] };
+export type BackwardsCompatibleKeyMap = {
+  [index: string]: string | number | (number | string)[];
+};
 
-export type KeyMap = { [index: string]: number[] };
+export type KeyMap = { [index: string]: (string | number)[] };
 
 const getChildClosestToOrigin = (children: FocusableComponent[]) => {
   const childrenClosestToOrigin = sortBy(
@@ -151,11 +153,7 @@ const normalizeKeyMap = (keyMap: BackwardsCompatibleKeyMap) => {
   const newKeyMap: KeyMap = {};
 
   Object.entries(keyMap).forEach(([key, value]) => {
-    if (typeof value === 'number') {
-      newKeyMap[key] = [value];
-    } else if (Array.isArray(value)) {
-      newKeyMap[key] = value;
-    }
+    newKeyMap[key] = Array.isArray(value) ? value : [value];
   });
 
   return newKeyMap;
@@ -656,8 +654,12 @@ class SpatialNavigationService {
     }
   }
 
-  getEventType(keyCode: number) {
+  getEventType(keyCode: number | string) {
     return findKey(this.getKeyMap(), (codeList) => codeList.includes(keyCode));
+  }
+
+  static getKeyCode(event: KeyboardEvent) {
+    return event.keyCode || event.code;
   }
 
   bindEventHandlers() {
@@ -672,7 +674,8 @@ class SpatialNavigationService {
           this.logIndex += 1;
         }
 
-        const eventType = this.getEventType(event.keyCode);
+        const keyCode = SpatialNavigationService.getKeyCode(event);
+        const eventType = this.getEventType(keyCode);
 
         if (!eventType) {
           return;
@@ -720,7 +723,8 @@ class SpatialNavigationService {
 
       // When throttling then make sure to only throttle key down and cancel any queued functions in case of key up
       this.keyUpEventListener = (event: KeyboardEvent) => {
-        const eventType = this.getEventType(event.keyCode);
+        const keyCode = SpatialNavigationService.getKeyCode(event);
+        const eventType = this.getEventType(keyCode);
 
         delete this.pressedKeys[eventType];
 
@@ -857,8 +861,9 @@ class SpatialNavigationService {
       this.visualDebugger.clear();
     }
 
+    const keyCode = SpatialNavigationService.getKeyCode(event);
     const direction = findKey(this.getKeyMap(), (codeList) =>
-      codeList.includes(event.keyCode)
+      codeList.includes(keyCode)
     );
 
     this.smartNavigate(direction, null, { event });
