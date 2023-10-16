@@ -261,14 +261,14 @@ Also consider `role` and `aria-label` attributes. But that depends on the applic
 The flag is ignored if `nativeMode` is set.
 
 ### `setKeyMap`
-Method to set custom key codes. I.e. when the device key codes differ from a standard browser arrow key codes.
+Method to set custom key codes (numbers) or key event names (strings) [MDN Docs](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode#non-printable_keys_function_keys). I.e. when the device key codes differ from a standard browser arrow key codes.
 ```jsx
 setKeyMap({
-  left: 9001,
-  up: 9002,
-  right: 9003,
-  down: 9004,
-  enter: 9005
+  left: 9001, // or 'ArrowLeft'
+  up: 9002, // or 'ArrowUp'
+  right: 9003, // or 'ArrowRight'
+  down: 9004, // or 'ArrowDown'
+  enter: 9005 // or 'Enter'
 });
 ```
 

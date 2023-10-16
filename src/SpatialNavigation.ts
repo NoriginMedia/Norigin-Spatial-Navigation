@@ -1216,6 +1216,14 @@ class SpatialNavigationService {
       layoutUpdated: false
     };
 
+    if (!node) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        'Component added without a node reference. This will result in its coordinates being empty and may cause lost focus. Check the "ref" passed to "useFocusable": ',
+        this.focusableComponents[focusKey]
+      );
+    }
+
     if (this.nativeMode) {
       return;
     }
