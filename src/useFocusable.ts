@@ -12,7 +12,8 @@ import {
   SpatialNavigation,
   FocusableComponentLayout,
   FocusDetails,
-  KeyPressDetails
+  KeyPressDetails,
+  Direction
 } from './SpatialNavigation';
 import { useFocusContext } from './useFocusContext';
 
@@ -46,7 +47,9 @@ export interface UseFocusableConfig<P = object> {
   saveLastFocusedChild?: boolean;
   trackChildren?: boolean;
   autoRestoreFocus?: boolean;
+  forceFocus?: boolean;
   isFocusBoundary?: boolean;
+  focusBoundaryDirections?: Direction[];
   focusKey?: string;
   preferredChildFocusKey?: string;
   onEnterPress?: EnterPressHandler<P>;
@@ -63,12 +66,6 @@ export interface UseFocusableResult {
   focused: boolean;
   hasFocusedChild: boolean;
   focusKey: string;
-  setFocus: (focusKey: string, focusDetails?: FocusDetails) => void;
-  navigateByDirection: (direction: string, focusDetails: FocusDetails) => void;
-  pause: () => void;
-  resume: () => void;
-  updateAllLayouts: () => void;
-  getCurrentFocusKey: () => string;
 }
 
 const useFocusableHook = <P>({
@@ -76,7 +73,9 @@ const useFocusableHook = <P>({
   saveLastFocusedChild = true,
   trackChildren = false,
   autoRestoreFocus = true,
+  forceFocus = false,
   isFocusBoundary = false,
+  focusBoundaryDirections,
   focusKey: propFocusKey,
   preferredChildFocusKey,
   onEnterPress = noop,
@@ -158,7 +157,9 @@ const useFocusableHook = <P>({
       saveLastFocusedChild,
       trackChildren,
       isFocusBoundary,
+      focusBoundaryDirections,
       autoRestoreFocus,
+      forceFocus,
       focusable
     });
 
@@ -177,6 +178,7 @@ const useFocusableHook = <P>({
       preferredChildFocusKey,
       focusable,
       isFocusBoundary,
+      focusBoundaryDirections,
       onEnterPress: onEnterPressHandler,
       onEnterRelease: onEnterReleaseHandler,
       onArrowPress: onArrowPressHandler,
@@ -188,6 +190,7 @@ const useFocusableHook = <P>({
     preferredChildFocusKey,
     focusable,
     isFocusBoundary,
+    focusBoundaryDirections,
     onEnterPressHandler,
     onEnterReleaseHandler,
     onArrowPressHandler,
@@ -200,15 +203,7 @@ const useFocusableHook = <P>({
     focusSelf,
     focused,
     hasFocusedChild,
-    focusKey, // returns either the same focusKey as passed in, or generated one
-    setFocus: SpatialNavigation.isNativeMode()
-      ? noop
-      : SpatialNavigation.setFocus,
-    navigateByDirection: SpatialNavigation.navigateByDirection,
-    pause: SpatialNavigation.pause,
-    resume: SpatialNavigation.resume,
-    updateAllLayouts: SpatialNavigation.updateAllLayouts,
-    getCurrentFocusKey: SpatialNavigation.getCurrentFocusKey
+    focusKey // returns either the same focusKey as passed in, or generated one
   };
 };
 
