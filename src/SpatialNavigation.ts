@@ -171,6 +171,8 @@ class SpatialNavigationService {
 
   private shouldFocusDOMNode: boolean;
 
+  private shouldUseNativeEvents: boolean;
+
   /**
    * This collection contains focus keys of the elements that are having a child focused
    * Might be handy for styling of certain parent components if their child is focused.
@@ -537,6 +539,7 @@ class SpatialNavigationService {
     this.throttleKeypresses = false;
     this.useGetBoundingClientRect = false;
     this.shouldFocusDOMNode = false;
+    this.shouldUseNativeEvents = false;
 
     this.pressedKeys = {};
 
@@ -581,7 +584,8 @@ class SpatialNavigationService {
     throttle: throttleParam = 0,
     throttleKeypresses = false,
     useGetBoundingClientRect = false,
-    shouldFocusDOMNode = false
+    shouldFocusDOMNode = false,
+    shouldUseNativeEvents = false
   } = {}) {
     if (!this.enabled) {
       this.enabled = true;
@@ -589,6 +593,7 @@ class SpatialNavigationService {
       this.throttleKeypresses = throttleKeypresses;
       this.useGetBoundingClientRect = useGetBoundingClientRect;
       this.shouldFocusDOMNode = shouldFocusDOMNode && !nativeMode;
+      this.shouldUseNativeEvents = shouldUseNativeEvents;
 
       this.debug = debug;
 
@@ -685,12 +690,26 @@ class SpatialNavigationService {
           ? this.pressedKeys[eventType] + 1
           : 1;
 
-        event.preventDefault();
-        event.stopPropagation();
+        if (!this.shouldUseNativeEvents) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
 
         const keysDetails = {
           pressedKeys: this.pressedKeys
         };
+
+        // Handle Link component
+        if (
+          event.target instanceof HTMLAnchorElement &&
+          event.target.getAttribute('href')
+        ) {
+          if (eventType === KEY_ENTER) {
+            // Optionally, you can use the Link component's native click method
+            event.target.click();
+            return;
+          }
+        }
 
         if (eventType === KEY_ENTER && this.focusKey) {
           this.onEnterPress(keysDetails);
