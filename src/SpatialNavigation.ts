@@ -699,18 +699,6 @@ class SpatialNavigationService {
           pressedKeys: this.pressedKeys
         };
 
-        // Handle Link component
-        if (
-          event.target instanceof HTMLAnchorElement &&
-          event.target.getAttribute('href')
-        ) {
-          if (eventType === KEY_ENTER) {
-            // Optionally, you can use the Link component's native click method
-            event.target.click();
-            return;
-          }
-        }
-
         if (eventType === KEY_ENTER && this.focusKey) {
           this.onEnterPress(keysDetails);
 
