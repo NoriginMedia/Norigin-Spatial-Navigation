@@ -260,6 +260,9 @@ Also consider `role` and `aria-label` attributes. But that depends on the applic
 
 The flag is ignored if `nativeMode` is set.
 
+### `shouldUseNativeEvents`: boolean (default: false)
+This flag, when set to true, enables the use of native events for triggering actions, such as clicks or key presses. For instance, the onClick method will be triggered while pressing the enterKey, as well as cliicking the element itself. It is particularly beneficial for enhancing the accessibility of web applications. When shouldUseNativeEvents is active, the underlying accessible DOM node becomes the focus of the event.
+
 ### `setKeyMap`
 Method to set custom key codes (numbers) or key event names (strings) [MDN Docs](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode#non-printable_keys_function_keys). I.e. when the device key codes differ from a standard browser arrow key codes.
 ```jsx
