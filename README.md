@@ -263,6 +263,9 @@ The flag is ignored if `nativeMode` is set.
 ### `shouldUseNativeEvents`: boolean (default: false)
 This flag, when set to true, enables the use of native events for triggering actions, such as clicks or key presses. For instance, the onClick method will be triggered while pressing the enterKey, as well as cliicking the element itself. It is particularly beneficial for enhancing the accessibility of web applications. When shouldUseNativeEvents is active, the underlying accessible DOM node becomes the focus of the event.
 
+##### `rtl`: boolean (default: false)
+This flag changes focus behavior for layouts in right-to-left (RTL) languages such as Arabic and Hebrew.
+
 ### `setKeyMap`
 Method to set custom key codes (numbers) or key event names (strings) [MDN Docs](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode#non-printable_keys_function_keys). I.e. when the device key codes differ from a standard browser arrow key codes.
 ```jsx
@@ -446,6 +449,8 @@ Used to provide the `focusKey` of the current Focusable Container down the Tree 
 interface FocusableComponentLayout {
   left: number; // absolute coordinate on the screen
   top: number; // absolute coordinate on the screen
+  readonly right: number; // absolute coordinate on the screen
+  readonly bottom: number; // absolute coordinate on the screen
   width: number;
   height: number;
   x: number; // relative to the parent DOM element
