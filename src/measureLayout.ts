@@ -36,11 +36,26 @@ const measureLayout = (node: HTMLElement) => {
       width,
       height,
       left,
-      top
+      top,
+      get right() {
+        return this.left + this.width;
+      },
+      get bottom() {
+        return this.top + this.height;
+      }
     };
   }
 
-  return { x: 0, y: 0, width: 0, height: 0, left: 0, top: 0 };
+  return { 
+    x: 0, 
+    y: 0, 
+    width: 0, 
+    height: 0, 
+    left: 0, 
+    top: 0, 
+    right: 0,
+    bottom: 0,
+  };
 };
 
 export default measureLayout;
@@ -55,9 +70,24 @@ export const getBoundingClientRect = (node: HTMLElement) => {
       width: rect.width,
       height: rect.height,
       left: rect.left,
-      top: rect.top
+      top: rect.top,
+      get right() {
+        return this.left + this.width;
+      },
+      get bottom() {
+        return this.top + this.height;
+      }
     };
   }
 
-  return { x: 0, y: 0, width: 0, height: 0, left: 0, top: 0 };
+  return { 
+    x: 0,
+    y: 0, 
+    width: 0,
+    height: 0, 
+    left: 0, 
+    top: 0,
+    right: 0,
+    bottom: 0,
+  };
 };
