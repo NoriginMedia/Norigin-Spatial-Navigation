@@ -139,15 +139,18 @@ export type BackwardsCompatibleKeyMap = {
 
 export type KeyMap = { [index: string]: (string | number)[] };
 
-const getChildClosestToOrigin = (children: FocusableComponent[], writingDirection: WritingDirection) => {
-  const comparator = writingDirection === WritingDirection.LTR
-    ? (({ layout }: FocusableComponent) => Math.abs(layout.left) + Math.abs(layout.top))
-    : (({ layout }: FocusableComponent) => Math.abs(window.innerWidth - layout.right) + Math.abs(layout.top));
+const getChildClosestToOrigin = (
+  children: FocusableComponent[],
+  writingDirection: WritingDirection
+) => {
+  const comparator =
+    writingDirection === WritingDirection.LTR
+      ? ({ layout }: FocusableComponent) =>
+          Math.abs(layout.left) + Math.abs(layout.top)
+      : ({ layout }: FocusableComponent) =>
+          Math.abs(window.innerWidth - layout.right) + Math.abs(layout.top);
 
-  const childrenClosestToOrigin = sortBy(
-    children,
-    comparator,
-  );
+  const childrenClosestToOrigin = sortBy(children, comparator);
 
   return first(childrenClosestToOrigin);
 };
@@ -246,27 +249,27 @@ class SpatialNavigationService {
     isIncremental: boolean,
     isSibling: boolean,
     layout: FocusableComponentLayout,
-    writingDirection: WritingDirection,
+    writingDirection: WritingDirection
   ) {
     const itemStart = isVertical
       ? layout.top
       : writingDirection === WritingDirection.LTR
-        ? layout.left
-        : layout.right;
+      ? layout.left
+      : layout.right;
 
     const itemEnd = isVertical
       ? layout.bottom
       : writingDirection === WritingDirection.LTR
-        ? layout.right
-        : layout.left;
+      ? layout.right
+      : layout.left;
 
     return isIncremental
       ? isSibling
         ? itemStart
         : itemEnd
       : isSibling
-        ? itemEnd
-        : itemStart;
+      ? itemEnd
+      : itemStart;
   }
 
   /**
@@ -594,7 +597,7 @@ class SpatialNavigationService {
     throttleKeypresses = false,
     useGetBoundingClientRect = false,
     shouldFocusDOMNode = false,
-    shouldUseNativeEvents = false
+    shouldUseNativeEvents = false,
     rtl = false
   } = {}) {
     if (!this.enabled) {
@@ -605,7 +608,6 @@ class SpatialNavigationService {
       this.shouldFocusDOMNode = shouldFocusDOMNode && !nativeMode;
       this.shouldUseNativeEvents = shouldUseNativeEvents;
       this.writingDirection = rtl ? WritingDirection.RTL : WritingDirection.LTR;
-
 
       this.debug = debug;
 
@@ -904,7 +906,10 @@ class SpatialNavigationService {
     const isVerticalDirection =
       direction === DIRECTION_DOWN || direction === DIRECTION_UP;
     const isIncrementalDirection =
-      direction === DIRECTION_DOWN || (this.writingDirection === WritingDirection.LTR ? direction === DIRECTION_RIGHT : direction === DIRECTION_LEFT);
+      direction === DIRECTION_DOWN ||
+      (this.writingDirection === WritingDirection.LTR
+        ? direction === DIRECTION_RIGHT
+        : direction === DIRECTION_LEFT);
 
     this.log('smartNavigate', 'direction', direction);
     this.log('smartNavigate', 'fromParentFocusKey', fromParentFocusKey);
@@ -947,7 +952,7 @@ class SpatialNavigationService {
           isIncrementalDirection,
           false,
           layout,
-          this.writingDirection,
+          this.writingDirection
         );
 
       /**
@@ -965,7 +970,7 @@ class SpatialNavigationService {
               isIncrementalDirection,
               true,
               component.layout,
-              this.writingDirection,
+              this.writingDirection
             );
 
           return isVerticalDirection
@@ -973,13 +978,12 @@ class SpatialNavigationService {
               ? siblingCutoffCoordinate >= currentCutoffCoordinate // vertical next
               : siblingCutoffCoordinate <= currentCutoffCoordinate // vertical previous
             : this.writingDirection === WritingDirection.LTR
-              ? isIncrementalDirection
-                ? siblingCutoffCoordinate >= currentCutoffCoordinate // horizontal LTR next
-                : siblingCutoffCoordinate <= currentCutoffCoordinate // horizontal LTR previous
-              : isIncrementalDirection
-                ? siblingCutoffCoordinate <= currentCutoffCoordinate // horizontal RTL next
-                : siblingCutoffCoordinate >= currentCutoffCoordinate // horizontal RTL previous
-            ;
+            ? isIncrementalDirection
+              ? siblingCutoffCoordinate >= currentCutoffCoordinate // horizontal LTR next
+              : siblingCutoffCoordinate <= currentCutoffCoordinate // horizontal LTR previous
+            : isIncrementalDirection
+            ? siblingCutoffCoordinate <= currentCutoffCoordinate // horizontal RTL next
+            : siblingCutoffCoordinate >= currentCutoffCoordinate; // horizontal RTL previous
         }
 
         return false;
@@ -1095,7 +1099,17 @@ class SpatialNavigationService {
      */
     const sortedForceFocusableComponents = this.sortSiblingsByPriority(
       forceFocusableComponents,
-      { x: 0, y: 0, width: 0, height: 0, left: 0, top: 0, right: 0, bottom: 0, node: null },
+      {
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0,
+        left: 0,
+        top: 0,
+        right: 0,
+        bottom: 0,
+        node: null
+      },
       'down',
       ROOT_FOCUS_KEY
     );
@@ -1175,7 +1189,10 @@ class SpatialNavigationService {
        * Otherwise, trying to focus something by coordinates
        */
       children.forEach((component) => this.updateLayout(component.focusKey));
-      const { focusKey: childKey } = getChildClosestToOrigin(children, this.writingDirection);
+      const { focusKey: childKey } = getChildClosestToOrigin(
+        children,
+        this.writingDirection
+      );
 
       this.log('getNextFocusKey', 'childKey will be focused', childKey);
 
