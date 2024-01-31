@@ -432,7 +432,7 @@ class SpatialNavigationService {
   /**
    * Inspired by: https://developer.mozilla.org/en-US/docs/Mozilla/Firefox_OS_for_TV/TV_remote_control_navigation#Algorithm_design
    * Ref Corners are the 2 corners of the current component in the direction of navigation
-   * They used as a base to measure adjacent slices
+   * They are used as a base to measure adjacent slices
    */
   sortSiblingsByPriority(
     siblings: FocusableComponent[],
