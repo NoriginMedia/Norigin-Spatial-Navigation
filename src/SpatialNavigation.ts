@@ -565,7 +565,6 @@ class SpatialNavigationService {
     this.keyUpEventListener = null;
     this.keyMap = DEFAULT_KEY_MAP;
 
-    this.onKeyEvent = this.onKeyEvent.bind(this);
     this.pause = this.pause.bind(this);
     this.resume = this.resume.bind(this);
     this.setFocus = this.setFocus.bind(this);
@@ -618,7 +617,21 @@ class SpatialNavigationService {
         this.bindEventHandlers();
         if (visualDebug) {
           this.visualDebugger = new VisualDebugger(this.writingDirection);
-          this.startDrawLayouts();
+          const draw = () => {
+            requestAnimationFrame(() => {
+              this.visualDebugger.clearLayouts();
+              forOwn(this.focusableComponents, (component, focusKey) => {
+                this.visualDebugger.drawLayout(
+                  component.layout,
+                  focusKey,
+                  component.parentFocusKey
+                );
+              });
+              draw();
+            });
+          };
+
+          draw();
         }
       }
     }
@@ -637,24 +650,6 @@ class SpatialNavigationService {
       }
       this.bindEventHandlers();
     }
-  }
-
-  startDrawLayouts() {
-    const draw = () => {
-      requestAnimationFrame(() => {
-        this.visualDebugger.clearLayouts();
-        forOwn(this.focusableComponents, (component, focusKey) => {
-          this.visualDebugger.drawLayout(
-            component.layout,
-            focusKey,
-            component.parentFocusKey
-          );
-        });
-        draw();
-      });
-    };
-
-    draw();
   }
 
   destroy() {
@@ -722,14 +717,18 @@ class SpatialNavigationService {
         const preventDefaultNavigation =
           this.onArrowPress(eventType, keysDetails) === false;
 
+        if (this.visualDebugger) {
+          this.visualDebugger.clear();
+        }
+
         if (preventDefaultNavigation) {
           this.log('keyDownEventListener', 'default navigation prevented');
-
-          if (this.visualDebugger) {
-            this.visualDebugger.clear();
-          }
         } else {
-          this.onKeyEvent(event);
+          const direction = findKey(this.getKeyMap(), (codeList) =>
+            codeList.includes(keyCode)
+          );
+
+          this.smartNavigate(direction, null, { event });
         }
       };
 
@@ -875,19 +874,6 @@ class SpatialNavigationService {
         validDirections
       );
     }
-  }
-
-  onKeyEvent(event: KeyboardEvent) {
-    if (this.visualDebugger) {
-      this.visualDebugger.clear();
-    }
-
-    const keyCode = SpatialNavigationService.getKeyCode(event);
-    const direction = findKey(this.getKeyMap(), (codeList) =>
-      codeList.includes(keyCode)
-    );
-
-    this.smartNavigate(direction, null, { event });
   }
 
   /**
