@@ -673,7 +673,7 @@ class SpatialNavigationService {
   }
 
   static getKeyCode(event: KeyboardEvent) {
-    return event.keyCode || event.code;
+    return event.keyCode || event.code || event.key;
   }
 
   bindEventHandlers() {
