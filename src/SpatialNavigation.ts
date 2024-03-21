@@ -767,6 +767,35 @@ class SpatialNavigationService {
     }
   }
 
+  onClickHandler(focusKey: string) {
+    if (!focusKey) {
+      this.log('onClickHandler', 'noFocusKey');
+      return;
+    }
+
+    const component = this.focusableComponents[focusKey];
+
+    if (!component) {
+      this.log('onClickHandler', 'noComponent');
+
+      return;
+    }
+
+    // Set focus as if this were a key press
+    this.setFocus(focusKey);
+
+    // Call onEnterPress directly or via existing mechanisms that handle enter press
+    if (component.onEnterPress) {
+      const keysDetails = {
+        pressedKeys: {
+          click: 1
+        }
+      };
+
+      component.onEnterPress(keysDetails);
+    }
+  }
+
   unbindEventHandlers() {
     // We check both because the React Native remote debugger implements window, but not window.removeEventListener.
     if (typeof window !== 'undefined' && window.removeEventListener) {
@@ -1283,6 +1312,12 @@ class SpatialNavigationService {
      * If so, it's required to check if parent lies on a path to focused child.
      */
     let currentComponent = this.focusableComponents[this.focusKey];
+
+    if (node) {
+      node.removeEventListener('click', () => this.onClickHandler(focusKey));
+      node.addEventListener('click', () => this.onClickHandler(focusKey));
+    }
+
     while (currentComponent) {
       if (currentComponent.parentFocusKey === focusKey) {
         this.updateParentsHasFocusedChild(this.focusKey, {});
