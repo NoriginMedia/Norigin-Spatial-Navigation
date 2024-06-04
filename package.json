@@ -13,7 +13,9 @@
     "build": "webpack --config webpack.config.prod.js",
     "prepublishOnly": "npm run eslint",
     "prepare": "npm run build",
-    "publish": "npm publish --access public"
+    "publish": "npm publish --access public",
+    "test": "jest",
+    "test:coverage": "jest --collect-coverage"
   },
   "repository": {
     "type": "git",
@@ -39,6 +41,7 @@
     "lodash": "^4.17.21"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.12",
     "@types/lodash": "^4.14.179",
     "@types/react": "^18.0.18",
     "@types/react-dom": "^18.0.6",
@@ -55,11 +58,14 @@
     "eslint-plugin-react-hooks": "^4.4.0",
     "file-loader": "^6.2.0",
     "html-webpack-plugin": "^5.5.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
     "pre-commit": "^1.2.2",
     "prettier": "^2.5.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "styled-components": "^5.3.3",
+    "ts-jest": "^29.1.4",
     "ts-loader": "^9.2.6",
     "typescript": "^4.5.5",
     "webpack": "^5.69.1",

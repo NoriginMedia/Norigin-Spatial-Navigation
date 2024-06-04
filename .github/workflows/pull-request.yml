@@ -1,0 +1,23 @@
+name: pull-request
+
+on: pull_request
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Test
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test -- --colors
