@@ -576,6 +576,7 @@ class SpatialNavigationService {
     this.setKeyMap = this.setKeyMap.bind(this);
     this.getCurrentFocusKey = this.getCurrentFocusKey.bind(this);
     this.doesFocusableExist = this.doesFocusableExist.bind(this);
+    this.updateRtl = this.updateRtl.bind(this);
 
     this.setFocusDebounced = debounce(this.setFocus, AUTO_RESTORE_FOCUS_DELAY, {
       leading: false,
@@ -1633,6 +1634,14 @@ class SpatialNavigationService {
   doesFocusableExist(focusKey: string) {
     return !!this.focusableComponents[focusKey];
   }
+
+  /**
+   * This function updates the writing direction
+   * @param rtl whether the writing direction is right-to-left
+   */
+  updateRtl(rtl: boolean) {
+    this.writingDirection = rtl ? WritingDirection.RTL : WritingDirection.LTR;
+  }
 }
 
 /**
@@ -1652,5 +1661,6 @@ export const {
   resume,
   updateAllLayouts,
   getCurrentFocusKey,
-  doesFocusableExist
+  doesFocusableExist,
+  updateRtl
 } = SpatialNavigation;
