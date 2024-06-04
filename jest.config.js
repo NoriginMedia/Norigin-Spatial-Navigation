@@ -2,5 +2,11 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'jsdom',
-  testMatch: ['**/*.test.[jt]s?(x)']
+  testMatch: ['**/__tests__/**/*.test.[jt]s?(x)'],
+  collectCoverageFrom: [
+    'src/**/*.ts',
+    '!src/__tests__/**',
+    '!**/node_modules/**',
+    '!**/coverage/**'
+  ]
 };
