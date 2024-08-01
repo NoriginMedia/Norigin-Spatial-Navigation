@@ -241,6 +241,8 @@ class SpatialNavigationService {
 
   private writingDirection: WritingDirection;
 
+  private distanceCalculationMethod: string;
+
   /**
    * Used to determine the coordinate that will be used to filter items that are over the "edge"
    */
@@ -408,7 +410,8 @@ class SpatialNavigationService {
   static getSecondaryAxisDistance(
     refCorners: Corners,
     siblingCorners: Corners,
-    isVerticalDirection: boolean
+    isVerticalDirection: boolean,
+    distanceCalculationMethod: string
   ) {
     const { a: refA, b: refB } = refCorners;
     const { a: siblingA, b: siblingB } = siblingCorners;
@@ -419,13 +422,27 @@ class SpatialNavigationService {
     const siblingCoordinateA = siblingA[coordinate];
     const siblingCoordinateB = siblingB[coordinate];
 
-    const distancesToCompare = [];
+    if (distanceCalculationMethod === 'center') {
+      const refCoordinateCenter = (refCoordinateA + refCoordinateB) / 2;
+      const siblingCoordinateCenter =
+        (siblingCoordinateA + siblingCoordinateB) / 2;
+      return Math.abs(refCoordinateCenter - siblingCoordinateCenter);
+    }
+    if (distanceCalculationMethod === 'edges') {
+      const refCoordinateEdge = Math.min(refCoordinateA, refCoordinateB);
+      const siblingCoordinateEdge = Math.min(
+        siblingCoordinateA,
+        siblingCoordinateB
+      );
+      return Math.abs(refCoordinateEdge - siblingCoordinateEdge);
+    }
 
+    // Default to corners
+    const distancesToCompare = [];
     distancesToCompare.push(Math.abs(siblingCoordinateA - refCoordinateA));
     distancesToCompare.push(Math.abs(siblingCoordinateA - refCoordinateB));
     distancesToCompare.push(Math.abs(siblingCoordinateB - refCoordinateA));
     distancesToCompare.push(Math.abs(siblingCoordinateB - refCoordinateB));
-
     return Math.min(...distancesToCompare);
   }
 
@@ -473,12 +490,14 @@ class SpatialNavigationService {
       const primaryAxisDistance = primaryAxisFunction(
         refCorners,
         siblingCorners,
-        isVerticalDirection
+        isVerticalDirection,
+        this.distanceCalculationMethod
       );
       const secondaryAxisDistance = secondaryAxisFunction(
         refCorners,
         siblingCorners,
-        isVerticalDirection
+        isVerticalDirection,
+        this.distanceCalculationMethod
       );
 
       /**
@@ -597,7 +616,8 @@ class SpatialNavigationService {
     useGetBoundingClientRect = false,
     shouldFocusDOMNode = false,
     shouldUseNativeEvents = false,
-    rtl = false
+    rtl = false,
+    distanceCalculationMethod = 'corners'
   } = {}) {
     if (!this.enabled) {
       this.enabled = true;
@@ -607,6 +627,7 @@ class SpatialNavigationService {
       this.shouldFocusDOMNode = shouldFocusDOMNode && !nativeMode;
       this.shouldUseNativeEvents = shouldUseNativeEvents;
       this.writingDirection = rtl ? WritingDirection.RTL : WritingDirection.LTR;
+      this.distanceCalculationMethod = distanceCalculationMethod;
 
       this.debug = debug;
 
