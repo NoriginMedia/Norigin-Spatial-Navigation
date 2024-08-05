@@ -20,6 +20,8 @@ const KEY_ENTER = 'enter';
 
 export type Direction = 'up' | 'down' | 'left' | 'right';
 
+type DistanceCalculationMethod = 'center' | 'edges' | 'corners';
+
 const DEFAULT_KEY_MAP = {
   [DIRECTION_LEFT]: [37, 'ArrowLeft'],
   [DIRECTION_UP]: [38, 'ArrowUp'],
@@ -241,7 +243,7 @@ class SpatialNavigationService {
 
   private writingDirection: WritingDirection;
 
-  private distanceCalculationMethod: string;
+  private distanceCalculationMethod: DistanceCalculationMethod;
 
   /**
    * Used to determine the coordinate that will be used to filter items that are over the "edge"
@@ -617,7 +619,7 @@ class SpatialNavigationService {
     shouldFocusDOMNode = false,
     shouldUseNativeEvents = false,
     rtl = false,
-    distanceCalculationMethod = 'corners'
+    distanceCalculationMethod = 'corners' as DistanceCalculationMethod
   } = {}) {
     if (!this.enabled) {
       this.enabled = true;

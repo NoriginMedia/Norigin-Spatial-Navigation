@@ -22,7 +22,8 @@ const logo = require('../logo.png').default;
 
 init({
   debug: false,
-  visualDebug: false
+  visualDebug: false,
+  distanceCalculationMethod: 'center'
 });
 
 const rows = shuffle([
@@ -182,12 +183,15 @@ const AssetWrapper = styled.div`
 `;
 
 interface AssetBoxProps {
+  index: number;
+  isShuffleSize: boolean;
   focused: boolean;
   color: string;
 }
 
 const AssetBox = styled.div<AssetBoxProps>`
-  width: 225px;
+  width: ${({ isShuffleSize, index }) =>
+    isShuffleSize ? `${80 + index * 30}px` : '225px'};
   height: 127px;
   background-color: ${({ color }) => color};
   border-color: white;
@@ -206,6 +210,8 @@ const AssetTitle = styled.div`
 `;
 
 interface AssetProps {
+  index: number;
+  isShuffleSize: boolean;
   title: string;
   color: string;
   onEnterPress: (props: object, details: KeyPressDetails) => void;
@@ -216,7 +222,14 @@ interface AssetProps {
   ) => void;
 }
 
-function Asset({ title, color, onEnterPress, onFocus }: AssetProps) {
+function Asset({
+  title,
+  color,
+  onEnterPress,
+  onFocus,
+  isShuffleSize,
+  index
+}: AssetProps) {
   const { ref, focused } = useFocusable({
     onEnterPress,
     onFocus,
@@ -228,7 +241,12 @@ function Asset({ title, color, onEnterPress, onFocus }: AssetProps) {
 
   return (
     <AssetWrapper ref={ref}>
-      <AssetBox color={color} focused={focused} />
+      <AssetBox
+        index={index}
+        color={color}
+        focused={focused}
+        isShuffleSize={isShuffleSize}
+      />
       <AssetTitle>{title}</AssetTitle>
     </AssetWrapper>
   );
@@ -261,6 +279,7 @@ const ContentRowScrollingContent = styled.div`
 `;
 
 interface ContentRowProps {
+  isShuffleSize: boolean;
   title: string;
   onAssetPress: (props: object, details: KeyPressDetails) => void;
   onFocus: (
@@ -273,7 +292,8 @@ interface ContentRowProps {
 function ContentRow({
   title: rowTitle,
   onAssetPress,
-  onFocus
+  onFocus,
+  isShuffleSize
 }: ContentRowProps) {
   const { ref, focusKey } = useFocusable({
     onFocus
@@ -297,13 +317,14 @@ function ContentRow({
         <ContentRowTitle>{rowTitle}</ContentRowTitle>
         <ContentRowScrollingWrapper ref={scrollingRef}>
           <ContentRowScrollingContent>
-            {assets.map(({ title, color }) => (
+            {assets.map(({ title, color }, index) => (
               <Asset
-                key={title}
+                index={index}
                 title={title}
                 color={color}
                 onEnterPress={onAssetPress}
                 onFocus={onAssetFocus}
+                isShuffleSize={isShuffleSize}
               />
             ))}
           </ContentRowScrollingContent>
@@ -397,12 +418,13 @@ function Content() {
         </SelectedItemWrapper>
         <ScrollingRows ref={ref}>
           <div>
-            {rows.map(({ title }) => (
+            {rows.map(({ title }, index) => (
               <ContentRow
                 key={title}
                 title={title}
                 onAssetPress={onAssetPress}
                 onFocus={onRowFocus}
+                isShuffleSize={index === rows.length - 1} // last row will have assets with random measurements (Width)
               />
             ))}
           </div>
