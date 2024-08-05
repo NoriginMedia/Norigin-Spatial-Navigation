@@ -22,6 +22,13 @@ export type Direction = 'up' | 'down' | 'left' | 'right';
 
 type DistanceCalculationMethod = 'center' | 'edges' | 'corners';
 
+type DistanceCalculationFunction = (
+  refCorners: Corners,
+  siblingCorners: Corners,
+  isVerticalDirection: boolean,
+  distanceCalculationMethod: DistanceCalculationMethod
+) => number;
+
 const DEFAULT_KEY_MAP = {
   [DIRECTION_LEFT]: [37, 'ArrowLeft'],
   [DIRECTION_UP]: [38, 'ArrowUp'],
@@ -245,6 +252,8 @@ class SpatialNavigationService {
 
   private distanceCalculationMethod: DistanceCalculationMethod;
 
+  private customDistanceCalculationFunction?: DistanceCalculationFunction;
+
   /**
    * Used to determine the coordinate that will be used to filter items that are over the "edge"
    */
@@ -413,8 +422,18 @@ class SpatialNavigationService {
     refCorners: Corners,
     siblingCorners: Corners,
     isVerticalDirection: boolean,
-    distanceCalculationMethod: string
+    distanceCalculationMethod: DistanceCalculationMethod,
+    customDistanceCalculationFunction?: DistanceCalculationFunction
   ) {
+    if (customDistanceCalculationFunction) {
+      return customDistanceCalculationFunction(
+        refCorners,
+        siblingCorners,
+        isVerticalDirection,
+        distanceCalculationMethod
+      );
+    }
+
     const { a: refA, b: refB } = refCorners;
     const { a: siblingA, b: siblingB } = siblingCorners;
     const coordinate = isVerticalDirection ? 'x' : 'y';
@@ -431,20 +450,37 @@ class SpatialNavigationService {
       return Math.abs(refCoordinateCenter - siblingCoordinateCenter);
     }
     if (distanceCalculationMethod === 'edges') {
-      const refCoordinateEdge = Math.min(refCoordinateA, refCoordinateB);
-      const siblingCoordinateEdge = Math.min(
+      // 1. Find the minimum and maximum coordinates for both ref and sibling
+      const refCoordinateEdgeMin = Math.min(refCoordinateA, refCoordinateB);
+      const siblingCoordinateEdgeMin = Math.min(
         siblingCoordinateA,
         siblingCoordinateB
       );
-      return Math.abs(refCoordinateEdge - siblingCoordinateEdge);
+      const refCoordinateEdgeMax = Math.max(refCoordinateA, refCoordinateB);
+      const siblingCoordinateEdgeMax = Math.max(
+        siblingCoordinateA,
+        siblingCoordinateB
+      );
+
+      // 2. Calculate the distances between the closest edges
+      const minEdgeDistance = Math.abs(
+        refCoordinateEdgeMin - siblingCoordinateEdgeMin
+      );
+      const maxEdgeDistance = Math.abs(
+        refCoordinateEdgeMax - siblingCoordinateEdgeMax
+      );
+
+      // 3. Return the smallest distance between the edges
+      return Math.min(minEdgeDistance, maxEdgeDistance);
     }
 
     // Default to corners
-    const distancesToCompare = [];
-    distancesToCompare.push(Math.abs(siblingCoordinateA - refCoordinateA));
-    distancesToCompare.push(Math.abs(siblingCoordinateA - refCoordinateB));
-    distancesToCompare.push(Math.abs(siblingCoordinateB - refCoordinateA));
-    distancesToCompare.push(Math.abs(siblingCoordinateB - refCoordinateB));
+    const distancesToCompare = [
+      Math.abs(siblingCoordinateA - refCoordinateA),
+      Math.abs(siblingCoordinateA - refCoordinateB),
+      Math.abs(siblingCoordinateB - refCoordinateA),
+      Math.abs(siblingCoordinateB - refCoordinateB)
+    ];
     return Math.min(...distancesToCompare);
   }
 
@@ -493,13 +529,15 @@ class SpatialNavigationService {
         refCorners,
         siblingCorners,
         isVerticalDirection,
-        this.distanceCalculationMethod
+        this.distanceCalculationMethod,
+        this.customDistanceCalculationFunction
       );
       const secondaryAxisDistance = secondaryAxisFunction(
         refCorners,
         siblingCorners,
         isVerticalDirection,
-        this.distanceCalculationMethod
+        this.distanceCalculationMethod,
+        this.customDistanceCalculationFunction
       );
 
       /**
@@ -607,6 +645,8 @@ class SpatialNavigationService {
     this.visualDebugger = null;
 
     this.logIndex = 0;
+
+    this.distanceCalculationMethod = 'corners';
   }
 
   init({
@@ -619,7 +659,8 @@ class SpatialNavigationService {
     shouldFocusDOMNode = false,
     shouldUseNativeEvents = false,
     rtl = false,
-    distanceCalculationMethod = 'corners' as DistanceCalculationMethod
+    distanceCalculationMethod = 'corners' as DistanceCalculationMethod,
+    customDistanceCalculationFunction = undefined as DistanceCalculationFunction
   } = {}) {
     if (!this.enabled) {
       this.enabled = true;
@@ -630,6 +671,8 @@ class SpatialNavigationService {
       this.shouldUseNativeEvents = shouldUseNativeEvents;
       this.writingDirection = rtl ? WritingDirection.RTL : WritingDirection.LTR;
       this.distanceCalculationMethod = distanceCalculationMethod;
+      this.customDistanceCalculationFunction =
+        customDistanceCalculationFunction;
 
       this.debug = debug;
 

@@ -418,13 +418,13 @@ function Content() {
         </SelectedItemWrapper>
         <ScrollingRows ref={ref}>
           <div>
-            {rows.map(({ title }, index) => (
+            {rows.map(({ title }) => (
               <ContentRow
                 key={title}
                 title={title}
                 onAssetPress={onAssetPress}
                 onFocus={onRowFocus}
-                isShuffleSize={index === rows.length - 1} // last row will have assets with random measurements (Width)
+                isShuffleSize={Math.random() < 0.5} // Rows will have children assets of different sizes, randomly setting it to true or false.
               />
             ))}
           </div>
