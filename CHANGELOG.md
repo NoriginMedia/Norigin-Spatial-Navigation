@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 # [2.1.1]
 ## Added
-- new `init` config option domNodeFocusOptions for passing [FocusOptions](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/focus#parameters) when using `shouldFocusDOMNode`
+- new `init` config option `domNodeFocusOptions` for passing [FocusOptions](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/focus#parameters) when using `shouldFocusDOMNode`
 
 # [2.1.0]
 ## Added
