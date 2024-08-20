@@ -316,7 +316,12 @@ Note that it is the developer's responsibility to make the elements accessible! 
 as it dives directly into the various html tags and how it complies with accessibility. Non-accessible tags like `<div>` needs to have the [tabindex](https://developer.mozilla.org/en-US/docs/Web/Accessibility/Keyboard-navigable_JavaScript_widgets) attribute set.
 Also consider `role` and `aria-label` attributes. But that depends on the application.
 
-The flag is ignored if `nativeMode` is set.
+[FocusOptions](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/focus#parameters) can be set using the `domNodeFocusOptions` option documented below.
+
+This flag is ignored if `nativeMode` is set to `true`.
+
+##### `domNodeFocusOptions`: [FocusOptions](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/focus#parameters) (default: `{}`)
+This object is passed to the `focus` method of the underlying _accessible_ DOM node when `shouldFocusDOMNode` is enabled.
 
 ### `shouldUseNativeEvents`: boolean (default: false)
 This flag, when set to true, enables the use of native events for triggering actions, such as clicks or key presses. For instance, the onClick method will be triggered while pressing the enterKey, as well as cliicking the element itself. It is particularly beneficial for enhancing the accessibility of web applications. When shouldUseNativeEvents is active, the underlying accessible DOM node becomes the focus of the event.

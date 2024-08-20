@@ -198,6 +198,11 @@ class SpatialNavigationService {
    */
   private parentsHavingFocusedChild: string[];
 
+  /**
+   * When shouldFocusDOMNode is true, this prop specifies the focus options that should be passed to the element being focused.
+   */
+  private domNodeFocusOptions: FocusOptions;
+
   private enabled: boolean;
 
   /**
@@ -603,6 +608,7 @@ class SpatialNavigationService {
      */
     this.parentsHavingFocusedChild = [];
 
+    this.domNodeFocusOptions = {};
     this.enabled = false;
     this.nativeMode = false;
     this.throttle = 0;
@@ -657,12 +663,14 @@ class SpatialNavigationService {
     throttleKeypresses = false,
     useGetBoundingClientRect = false,
     shouldFocusDOMNode = false,
+    domNodeFocusOptions = {},
     shouldUseNativeEvents = false,
     rtl = false,
     distanceCalculationMethod = 'corners' as DistanceCalculationMethod,
     customDistanceCalculationFunction = undefined as DistanceCalculationFunction
   } = {}) {
     if (!this.enabled) {
+      this.domNodeFocusOptions = domNodeFocusOptions;
       this.enabled = true;
       this.nativeMode = nativeMode;
       this.throttleKeypresses = throttleKeypresses;
@@ -1451,7 +1459,7 @@ class SpatialNavigationService {
       const newComponent = this.focusableComponents[this.focusKey];
 
       if (this.shouldFocusDOMNode && newComponent.node) {
-        newComponent.node.focus();
+        newComponent.node.focus(this.domNodeFocusOptions);
       }
 
       newComponent.onUpdateFocus(true);
