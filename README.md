@@ -62,6 +62,64 @@ init({
 });
 ```
 
+## New Distance Calculation Configuration
+Starting from version `2.2.0`, you can configure the method used for distance calculations between focusable components. This can be set during initialization using the `distanceCalculationMethod` option.
+
+### How to use | Available Options
+* `edges`:  Calculates distances using the closest edges of the components.
+* `center`:  Calculates distances using the center points of the components for size-agnostic comparisons. Ideal for non-uniform elements between siblings.
+* `corners`: Calculates distances using the corners of the components, between the nearest corners. This is the default value.
+
+```jsx
+import { init } from '@noriginmedia/norigin-spatial-navigation';
+
+init({
+  // options
+  distanceCalculationMethod: 'center', // or 'edges' or 'corners' (default)
+});
+```
+
+## Custom Distance Calculation Function
+In addition to the predefined distance calculation methods, you can define your own custom distance calculation function. This will override the `getSecondaryAxisDistance` method.
+
+You can pass your custom distance calculation function during initialization using the customDistanceCalculationFunction option. This function will override the built-in methods.
+
+### How to use | Available Options
+The custom distance calculation function should follow the DistanceCalculationFunction type signature:
+
+```jsx
+type DistanceCalculationFunction = (
+  refCorners: Corners,
+  siblingCorners: Corners,
+  isVerticalDirection: boolean,
+  distanceCalculationMethod: DistanceCalculationMethod
+) => number;
+```
+
+### Example
+```jsx
+import { init } from '@noriginmedia/norigin-spatial-navigation';
+
+// Define a custom distance calculation function
+const myCustomDistanceCalculationFunction = (refCorners, siblingCorners, isVerticalDirection, distanceCalculationMethod) => {
+  // Custom logic for distance calculation
+  const { a: refA, b: refB } = refCorners;
+  const { a: siblingA, b: siblingB } = siblingCorners;
+  const coordinate = isVerticalDirection ? 'x' : 'y';
+
+  const refCoordinateCenter = (refA[coordinate] + refB[coordinate]) / 2;
+  const siblingCoordinateCenter = (siblingA[coordinate] + siblingB[coordinate]) / 2;
+
+  return Math.abs(refCoordinateCenter - siblingCoordinateCenter);
+};
+
+// Initialize with custom distance calculation function
+init({
+  // options
+  customDistanceCalculationFunction: myCustomDistanceCalculationFunction,
+});
+```
+
 ## Making your component focusable
 Most commonly you will have Leaf Focusable components. (See [Tree Hierarchy](#tree-hierarchy-of-focusable-components))
 Leaf component is the one that doesn't have focusable children.
