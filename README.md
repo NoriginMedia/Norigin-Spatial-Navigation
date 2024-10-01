@@ -395,6 +395,9 @@ Manually recalculate all the layouts. Rarely used.
 This hook is the main link between the React component (its DOM element) and the navigation service.
 It is used to register the component in the service, get its `focusKey`, `focused` state etc.
 
+### `updateRtl` (function)
+Manually update the focus behavior (whether RTL or LTR)
+
 ```jsx
 const {/* hook output */ } = useFocusable({/* hook params */ });
 ```
