@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Added
 - New init config option `distanceCalculationMethod` that allows switching between edge-based, center-based and corner-based (default) distance calculations.
 - Support for a custom distance calculation function via the `customDistanceCalculationFunction` option, enabling custom logic for determining distances between focusable components. This will override the `getSecondaryAxisDistance` method.
+- Added `updateRTL` method to update the RTL behavior dynamically. This method allows toggling the Right-to-Left layout at runtime, updating the spatial navigation behavior without requiring reinitialization.
 
 # [2.1.1]
 ## Added
