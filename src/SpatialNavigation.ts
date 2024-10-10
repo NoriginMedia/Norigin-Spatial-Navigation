@@ -80,6 +80,7 @@ interface FocusableComponent {
   onEnterPress: (details?: KeyPressDetails) => void;
   onEnterRelease: () => void;
   onArrowPress: (direction: string, details: KeyPressDetails) => boolean;
+  onArrowRelease: (direction: string) => void;
   onFocus: (layout: FocusableComponentLayout, details: FocusDetails) => void;
   onBlur: (layout: FocusableComponentLayout, details: FocusDetails) => void;
   onUpdateFocus: (focused: boolean) => void;
@@ -106,6 +107,7 @@ interface FocusableComponentUpdatePayload {
   onEnterPress: (details?: KeyPressDetails) => void;
   onEnterRelease: () => void;
   onArrowPress: (direction: string, details: KeyPressDetails) => boolean;
+  onArrowRelease: (direction: string) => void;
   onFocus: (layout: FocusableComponentLayout, details: FocusDetails) => void;
   onBlur: (layout: FocusableComponentLayout, details: FocusDetails) => void;
 }
@@ -155,9 +157,9 @@ const getChildClosestToOrigin = (
   const comparator =
     writingDirection === WritingDirection.LTR
       ? ({ layout }: FocusableComponent) =>
-          Math.abs(layout.left) + Math.abs(layout.top)
+        Math.abs(layout.left) + Math.abs(layout.top)
       : ({ layout }: FocusableComponent) =>
-          Math.abs(window.innerWidth - layout.right) + Math.abs(layout.top);
+        Math.abs(window.innerWidth - layout.right) + Math.abs(layout.top);
 
   const childrenClosestToOrigin = sortBy(children, comparator);
 
@@ -272,22 +274,22 @@ class SpatialNavigationService {
     const itemStart = isVertical
       ? layout.top
       : writingDirection === WritingDirection.LTR
-      ? layout.left
-      : layout.right;
+        ? layout.left
+        : layout.right;
 
     const itemEnd = isVertical
       ? layout.bottom
       : writingDirection === WritingDirection.LTR
-      ? layout.right
-      : layout.left;
+        ? layout.right
+        : layout.left;
 
     return isIncremental
       ? isSibling
         ? itemStart
         : itemEnd
       : isSibling
-      ? itemEnd
-      : itemStart;
+        ? itemEnd
+        : itemStart;
   }
 
   /**
@@ -405,7 +407,7 @@ class SpatialNavigationService {
     const intersectionLength = Math.max(
       0,
       Math.min(refCoordinateB, siblingCoordinateB) -
-        Math.max(refCoordinateA, siblingCoordinateA)
+      Math.max(refCoordinateA, siblingCoordinateA)
     );
 
     return intersectionLength >= thresholdDistance;
@@ -830,6 +832,14 @@ class SpatialNavigationService {
         if (eventType === KEY_ENTER && this.focusKey) {
           this.onEnterRelease();
         }
+
+        if (this.focusKey && (
+          eventType === DIRECTION_LEFT ||
+          eventType === DIRECTION_RIGHT ||
+          eventType === DIRECTION_UP ||
+          eventType === DIRECTION_DOWN)) {
+          this.onArrowRelease(eventType)
+        }
       };
 
       window.addEventListener('keyup', this.keyUpEventListener);
@@ -919,6 +929,28 @@ class SpatialNavigationService {
       component.onArrowPress &&
       component.onArrowPress(direction, keysDetails)
     );
+  }
+
+  onArrowRelease(direction: string) {
+    const component = this.focusableComponents[this.focusKey];
+
+    /* Guard against last-focused component being unmounted at time of onArrowRelease (e.g due to UI fading out) */
+    if (!component) {
+      this.log('onArrowRelease', 'noComponent');
+
+      return;
+    }
+
+    /* Suppress onArrowRelease if the last-focused item happens to lose its 'focused' status. */
+    if (!component.focusable) {
+      this.log('onArrowRelease', 'componentNotFocusable');
+
+      return;
+    }
+
+    if (component.onArrowRelease) {
+      component.onArrowRelease(direction);
+    }
   }
 
   /**
@@ -1039,12 +1071,12 @@ class SpatialNavigationService {
               ? siblingCutoffCoordinate >= currentCutoffCoordinate // vertical next
               : siblingCutoffCoordinate <= currentCutoffCoordinate // vertical previous
             : this.writingDirection === WritingDirection.LTR
-            ? isIncrementalDirection
-              ? siblingCutoffCoordinate >= currentCutoffCoordinate // horizontal LTR next
-              : siblingCutoffCoordinate <= currentCutoffCoordinate // horizontal LTR previous
-            : isIncrementalDirection
-            ? siblingCutoffCoordinate <= currentCutoffCoordinate // horizontal RTL next
-            : siblingCutoffCoordinate >= currentCutoffCoordinate; // horizontal RTL previous
+              ? isIncrementalDirection
+                ? siblingCutoffCoordinate >= currentCutoffCoordinate // horizontal LTR next
+                : siblingCutoffCoordinate <= currentCutoffCoordinate // horizontal LTR previous
+              : isIncrementalDirection
+                ? siblingCutoffCoordinate <= currentCutoffCoordinate // horizontal RTL next
+                : siblingCutoffCoordinate >= currentCutoffCoordinate; // horizontal RTL previous
         }
 
         return false;
@@ -1128,8 +1160,7 @@ class SpatialNavigationService {
       // eslint-disable-next-line no-console
       console.log(
         `%c${functionName}%c${debugString}`,
-        `background: ${
-          DEBUG_FN_COLORS[this.logIndex % DEBUG_FN_COLORS.length]
+        `background: ${DEBUG_FN_COLORS[this.logIndex % DEBUG_FN_COLORS.length]
         }; color: black; padding: 1px 5px;`,
         'background: #333; color: #BADA55; padding: 1px 5px;',
         ...rest
@@ -1275,6 +1306,7 @@ class SpatialNavigationService {
     onEnterPress,
     onEnterRelease,
     onArrowPress,
+    onArrowRelease,
     onFocus,
     onBlur,
     saveLastFocusedChild,
@@ -1295,6 +1327,7 @@ class SpatialNavigationService {
       onEnterPress,
       onEnterRelease,
       onArrowPress,
+      onArrowRelease,
       onFocus,
       onBlur,
       onUpdateFocus,
