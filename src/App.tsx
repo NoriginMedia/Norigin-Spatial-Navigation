@@ -153,6 +153,7 @@ function Menu({ focusKey: focusKeyParam }: MenuProps) {
     onEnterPress: () => {},
     onEnterRelease: () => {},
     onArrowPress: () => true,
+    onArrowRelease: () => {},
     onFocus: () => {},
     onBlur: () => {},
     extraProps: { foo: 'bar' }
@@ -383,6 +384,85 @@ const ScrollingRows = styled.div`
   flex-grow: 1;
 `;
 
+interface ProgressBarWrapperProps {
+  focused: boolean;
+}
+
+interface ProgressBarProgressProps {
+  percent: number;
+  focused: boolean;
+}
+
+const ProgressBarWrapper = styled.div<ProgressBarWrapperProps>`
+  position: absolute;
+  bottom: 95px;
+  right: 100px;
+  width: 540px;
+  height: 24px;
+  background-color: gray;
+  border-radius: 21px;
+  border-color: white;
+  border-style: solid;
+  border-width: ${({ focused }) => (focused ? '6px' : 0)};
+  box-sizing: border-box;
+`;
+
+const ProgressBarProgress = styled.div<ProgressBarProgressProps>`
+  width: ${({ percent }) => `${percent}%`};
+  height: 100%;
+  background-color: ${({ focused }) =>
+    focused ? 'deepskyblue' : 'dodgerblue'};
+  border-radius: 21px;
+`;
+
+const defaultPercent = 10;
+const seekPercent = 10;
+const delayedTime = 100;
+const DIRECTION_RIGHT = 'right';
+
+function ProgressBar() {
+  const [percent, setPercent] = useState(defaultPercent);
+  const timerRef = useRef<NodeJS.Timer | null>(null);
+  const { ref, focused } = useFocusable({
+    onArrowPress: (direction: string) => {
+      if (direction === DIRECTION_RIGHT && timerRef.current === null) {
+        timerRef.current = setInterval(() => {
+          setPercent((prevPercent) =>
+            prevPercent >= 100 ? prevPercent : prevPercent + seekPercent
+          );
+        }, delayedTime);
+        return true;
+      }
+      return true;
+    },
+    onArrowRelease: (direction: string) => {
+      if (direction === DIRECTION_RIGHT) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    }
+  });
+  useEffect(() => {
+    if (!focused) {
+      setPercent(defaultPercent);
+    }
+  }, [focused]);
+  useEffect(
+    () => () => {
+      if (timerRef.current !== null) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    },
+    []
+  );
+  return (
+    <ProgressBarWrapper ref={ref} focused={focused}>
+      <ProgressBarProgress percent={percent} focused={focused} />
+    </ProgressBarWrapper>
+  );
+}
+
 function Content() {
   const { ref, focusKey } = useFocusable();
 
@@ -415,6 +495,7 @@ function Content() {
               ? selectedAsset.title
               : 'Press "Enter" to select an asset'}
           </SelectedItemTitle>
+          <ProgressBar />
         </SelectedItemWrapper>
         <ScrollingRows ref={ref}>
           <div>
