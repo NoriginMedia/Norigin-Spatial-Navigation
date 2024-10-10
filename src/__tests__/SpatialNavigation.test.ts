@@ -129,11 +129,12 @@ describe('SpatialNavigation', () => {
       } as unknown as HTMLElement,
       isFocusBoundary: false,
       focusable: true,
-      onEnterPress: () => {},
-      onEnterRelease: () => {},
-      onFocus: () => {},
-      onBlur: () => {},
-      onArrowPress: () => true
+      onEnterPress: () => { },
+      onEnterRelease: () => { },
+      onFocus: () => { },
+      onBlur: () => { },
+      onArrowPress: () => true,
+      onArrowRelease: () => { },
     });
 
     SpatialNavigation.navigateByDirection('right', {});

@@ -30,6 +30,11 @@ export type ArrowPressHandler<P = object> = (
   details: KeyPressDetails
 ) => boolean;
 
+export type ArrowReleaseHandler<P = object> = (
+  direction: string,
+  props: P,
+) => void;
+
 export type FocusHandler<P = object> = (
   layout: FocusableComponentLayout,
   props: P,
@@ -55,6 +60,7 @@ export interface UseFocusableConfig<P = object> {
   onEnterPress?: EnterPressHandler<P>;
   onEnterRelease?: EnterReleaseHandler<P>;
   onArrowPress?: ArrowPressHandler<P>;
+  onArrowRelease?: ArrowReleaseHandler<P>;
   onFocus?: FocusHandler<P>;
   onBlur?: BlurHandler<P>;
   extraProps?: P;
@@ -81,6 +87,7 @@ const useFocusableHook = <P>({
   onEnterPress = noop,
   onEnterRelease = noop,
   onArrowPress = () => true,
+  onArrowRelease = noop,
   onFocus = noop,
   onBlur = noop,
   extraProps
@@ -101,6 +108,10 @@ const useFocusableHook = <P>({
       onArrowPress(direction, extraProps, details),
     [extraProps, onArrowPress]
   );
+
+  const onArrowReleaseHandler = useCallback((direction: string) => {
+    onArrowRelease(direction, extraProps);
+  }, [onArrowRelease, extraProps])
 
   const onFocusHandler = useCallback(
     (layout: FocusableComponentLayout, details: FocusDetails) => {
@@ -149,6 +160,7 @@ const useFocusableHook = <P>({
       onEnterPress: onEnterPressHandler,
       onEnterRelease: onEnterReleaseHandler,
       onArrowPress: onArrowPressHandler,
+      onArrowRelease: onArrowReleaseHandler,
       onFocus: onFocusHandler,
       onBlur: onBlurHandler,
       onUpdateFocus: (isFocused = false) => setFocused(isFocused),
@@ -182,6 +194,7 @@ const useFocusableHook = <P>({
       onEnterPress: onEnterPressHandler,
       onEnterRelease: onEnterReleaseHandler,
       onArrowPress: onArrowPressHandler,
+      onArrowRelease: onArrowReleaseHandler,
       onFocus: onFocusHandler,
       onBlur: onBlurHandler
     });
@@ -194,6 +207,7 @@ const useFocusableHook = <P>({
     onEnterPressHandler,
     onEnterReleaseHandler,
     onArrowPressHandler,
+    onArrowReleaseHandler,
     onFocusHandler,
     onBlurHandler
   ]);
