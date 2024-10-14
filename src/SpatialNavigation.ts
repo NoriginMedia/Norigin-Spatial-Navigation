@@ -1721,7 +1721,6 @@ class SpatialNavigationService {
 /**
  * Export singleton
  */
-/** @internal */
 export const SpatialNavigation = new SpatialNavigationService();
 
 export const {

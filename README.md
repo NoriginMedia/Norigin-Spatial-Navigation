@@ -272,6 +272,9 @@ IMPORTANT TO NOTE:
 
 # API
 ## Top Level exports
+### `SpatialNavigation` (advanced)
+Top level API class singleton that provides access to the Navigation Service and its methods. Not recommended for beginners as it provides access to all internal methods of the core navigation service.
+
 ### `init`
 #### Init options
 ##### `debug`: boolean (default: false)
