@@ -31,14 +31,14 @@ export const createRootNode = () => {
     forceFocus: true,
     autoRestoreFocus: true,
     saveLastFocusedChild: false,
-    onEnterPress: () => { },
-    onEnterRelease: () => { },
-    onFocus: () => { },
-    onBlur: () => { },
+    onEnterPress: () => {},
+    onEnterRelease: () => {},
+    onFocus: () => {},
+    onBlur: () => {},
     onArrowPress: () => true,
-    onArrowRelease: () => { },
-    onUpdateFocus: () => { },
-    onUpdateHasFocusedChild: () => { }
+    onArrowRelease: () => {},
+    onUpdateFocus: () => {},
+    onUpdateHasFocusedChild: () => {}
   });
 };
 
@@ -75,14 +75,14 @@ export const createHorizontalLayout = () => {
     forceFocus: false,
     autoRestoreFocus: true,
     saveLastFocusedChild: false,
-    onEnterPress: () => { },
-    onEnterRelease: () => { },
-    onFocus: () => { },
-    onBlur: () => { },
+    onEnterPress: () => {},
+    onEnterRelease: () => {},
+    onFocus: () => {},
+    onBlur: () => {},
     onArrowPress: () => true,
-    onArrowRelease: () => { },
-    onUpdateFocus: () => { },
-    onUpdateHasFocusedChild: () => { }
+    onArrowRelease: () => {},
+    onUpdateFocus: () => {},
+    onUpdateHasFocusedChild: () => {}
   });
 
   SpatialNavigation.addFocusable({
@@ -115,14 +115,14 @@ export const createHorizontalLayout = () => {
     forceFocus: false,
     autoRestoreFocus: true,
     saveLastFocusedChild: false,
-    onEnterPress: () => { },
-    onEnterRelease: () => { },
-    onFocus: () => { },
-    onBlur: () => { },
+    onEnterPress: () => {},
+    onEnterRelease: () => {},
+    onFocus: () => {},
+    onBlur: () => {},
     onArrowPress: () => true,
-    onArrowRelease: () => { },
-    onUpdateFocus: () => { },
-    onUpdateHasFocusedChild: () => { }
+    onArrowRelease: () => {},
+    onUpdateFocus: () => {},
+    onUpdateHasFocusedChild: () => {}
   });
 
   SpatialNavigation.addFocusable({
@@ -155,14 +155,14 @@ export const createHorizontalLayout = () => {
     forceFocus: false,
     autoRestoreFocus: true,
     saveLastFocusedChild: false,
-    onEnterPress: () => { },
-    onEnterRelease: () => { },
-    onFocus: () => { },
-    onBlur: () => { },
+    onEnterPress: () => {},
+    onEnterRelease: () => {},
+    onFocus: () => {},
+    onBlur: () => {},
     onArrowPress: () => true,
-    onArrowRelease: () => { },
-    onUpdateFocus: () => { },
-    onUpdateHasFocusedChild: () => { }
+    onArrowRelease: () => {},
+    onUpdateFocus: () => {},
+    onUpdateHasFocusedChild: () => {}
   });
 };
 
@@ -199,14 +199,14 @@ export const createVerticalLayout = () => {
     forceFocus: false,
     autoRestoreFocus: true,
     saveLastFocusedChild: false,
-    onEnterPress: () => { },
-    onEnterRelease: () => { },
-    onFocus: () => { },
-    onBlur: () => { },
+    onEnterPress: () => {},
+    onEnterRelease: () => {},
+    onFocus: () => {},
+    onBlur: () => {},
     onArrowPress: () => true,
-    onArrowRelease: () => { },
-    onUpdateFocus: () => { },
-    onUpdateHasFocusedChild: () => { }
+    onArrowRelease: () => {},
+    onUpdateFocus: () => {},
+    onUpdateHasFocusedChild: () => {}
   });
 
   SpatialNavigation.addFocusable({
@@ -239,13 +239,13 @@ export const createVerticalLayout = () => {
     forceFocus: false,
     autoRestoreFocus: true,
     saveLastFocusedChild: false,
-    onEnterPress: () => { },
-    onEnterRelease: () => { },
-    onFocus: () => { },
-    onBlur: () => { },
+    onEnterPress: () => {},
+    onEnterRelease: () => {},
+    onFocus: () => {},
+    onBlur: () => {},
     onArrowPress: () => true,
-    onArrowRelease: () => { },
-    onUpdateFocus: () => { },
-    onUpdateHasFocusedChild: () => { }
+    onArrowRelease: () => {},
+    onUpdateFocus: () => {},
+    onUpdateHasFocusedChild: () => {}
   });
 };

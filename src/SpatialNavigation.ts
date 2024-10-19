@@ -157,9 +157,9 @@ const getChildClosestToOrigin = (
   const comparator =
     writingDirection === WritingDirection.LTR
       ? ({ layout }: FocusableComponent) =>
-        Math.abs(layout.left) + Math.abs(layout.top)
+          Math.abs(layout.left) + Math.abs(layout.top)
       : ({ layout }: FocusableComponent) =>
-        Math.abs(window.innerWidth - layout.right) + Math.abs(layout.top);
+          Math.abs(window.innerWidth - layout.right) + Math.abs(layout.top);
 
   const childrenClosestToOrigin = sortBy(children, comparator);
 
@@ -274,22 +274,22 @@ class SpatialNavigationService {
     const itemStart = isVertical
       ? layout.top
       : writingDirection === WritingDirection.LTR
-        ? layout.left
-        : layout.right;
+      ? layout.left
+      : layout.right;
 
     const itemEnd = isVertical
       ? layout.bottom
       : writingDirection === WritingDirection.LTR
-        ? layout.right
-        : layout.left;
+      ? layout.right
+      : layout.left;
 
     return isIncremental
       ? isSibling
         ? itemStart
         : itemEnd
       : isSibling
-        ? itemEnd
-        : itemStart;
+      ? itemEnd
+      : itemStart;
   }
 
   /**
@@ -407,7 +407,7 @@ class SpatialNavigationService {
     const intersectionLength = Math.max(
       0,
       Math.min(refCoordinateB, siblingCoordinateB) -
-      Math.max(refCoordinateA, siblingCoordinateA)
+        Math.max(refCoordinateA, siblingCoordinateA)
     );
 
     return intersectionLength >= thresholdDistance;
@@ -1071,12 +1071,12 @@ class SpatialNavigationService {
               ? siblingCutoffCoordinate >= currentCutoffCoordinate // vertical next
               : siblingCutoffCoordinate <= currentCutoffCoordinate // vertical previous
             : this.writingDirection === WritingDirection.LTR
-              ? isIncrementalDirection
-                ? siblingCutoffCoordinate >= currentCutoffCoordinate // horizontal LTR next
-                : siblingCutoffCoordinate <= currentCutoffCoordinate // horizontal LTR previous
-              : isIncrementalDirection
-                ? siblingCutoffCoordinate <= currentCutoffCoordinate // horizontal RTL next
-                : siblingCutoffCoordinate >= currentCutoffCoordinate; // horizontal RTL previous
+            ? isIncrementalDirection
+              ? siblingCutoffCoordinate >= currentCutoffCoordinate // horizontal LTR next
+              : siblingCutoffCoordinate <= currentCutoffCoordinate // horizontal LTR previous
+            : isIncrementalDirection
+            ? siblingCutoffCoordinate <= currentCutoffCoordinate // horizontal RTL next
+            : siblingCutoffCoordinate >= currentCutoffCoordinate; // horizontal RTL previous
         }
 
         return false;
@@ -1160,7 +1160,8 @@ class SpatialNavigationService {
       // eslint-disable-next-line no-console
       console.log(
         `%c${functionName}%c${debugString}`,
-        `background: ${DEBUG_FN_COLORS[this.logIndex % DEBUG_FN_COLORS.length]
+        `background: ${
+          DEBUG_FN_COLORS[this.logIndex % DEBUG_FN_COLORS.length]
         }; color: black; padding: 1px 5px;`,
         'background: #333; color: #BADA55; padding: 1px 5px;',
         ...rest
