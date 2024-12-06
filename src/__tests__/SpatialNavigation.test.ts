@@ -133,7 +133,8 @@ describe('SpatialNavigation', () => {
       onEnterRelease: () => {},
       onFocus: () => {},
       onBlur: () => {},
-      onArrowPress: () => true
+      onArrowPress: () => true,
+      onArrowRelease: () => {},
     });
 
     SpatialNavigation.navigateByDirection('right', {});

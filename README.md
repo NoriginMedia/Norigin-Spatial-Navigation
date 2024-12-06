@@ -466,6 +466,10 @@ Receives `direction` (`left`, `right`, `up`, `down`), `extraProps` (see below) a
 This callback HAS to return `true` if you want to proceed with the default directional navigation behavior, or `false`
 if you want to block the navigation in the specified direction.
 
+##### `onArrowRelease` (function)
+Callback that is called when the component is focused and Arrow key is released.
+Receives `direction` (`left`, `right`, `up`, `down`), `extraProps` (see below) as argument.
+
 ##### `onFocus` (function)
 Callback that is called when component gets focus.
 Receives `FocusableComponentLayout`, `extraProps` and `FocusDetails` as arguments.

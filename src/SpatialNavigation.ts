@@ -80,6 +80,7 @@ interface FocusableComponent {
   onEnterPress: (details?: KeyPressDetails) => void;
   onEnterRelease: () => void;
   onArrowPress: (direction: string, details: KeyPressDetails) => boolean;
+  onArrowRelease: (direction: string) => void;
   onFocus: (layout: FocusableComponentLayout, details: FocusDetails) => void;
   onBlur: (layout: FocusableComponentLayout, details: FocusDetails) => void;
   onUpdateFocus: (focused: boolean) => void;
@@ -106,6 +107,7 @@ interface FocusableComponentUpdatePayload {
   onEnterPress: (details?: KeyPressDetails) => void;
   onEnterRelease: () => void;
   onArrowPress: (direction: string, details: KeyPressDetails) => boolean;
+  onArrowRelease: (direction: string) => void;
   onFocus: (layout: FocusableComponentLayout, details: FocusDetails) => void;
   onBlur: (layout: FocusableComponentLayout, details: FocusDetails) => void;
 }
@@ -830,6 +832,14 @@ class SpatialNavigationService {
         if (eventType === KEY_ENTER && this.focusKey) {
           this.onEnterRelease();
         }
+
+        if (this.focusKey && (
+          eventType === DIRECTION_LEFT ||
+          eventType === DIRECTION_RIGHT ||
+          eventType === DIRECTION_UP ||
+          eventType === DIRECTION_DOWN)) {
+          this.onArrowRelease(eventType)
+        }
       };
 
       window.addEventListener('keyup', this.keyUpEventListener);
@@ -919,6 +929,28 @@ class SpatialNavigationService {
       component.onArrowPress &&
       component.onArrowPress(direction, keysDetails)
     );
+  }
+
+  onArrowRelease(direction: string) {
+    const component = this.focusableComponents[this.focusKey];
+
+    /* Guard against last-focused component being unmounted at time of onArrowRelease (e.g due to UI fading out) */
+    if (!component) {
+      this.log('onArrowRelease', 'noComponent');
+
+      return;
+    }
+
+    /* Suppress onArrowRelease if the last-focused item happens to lose its 'focused' status. */
+    if (!component.focusable) {
+      this.log('onArrowRelease', 'componentNotFocusable');
+
+      return;
+    }
+
+    if (component.onArrowRelease) {
+      component.onArrowRelease(direction);
+    }
   }
 
   /**
@@ -1275,6 +1307,7 @@ class SpatialNavigationService {
     onEnterPress,
     onEnterRelease,
     onArrowPress,
+    onArrowRelease,
     onFocus,
     onBlur,
     saveLastFocusedChild,
@@ -1295,6 +1328,7 @@ class SpatialNavigationService {
       onEnterPress,
       onEnterRelease,
       onArrowPress,
+      onArrowRelease,
       onFocus,
       onBlur,
       onUpdateFocus,
