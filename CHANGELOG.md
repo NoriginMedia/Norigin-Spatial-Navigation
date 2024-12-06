@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# [2.2.2]
+## Added
+- New export for `SpatialNavigation` core service with types
+
+## Fixed
+- Some Prettier formatting issues
+
 # [2.2.1]
 ## Added
 - New init config option `distanceCalculationMethod` that allows switching between edge-based, center-based and corner-based (default) distance calculations.
