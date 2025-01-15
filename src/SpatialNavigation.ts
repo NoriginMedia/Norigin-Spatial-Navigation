@@ -1451,9 +1451,7 @@ class SpatialNavigationService {
         focusDetails
       );
 
-      if (oldComponent.node) {
-        oldComponent.node.removeAttribute('data-focused');
-      }
+      oldComponent.node?.removeAttribute?.('data-focused');
 
       this.log('setCurrentFocusedKey', 'onBlur', oldComponent);
     }
@@ -1467,9 +1465,7 @@ class SpatialNavigationService {
         newComponent.node.focus(this.domNodeFocusOptions);
       }
 
-      if (newComponent.node) {
-        newComponent.node.setAttribute('data-focused', 'true');
-      }
+      newComponent.node?.setAttribute?.('data-focused', 'true');
 
       newComponent.onUpdateFocus(true);
       newComponent.onFocus(
