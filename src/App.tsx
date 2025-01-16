@@ -321,6 +321,7 @@ function ContentRow({
               <Asset
                 index={index}
                 title={title}
+                key={title}
                 color={color}
                 onEnterPress={onAssetPress}
                 onFocus={onAssetFocus}

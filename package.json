@@ -1,6 +1,6 @@
 {
   "name": "@noriginmedia/norigin-spatial-navigation",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "description": "React hooks based Spatial Navigation solution",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
