@@ -1613,7 +1613,7 @@ class SpatialNavigationService {
     // Cancel any pending auto-restore focus calls if we are setting focus manually
     this.setFocusDebounced.cancel();
 
-    if (!this.enabled || this.nativeMode) {
+    if (!this.enabled) {
       return;
     }
 
