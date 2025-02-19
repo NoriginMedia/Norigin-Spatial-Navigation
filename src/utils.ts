@@ -18,4 +18,47 @@ const difference = <T extends string | number>(array: T[], ...values: T[][]): T[
   return array.filter(item => !exclusionSet.has(item));
 }
 
-export { findKey, difference }
+type DebouncedFunc<T extends (...args: any[]) => void> = {
+  (...args: Parameters<T>): void;
+  cancel: () => void;
+};
+
+function debounce<T extends (...args: any[]) => void>(
+  func: T,
+  wait: number,
+  { leading = false, trailing = true }: { leading?: boolean; trailing?: boolean }
+): DebouncedFunc<T> {
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
+  let lastArgs: Parameters<T> | null = null;
+
+  const invokeFunc = (args: Parameters<T>) => {
+    func(...args);
+  };
+
+  const debounced = (...args: Parameters<T>) => {
+    lastArgs = args;
+
+    if (leading && !timeoutId) {
+      invokeFunc(args); // Call immediately on the first call
+    }
+
+    if (timeoutId) clearTimeout(timeoutId);
+
+    timeoutId = setTimeout(() => {
+      if (trailing && lastArgs) {
+        invokeFunc(lastArgs); // Call on trailing edge
+      }
+      timeoutId = null;
+    }, wait);
+  };
+
+  // Add the cancel method to clear any pending timeout
+  debounced.cancel = () => {
+    if (timeoutId) clearTimeout(timeoutId);
+    timeoutId = null;
+  };
+
+  return debounced;
+}
+
+export { findKey, difference, debounce, DebouncedFunc }
