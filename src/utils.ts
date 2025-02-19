@@ -31,7 +31,7 @@ const shuffle = <T>(array: T[]): T[] => {
   const shuffledArray = [...array];
 
   // Fisher-Yates (Knuth) shuffle algorithm
-  for (let i = shuffledArray.length - 1; i > 0; i -=1) {
+  for (let i = shuffledArray.length - 1; i > 0; i -= 1) {
     const j = Math.floor(Math.random() * (i + 1));
     [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]]; // Swap elements
   }
@@ -102,31 +102,34 @@ const throttle = <T extends (...args: any[]) => void>(
   };
 
   const throttled: ThrottleFunc<T> = (...args: Parameters<T>) => {
+    lastArgs = args;
     const now = Date.now();
-    const remainingTime = wait - (now - lastExecuted);
+    const timeSinceLastCall = now - lastExecuted;
+    const remainingTime = wait - timeSinceLastCall;
 
     if (remainingTime <= 0) {
       if (leading) {
-        invokeFunc(args);  // Call immediately if enough time has passed
+        invokeFunc(args);
       }
-    } else if (!timeoutId && trailing) {
+    } else if (trailing && !timeoutId) {
       timeoutId = setTimeout(() => {
         if (lastArgs) {
-          invokeFunc(lastArgs);  // Call the function on trailing edge
+          invokeFunc(lastArgs);
         }
         timeoutId = null;
       }, remainingTime);
     }
-
-    lastArgs = args;
   };
 
   throttled.cancel = () => {
-    if (timeoutId) clearTimeout(timeoutId);
-    timeoutId = null;
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      timeoutId = null;
+    }
+    lastExecuted = 0; // Reset lastExecuted time to ensure it can be triggered again
   };
 
   return throttled;
-};
+}
 
 export { findKey, difference, debounce, DebouncedFunc, throttle, noop, uniqueId, shuffle }
