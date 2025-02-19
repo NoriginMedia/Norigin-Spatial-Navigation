@@ -8,7 +8,6 @@ import React, { useCallback, useEffect, useState, useRef } from 'react';
 import ReactDOMClient from 'react-dom/client';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import styled, { createGlobalStyle } from 'styled-components';
-import shuffle from 'lodash/shuffle';
 import {
   useFocusable,
   init,
@@ -17,6 +16,7 @@ import {
   FocusableComponentLayout,
   KeyPressDetails
 } from './index';
+import { shuffle } from './utils';
 
 const logo = require('../logo.png').default;
 

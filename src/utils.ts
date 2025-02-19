@@ -27,6 +27,18 @@ const uniqueId = (prefix: string = ''): string => {
   return `${prefix}${counter}`;
 };
 
+const shuffle = <T>(array: T[]): T[] => {
+  const shuffledArray = [...array];
+
+  // Fisher-Yates (Knuth) shuffle algorithm
+  for (let i = shuffledArray.length - 1; i > 0; i -=1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]]; // Swap elements
+  }
+
+  return shuffledArray;
+};
+
 type DebouncedFunc<T extends (...args: any[]) => void> = {
   (...args: Parameters<T>): void;
   cancel: () => void;
@@ -117,4 +129,4 @@ const throttle = <T extends (...args: any[]) => void>(
   return throttled;
 };
 
-export { findKey, difference, debounce, DebouncedFunc, throttle, noop, uniqueId }
+export { findKey, difference, debounce, DebouncedFunc, throttle, noop, uniqueId, shuffle }
