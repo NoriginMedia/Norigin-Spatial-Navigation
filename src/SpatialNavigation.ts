@@ -1,8 +1,7 @@
-import throttle from 'lodash/throttle';
 import VisualDebugger from './VisualDebugger';
 import WritingDirection from './WritingDirection';
 import measureLayout, { getBoundingClientRect } from './measureLayout';
-import { debounce, DebouncedFunc, difference, findKey } from './utils';
+import { debounce, DebouncedFunc, difference, findKey, throttle } from './utils';
 
 const DIRECTION_LEFT = 'left';
 const DIRECTION_RIGHT = 'right';

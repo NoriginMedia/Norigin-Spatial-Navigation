@@ -61,4 +61,51 @@ function debounce<T extends (...args: any[]) => void>(
   return debounced;
 }
 
-export { findKey, difference, debounce, DebouncedFunc }
+type ThrottleFunc<T extends (...args: any[]) => void> = {
+  (...args: Parameters<T>): void;
+  cancel: () => void;
+};
+
+const throttle = <T extends (...args: any[]) => void>(
+  func: T,
+  wait: number,
+  { leading = true, trailing = true }: { leading?: boolean; trailing?: boolean } = {}
+): ThrottleFunc<T> => {
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
+  let lastExecuted = 0;
+  let lastArgs: Parameters<T> | null = null;
+
+  const invokeFunc = (args: Parameters<T>) => {
+    func(...args);
+    lastExecuted = Date.now();
+  };
+
+  const throttled: ThrottleFunc<T> = (...args: Parameters<T>) => {
+    const now = Date.now();
+    const remainingTime = wait - (now - lastExecuted);
+
+    if (remainingTime <= 0) {
+      if (leading) {
+        invokeFunc(args);  // Call immediately if enough time has passed
+      }
+    } else if (!timeoutId && trailing) {
+        timeoutId = setTimeout(() => {
+          if (lastArgs) {
+            invokeFunc(lastArgs);  // Call the function on trailing edge
+          }
+          timeoutId = null;
+        }, remainingTime);
+      }
+
+    lastArgs = args;
+  };
+
+  throttled.cancel = () => {
+    if (timeoutId) clearTimeout(timeoutId);
+    timeoutId = null;
+  };
+
+  return throttled;
+};
+
+export { findKey, difference, debounce, DebouncedFunc, throttle }
