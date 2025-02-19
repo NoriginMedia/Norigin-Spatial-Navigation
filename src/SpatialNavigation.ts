@@ -1,7 +1,6 @@
 import { DebouncedFunc } from 'lodash';
 import debounce from 'lodash/debounce';
 import difference from 'lodash/difference';
-import forEach from 'lodash/forEach';
 import sortBy from 'lodash/sortBy';
 import throttle from 'lodash/throttle';
 import VisualDebugger from './VisualDebugger';
@@ -1499,7 +1498,7 @@ class SpatialNavigationService {
       this.parentsHavingFocusedChild
     );
 
-    forEach(parentsToRemoveFlag, (parentFocusKey) => {
+    parentsToRemoveFlag.forEach((parentFocusKey) => {
       const parentComponent = this.focusableComponents[parentFocusKey];
 
       if (parentComponent && parentComponent.trackChildren) {
@@ -1508,7 +1507,7 @@ class SpatialNavigationService {
       this.onIntermediateNodeBecameBlurred(parentFocusKey, focusDetails);
     });
 
-    forEach(parentsToAddFlag, (parentFocusKey) => {
+    parentsToAddFlag.forEach((parentFocusKey) => {
       const parentComponent = this.focusableComponents[parentFocusKey];
 
       if (parentComponent && parentComponent.trackChildren) {
