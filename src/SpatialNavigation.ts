@@ -2,7 +2,6 @@ import { DebouncedFunc } from 'lodash';
 import debounce from 'lodash/debounce';
 import difference from 'lodash/difference';
 import forEach from 'lodash/forEach';
-import forOwn from 'lodash/forOwn';
 import sortBy from 'lodash/sortBy';
 import throttle from 'lodash/throttle';
 import VisualDebugger from './VisualDebugger';
@@ -693,7 +692,8 @@ class SpatialNavigationService {
           const draw = () => {
             requestAnimationFrame(() => {
               this.visualDebugger.clearLayouts();
-              forOwn(this.focusableComponents, (component, focusKey) => {
+              Object.keys(this.focusableComponents).forEach((focusKey) => {
+                const component = this.focusableComponents[focusKey];
                 this.visualDebugger.drawLayout(
                   component.layout,
                   focusKey,
@@ -975,7 +975,7 @@ class SpatialNavigationService {
     this.log('smartNavigate', 'this.focusKey', this.focusKey);
 
     if (!fromParentFocusKey) {
-      forOwn(this.focusableComponents, (component) => {
+      Object.values(this.focusableComponents).forEach((component) => {
         // eslint-disable-next-line no-param-reassign
         component.layoutUpdated = false;
       });
@@ -1634,7 +1634,7 @@ class SpatialNavigationService {
       return;
     }
 
-    forOwn(this.focusableComponents, (component, focusKey) => {
+    Object.keys(this.focusableComponents).forEach((focusKey) => {
       this.updateLayout(focusKey);
     });
   }
