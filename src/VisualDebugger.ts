@@ -1,4 +1,4 @@
-import WritingDirection from "./WritingDirection";
+import WritingDirection from './WritingDirection';
 
 // We'll make VisualDebugger no-op for any environments lacking a DOM (e.g. SSR and React Native non-web platforms).
 const hasDOM = typeof window !== 'undefined' && window.document;
@@ -24,18 +24,33 @@ class VisualDebugger {
 
   constructor(writingDirection: WritingDirection) {
     if (hasDOM) {
-      this.debugCtx = VisualDebugger.createCanvas('sn-debug', '1010', writingDirection);
-      this.layoutsCtx = VisualDebugger.createCanvas('sn-layouts', '1000', writingDirection);
+      this.debugCtx = VisualDebugger.createCanvas(
+        'sn-debug',
+        '1010',
+        writingDirection
+      );
+      this.layoutsCtx = VisualDebugger.createCanvas(
+        'sn-layouts',
+        '1000',
+        writingDirection
+      );
       this.writingDirection = writingDirection;
     }
   }
 
-  static createCanvas(id: string, zIndex: string, writingDirection: WritingDirection) {
+  static createCanvas(
+    id: string,
+    zIndex: string,
+    writingDirection: WritingDirection
+  ) {
     const canvas: HTMLCanvasElement =
       document.querySelector(`#${id}`) || document.createElement('canvas');
 
     canvas.setAttribute('id', id);
-    canvas.setAttribute('dir', writingDirection === WritingDirection.LTR ? "ltr" : "rtl");
+    canvas.setAttribute(
+      'dir',
+      writingDirection === WritingDirection.LTR ? 'ltr' : 'rtl'
+    );
 
     const ctx = canvas.getContext('2d');
 
@@ -82,11 +97,20 @@ class VisualDebugger {
     this.layoutsCtx.font = '8px monospace';
     this.layoutsCtx.fillStyle = 'red';
 
-    const horizontalStartDirection = this.writingDirection === WritingDirection.LTR ? "left" : "right";
+    const horizontalStartDirection =
+      this.writingDirection === WritingDirection.LTR ? 'left' : 'right';
     const horizontalStartCoordinate = layout[horizontalStartDirection];
 
-    this.layoutsCtx.fillText(focusKey, horizontalStartCoordinate, layout.top + 10);
-    this.layoutsCtx.fillText(parentFocusKey, horizontalStartCoordinate, layout.top + 25);
+    this.layoutsCtx.fillText(
+      focusKey,
+      horizontalStartCoordinate,
+      layout.top + 10
+    );
+    this.layoutsCtx.fillText(
+      parentFocusKey,
+      horizontalStartCoordinate,
+      layout.top + 25
+    );
     this.layoutsCtx.fillText(
       `${horizontalStartDirection}: ${horizontalStartCoordinate}`,
       horizontalStartCoordinate,
