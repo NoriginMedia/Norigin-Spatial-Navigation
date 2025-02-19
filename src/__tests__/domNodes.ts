@@ -36,6 +36,7 @@ export const createRootNode = () => {
     onFocus: () => {},
     onBlur: () => {},
     onArrowPress: () => true,
+    onArrowRelease: () => {},
     onUpdateFocus: () => {},
     onUpdateHasFocusedChild: () => {}
   });
@@ -79,6 +80,7 @@ export const createHorizontalLayout = () => {
     onFocus: () => {},
     onBlur: () => {},
     onArrowPress: () => true,
+    onArrowRelease: () => {},
     onUpdateFocus: () => {},
     onUpdateHasFocusedChild: () => {}
   });
@@ -118,6 +120,7 @@ export const createHorizontalLayout = () => {
     onFocus: () => {},
     onBlur: () => {},
     onArrowPress: () => true,
+    onArrowRelease: () => {},
     onUpdateFocus: () => {},
     onUpdateHasFocusedChild: () => {}
   });
@@ -157,6 +160,7 @@ export const createHorizontalLayout = () => {
     onFocus: () => {},
     onBlur: () => {},
     onArrowPress: () => true,
+    onArrowRelease: () => {},
     onUpdateFocus: () => {},
     onUpdateHasFocusedChild: () => {}
   });
@@ -200,6 +204,7 @@ export const createVerticalLayout = () => {
     onFocus: () => {},
     onBlur: () => {},
     onArrowPress: () => true,
+    onArrowRelease: () => {},
     onUpdateFocus: () => {},
     onUpdateHasFocusedChild: () => {}
   });
@@ -239,6 +244,7 @@ export const createVerticalLayout = () => {
     onFocus: () => {},
     onBlur: () => {},
     onArrowPress: () => true,
+    onArrowRelease: () => {},
     onUpdateFocus: () => {},
     onUpdateHasFocusedChild: () => {}
   });
