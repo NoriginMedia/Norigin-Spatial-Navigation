@@ -1,6 +1,5 @@
 import { DebouncedFunc } from 'lodash';
 import debounce from 'lodash/debounce';
-import sortBy from 'lodash/sortBy';
 import throttle from 'lodash/throttle';
 import VisualDebugger from './VisualDebugger';
 import WritingDirection from './WritingDirection';
@@ -147,14 +146,15 @@ const getChildClosestToOrigin = (
   children: FocusableComponent[],
   writingDirection: WritingDirection
 ) => {
-  const comparator =
-    writingDirection === WritingDirection.LTR
-      ? ({ layout }: FocusableComponent) =>
-        Math.abs(layout.left) + Math.abs(layout.top)
-      : ({ layout }: FocusableComponent) =>
-        Math.abs(window.innerWidth - layout.right) + Math.abs(layout.top);
+  const comparator = writingDirection === WritingDirection.LTR
+    ? (a: FocusableComponent, b: FocusableComponent) =>
+      (Math.abs(a.layout.left) + Math.abs(a.layout.top)) -
+      (Math.abs(b.layout.left) + Math.abs(b.layout.top))
+    : (a: FocusableComponent, b: FocusableComponent) =>
+      (Math.abs(window.innerWidth - a.layout.right) + Math.abs(a.layout.top)) -
+      (Math.abs(window.innerWidth - b.layout.right) + Math.abs(b.layout.top));
 
-  const childrenClosestToOrigin = sortBy(children, comparator);
+  const childrenClosestToOrigin = children.sort(comparator);
 
   return childrenClosestToOrigin[0]
 };
@@ -505,37 +505,68 @@ class SpatialNavigationService {
       currentLayout
     );
 
-    return sortBy(siblings, (sibling) => {
-      const siblingCorners = SpatialNavigationService.getRefCorners(
+    return siblings.sort((a, b) => {
+      const siblingCornersA = SpatialNavigationService.getRefCorners(
         direction,
         true,
-        sibling.layout
+        a.layout
+      );
+      const siblingCornersB = SpatialNavigationService.getRefCorners(
+        direction,
+        true,
+        b.layout
       );
 
-      const isAdjacentSlice = SpatialNavigationService.isAdjacentSlice(
+      const isAdjacentSliceA = SpatialNavigationService.isAdjacentSlice(
         refCorners,
-        siblingCorners,
+        siblingCornersA,
+        isVerticalDirection
+      );
+      const isAdjacentSliceB = SpatialNavigationService.isAdjacentSlice(
+        refCorners,
+        siblingCornersB,
         isVerticalDirection
       );
 
-      const primaryAxisFunction = isAdjacentSlice
+      const primaryAxisFunctionA = isAdjacentSliceA
+        ? SpatialNavigationService.getPrimaryAxisDistance
+        : SpatialNavigationService.getSecondaryAxisDistance;
+      const primaryAxisFunctionB = isAdjacentSliceB
         ? SpatialNavigationService.getPrimaryAxisDistance
         : SpatialNavigationService.getSecondaryAxisDistance;
 
-      const secondaryAxisFunction = isAdjacentSlice
+      const secondaryAxisFunctionA = isAdjacentSliceA
+        ? SpatialNavigationService.getSecondaryAxisDistance
+        : SpatialNavigationService.getPrimaryAxisDistance;
+      const secondaryAxisFunctionB = isAdjacentSliceB
         ? SpatialNavigationService.getSecondaryAxisDistance
         : SpatialNavigationService.getPrimaryAxisDistance;
 
-      const primaryAxisDistance = primaryAxisFunction(
+      const primaryAxisDistanceA = primaryAxisFunctionA(
         refCorners,
-        siblingCorners,
+        siblingCornersA,
         isVerticalDirection,
         this.distanceCalculationMethod,
         this.customDistanceCalculationFunction
       );
-      const secondaryAxisDistance = secondaryAxisFunction(
+      const primaryAxisDistanceB = primaryAxisFunctionB(
         refCorners,
-        siblingCorners,
+        siblingCornersB,
+        isVerticalDirection,
+        this.distanceCalculationMethod,
+        this.customDistanceCalculationFunction
+      );
+
+      const secondaryAxisDistanceA = secondaryAxisFunctionA(
+        refCorners,
+        siblingCornersA,
+        isVerticalDirection,
+        this.distanceCalculationMethod,
+        this.customDistanceCalculationFunction
+      );
+      const secondaryAxisDistanceB = secondaryAxisFunctionB(
+        refCorners,
+        siblingCornersB,
         isVerticalDirection,
         this.distanceCalculationMethod,
         this.customDistanceCalculationFunction
@@ -544,46 +575,51 @@ class SpatialNavigationService {
       /**
        * The higher this value is, the less prioritised the candidate is
        */
-      const totalDistancePoints =
-        primaryAxisDistance * MAIN_COORDINATE_WEIGHT + secondaryAxisDistance;
+      const totalDistancePointsA =
+        primaryAxisDistanceA * MAIN_COORDINATE_WEIGHT + secondaryAxisDistanceA;
+      const totalDistancePointsB =
+        primaryAxisDistanceB * MAIN_COORDINATE_WEIGHT + secondaryAxisDistanceB;
 
       /**
        * + 1 here is in case of distance is zero, but we still want to apply Adjacent priority weight
        */
-      const priority =
-        (totalDistancePoints + 1) /
-        (isAdjacentSlice ? ADJACENT_SLICE_WEIGHT : DIAGONAL_SLICE_WEIGHT);
+      const priorityA =
+        (totalDistancePointsA + 1) /
+        (isAdjacentSliceA ? ADJACENT_SLICE_WEIGHT : DIAGONAL_SLICE_WEIGHT);
+      const priorityB =
+        (totalDistancePointsB + 1) /
+        (isAdjacentSliceB ? ADJACENT_SLICE_WEIGHT : DIAGONAL_SLICE_WEIGHT);
 
       this.log(
         'smartNavigate',
-        `distance (primary, secondary, total weighted) for ${sibling.focusKey} relative to ${focusKey} is`,
-        primaryAxisDistance,
-        secondaryAxisDistance,
-        totalDistancePoints
+        `distance (primary, secondary, total weighted) for ${a.focusKey} relative to ${focusKey} is`,
+        primaryAxisDistanceA,
+        secondaryAxisDistanceA,
+        totalDistancePointsA
       );
 
       this.log(
         'smartNavigate',
-        `priority for ${sibling.focusKey} relative to ${focusKey} is`,
-        priority
+        `priority for ${a.focusKey} relative to ${focusKey} is`,
+        priorityA
       );
 
       if (this.visualDebugger) {
         this.visualDebugger.drawPoint(
-          siblingCorners.a.x,
-          siblingCorners.a.y,
+          siblingCornersA.a.x,
+          siblingCornersA.a.y,
           'yellow',
           6
         );
         this.visualDebugger.drawPoint(
-          siblingCorners.b.x,
-          siblingCorners.b.y,
+          siblingCornersA.b.x,
+          siblingCornersA.b.y,
           'yellow',
           6
         );
       }
 
-      return priority;
+      return priorityA - priorityB;
     });
   }
 
