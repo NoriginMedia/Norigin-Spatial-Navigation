@@ -1,7 +1,6 @@
 import { DebouncedFunc } from 'lodash';
 import debounce from 'lodash/debounce';
 import difference from 'lodash/difference';
-import filter from 'lodash/filter';
 import first from 'lodash/first';
 import forEach from 'lodash/forEach';
 import forOwn from 'lodash/forOwn';
@@ -1019,7 +1018,7 @@ class SpatialNavigationService {
       /**
        * Get only the siblings with the coords on the way of our moving direction
        */
-      const siblings = filter(this.focusableComponents, (component) => {
+      const siblings = Object.values(this.focusableComponents).filter((component) => {
         if (
           component.parentFocusKey === parentFocusKey &&
           component.focusable
@@ -1149,8 +1148,7 @@ class SpatialNavigationService {
    * A component closest to the top left viewport corner (0,0) is returned.
    */
   getForcedFocusKey(): string | undefined {
-    const forceFocusableComponents = filter(
-      this.focusableComponents,
+    const forceFocusableComponents = Object.values(this.focusableComponents).filter(
       (component) => component.focusable && component.forceFocus
     );
 
@@ -1193,10 +1191,8 @@ class SpatialNavigationService {
       return targetFocusKey;
     }
 
-    const children = filter(
-      this.focusableComponents,
-      (component) =>
-        component.parentFocusKey === targetFocusKey && component.focusable
+    const children = Object.values(this.focusableComponents).filter((component) =>
+      component.parentFocusKey === targetFocusKey && component.focusable
     );
 
     if (children.length > 0) {
