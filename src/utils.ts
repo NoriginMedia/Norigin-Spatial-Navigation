@@ -13,21 +13,30 @@ const findKey = <T>(
  * This function only works for string or numbers since Set checks for reference equality,
  * meaning objects wouldn't work.
  */
-const difference = <T extends string | number>(array: T[], ...values: T[][]): T[]  => {
+const difference = <T extends string | number>(array: T[], ...values: T[][]): T[] => {
   const exclusionSet = new Set(values.flat());
   return array.filter(item => !exclusionSet.has(item));
 }
+
+const noop: VoidFunction = () => null;
+
+let counter = 0;
+
+const uniqueId = (prefix: string = ''): string => {
+  counter += 1;
+  return `${prefix}${counter}`;
+};
 
 type DebouncedFunc<T extends (...args: any[]) => void> = {
   (...args: Parameters<T>): void;
   cancel: () => void;
 };
 
-function debounce<T extends (...args: any[]) => void>(
+const debounce = <T extends (...args: any[]) => void>(
   func: T,
   wait: number,
   { leading = false, trailing = true }: { leading?: boolean; trailing?: boolean }
-): DebouncedFunc<T> {
+): DebouncedFunc<T> => {
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
   let lastArgs: Parameters<T> | null = null;
 
@@ -89,13 +98,13 @@ const throttle = <T extends (...args: any[]) => void>(
         invokeFunc(args);  // Call immediately if enough time has passed
       }
     } else if (!timeoutId && trailing) {
-        timeoutId = setTimeout(() => {
-          if (lastArgs) {
-            invokeFunc(lastArgs);  // Call the function on trailing edge
-          }
-          timeoutId = null;
-        }, remainingTime);
-      }
+      timeoutId = setTimeout(() => {
+        if (lastArgs) {
+          invokeFunc(lastArgs);  // Call the function on trailing edge
+        }
+        timeoutId = null;
+      }, remainingTime);
+    }
 
     lastArgs = args;
   };
@@ -108,4 +117,4 @@ const throttle = <T extends (...args: any[]) => void>(
   return throttled;
 };
 
-export { findKey, difference, debounce, DebouncedFunc, throttle }
+export { findKey, difference, debounce, DebouncedFunc, throttle, noop, uniqueId }

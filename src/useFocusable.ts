@@ -6,8 +6,6 @@ import {
   useEffect,
   useState
 } from 'react';
-import noop from 'lodash/noop';
-import uniqueId from 'lodash/uniqueId';
 import {
   SpatialNavigation,
   FocusableComponentLayout,
@@ -16,6 +14,7 @@ import {
   Direction
 } from './SpatialNavigation';
 import { useFocusContext } from './useFocusContext';
+import { noop, uniqueId } from './utils';
 
 export type EnterPressHandler<P = object> = (
   props: P,
