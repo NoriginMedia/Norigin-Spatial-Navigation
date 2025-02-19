@@ -2,7 +2,6 @@ import { DebouncedFunc } from 'lodash';
 import debounce from 'lodash/debounce';
 import difference from 'lodash/difference';
 import filter from 'lodash/filter';
-import findKey from 'lodash/findKey';
 import first from 'lodash/first';
 import forEach from 'lodash/forEach';
 import forOwn from 'lodash/forOwn';
@@ -11,6 +10,7 @@ import throttle from 'lodash/throttle';
 import VisualDebugger from './VisualDebugger';
 import WritingDirection from './WritingDirection';
 import measureLayout, { getBoundingClientRect } from './measureLayout';
+import { findKey } from './utils';
 
 const DIRECTION_LEFT = 'left';
 const DIRECTION_RIGHT = 'right';
