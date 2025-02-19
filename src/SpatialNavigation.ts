@@ -1,12 +1,11 @@
 import { DebouncedFunc } from 'lodash';
 import debounce from 'lodash/debounce';
-import difference from 'lodash/difference';
 import sortBy from 'lodash/sortBy';
 import throttle from 'lodash/throttle';
 import VisualDebugger from './VisualDebugger';
 import WritingDirection from './WritingDirection';
 import measureLayout, { getBoundingClientRect } from './measureLayout';
-import { findKey } from './utils';
+import { difference, findKey } from './utils';
 
 const DIRECTION_LEFT = 'left';
 const DIRECTION_RIGHT = 'right';
@@ -174,6 +173,7 @@ const normalizeKeyMap = (keyMap: BackwardsCompatibleKeyMap) => {
   return newKeyMap;
 };
 
+
 class SpatialNavigationService {
   private focusableComponents: { [index: string]: FocusableComponent };
 
@@ -268,22 +268,22 @@ class SpatialNavigationService {
     const itemStart = isVertical
       ? layout.top
       : writingDirection === WritingDirection.LTR
-      ? layout.left
-      : layout.right;
+        ? layout.left
+        : layout.right;
 
     const itemEnd = isVertical
       ? layout.bottom
       : writingDirection === WritingDirection.LTR
-      ? layout.right
-      : layout.left;
+        ? layout.right
+        : layout.left;
 
     return isIncremental
       ? isSibling
         ? itemStart
         : itemEnd
       : isSibling
-      ? itemEnd
-      : itemStart;
+        ? itemEnd
+        : itemStart;
   }
 
   /**
@@ -401,7 +401,7 @@ class SpatialNavigationService {
     const intersectionLength = Math.max(
       0,
       Math.min(refCoordinateB, siblingCoordinateB) -
-        Math.max(refCoordinateA, siblingCoordinateA)
+      Math.max(refCoordinateA, siblingCoordinateA)
     );
 
     return intersectionLength >= thresholdDistance;
@@ -1125,8 +1125,7 @@ class SpatialNavigationService {
       // eslint-disable-next-line no-console
       console.log(
         `%c${functionName}%c${debugString}`,
-        `background: ${
-          DEBUG_FN_COLORS[this.logIndex % DEBUG_FN_COLORS.length]
+        `background: ${DEBUG_FN_COLORS[this.logIndex % DEBUG_FN_COLORS.length]
         }; color: black; padding: 1px 5px;`,
         'background: #333; color: #BADA55; padding: 1px 5px;',
         ...rest
