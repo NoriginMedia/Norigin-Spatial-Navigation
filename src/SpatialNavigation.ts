@@ -1,7 +1,6 @@
 import { DebouncedFunc } from 'lodash';
 import debounce from 'lodash/debounce';
 import difference from 'lodash/difference';
-import first from 'lodash/first';
 import forEach from 'lodash/forEach';
 import forOwn from 'lodash/forOwn';
 import sortBy from 'lodash/sortBy';
@@ -154,13 +153,13 @@ const getChildClosestToOrigin = (
   const comparator =
     writingDirection === WritingDirection.LTR
       ? ({ layout }: FocusableComponent) =>
-          Math.abs(layout.left) + Math.abs(layout.top)
+        Math.abs(layout.left) + Math.abs(layout.top)
       : ({ layout }: FocusableComponent) =>
-          Math.abs(window.innerWidth - layout.right) + Math.abs(layout.top);
+        Math.abs(window.innerWidth - layout.right) + Math.abs(layout.top);
 
   const childrenClosestToOrigin = sortBy(children, comparator);
 
-  return first(childrenClosestToOrigin);
+  return childrenClosestToOrigin[0]
 };
 
 /**
@@ -1083,7 +1082,7 @@ class SpatialNavigationService {
         focusKey
       );
 
-      const nextComponent = first(sortedSiblings);
+      const nextComponent = sortedSiblings[0];
 
       this.log(
         'smartNavigate',
@@ -1173,7 +1172,7 @@ class SpatialNavigationService {
       ROOT_FOCUS_KEY
     );
 
-    return first(sortedForceFocusableComponents)?.focusKey;
+    return sortedForceFocusableComponents[0]?.focusKey;
   }
 
   /**
