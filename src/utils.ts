@@ -18,7 +18,7 @@ const difference = <T extends string | number>(array: T[], ...values: T[][]): T[
   return array.filter(item => !exclusionSet.has(item));
 }
 
-const noop: VoidFunction = () => null;
+const noop: VoidFunction = () => {};
 
 let counter = 0;
 
@@ -47,7 +47,7 @@ type DebouncedFunc<T extends (...args: any[]) => void> = {
 const debounce = <T extends (...args: any[]) => void>(
   func: T,
   wait: number,
-  { leading = false, trailing = true }: { leading?: boolean; trailing?: boolean }
+  options?: { leading?: boolean; trailing?: boolean }
 ): DebouncedFunc<T> => {
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
   let lastArgs: Parameters<T> | null = null;
@@ -59,6 +59,7 @@ const debounce = <T extends (...args: any[]) => void>(
   const debounced = (...args: Parameters<T>) => {
     lastArgs = args;
 
+    const { leading = false, trailing = true} = options || {};
     if (leading && !timeoutId) {
       invokeFunc(args); // Call immediately on the first call
     }
