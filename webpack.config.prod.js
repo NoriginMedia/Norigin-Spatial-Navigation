@@ -4,6 +4,7 @@ module.exports = {
   mode: 'production',
   entry: './src/index.ts',
   target: ['web', 'es5'],
+  devtool: 'source-map',
   module: {
     rules: [
       {
@@ -16,7 +17,7 @@ module.exports = {
   resolve: {
     extensions: ['.tsx', '.ts', '.js', '.jsx']
   },
-  externals: ['react', /^lodash(\/.+)?$/],
+  externals: ['react'],
   output: {
     filename: 'index.js',
     path: path.resolve(__dirname, 'dist'),

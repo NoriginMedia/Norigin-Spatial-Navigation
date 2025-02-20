@@ -1,16 +1,7 @@
-import { DebouncedFunc } from 'lodash';
-import debounce from 'lodash/debounce';
-import difference from 'lodash/difference';
-import filter from 'lodash/filter';
-import findKey from 'lodash/findKey';
-import first from 'lodash/first';
-import forEach from 'lodash/forEach';
-import forOwn from 'lodash/forOwn';
-import sortBy from 'lodash/sortBy';
-import throttle from 'lodash/throttle';
 import VisualDebugger from './VisualDebugger';
 import WritingDirection from './WritingDirection';
 import measureLayout, { getBoundingClientRect } from './measureLayout';
+import { debounce, DebouncedFunc, difference, findKey, throttle } from './utils';
 
 const DIRECTION_LEFT = 'left';
 const DIRECTION_RIGHT = 'right';
@@ -154,16 +145,17 @@ const getChildClosestToOrigin = (
   children: FocusableComponent[],
   writingDirection: WritingDirection
 ) => {
-  const comparator =
-    writingDirection === WritingDirection.LTR
-      ? ({ layout }: FocusableComponent) =>
-          Math.abs(layout.left) + Math.abs(layout.top)
-      : ({ layout }: FocusableComponent) =>
-          Math.abs(window.innerWidth - layout.right) + Math.abs(layout.top);
+  const comparator = writingDirection === WritingDirection.LTR
+    ? (a: FocusableComponent, b: FocusableComponent) =>
+      (Math.abs(a.layout.left) + Math.abs(a.layout.top)) -
+      (Math.abs(b.layout.left) + Math.abs(b.layout.top))
+    : (a: FocusableComponent, b: FocusableComponent) =>
+      (Math.abs(window.innerWidth - a.layout.right) + Math.abs(a.layout.top)) -
+      (Math.abs(window.innerWidth - b.layout.right) + Math.abs(b.layout.top));
 
-  const childrenClosestToOrigin = sortBy(children, comparator);
+  const childrenClosestToOrigin = children.sort(comparator);
 
-  return first(childrenClosestToOrigin);
+  return childrenClosestToOrigin[0]
 };
 
 /**
@@ -179,6 +171,7 @@ const normalizeKeyMap = (keyMap: BackwardsCompatibleKeyMap) => {
 
   return newKeyMap;
 };
+
 
 class SpatialNavigationService {
   private focusableComponents: { [index: string]: FocusableComponent };
@@ -274,22 +267,22 @@ class SpatialNavigationService {
     const itemStart = isVertical
       ? layout.top
       : writingDirection === WritingDirection.LTR
-      ? layout.left
-      : layout.right;
+        ? layout.left
+        : layout.right;
 
     const itemEnd = isVertical
       ? layout.bottom
       : writingDirection === WritingDirection.LTR
-      ? layout.right
-      : layout.left;
+        ? layout.right
+        : layout.left;
 
     return isIncremental
       ? isSibling
         ? itemStart
         : itemEnd
       : isSibling
-      ? itemEnd
-      : itemStart;
+        ? itemEnd
+        : itemStart;
   }
 
   /**
@@ -407,7 +400,7 @@ class SpatialNavigationService {
     const intersectionLength = Math.max(
       0,
       Math.min(refCoordinateB, siblingCoordinateB) -
-        Math.max(refCoordinateA, siblingCoordinateA)
+      Math.max(refCoordinateA, siblingCoordinateA)
     );
 
     return intersectionLength >= thresholdDistance;
@@ -511,37 +504,68 @@ class SpatialNavigationService {
       currentLayout
     );
 
-    return sortBy(siblings, (sibling) => {
-      const siblingCorners = SpatialNavigationService.getRefCorners(
+    return siblings.sort((a, b) => {
+      const siblingCornersA = SpatialNavigationService.getRefCorners(
         direction,
         true,
-        sibling.layout
+        a.layout
+      );
+      const siblingCornersB = SpatialNavigationService.getRefCorners(
+        direction,
+        true,
+        b.layout
       );
 
-      const isAdjacentSlice = SpatialNavigationService.isAdjacentSlice(
+      const isAdjacentSliceA = SpatialNavigationService.isAdjacentSlice(
         refCorners,
-        siblingCorners,
+        siblingCornersA,
+        isVerticalDirection
+      );
+      const isAdjacentSliceB = SpatialNavigationService.isAdjacentSlice(
+        refCorners,
+        siblingCornersB,
         isVerticalDirection
       );
 
-      const primaryAxisFunction = isAdjacentSlice
+      const primaryAxisFunctionA = isAdjacentSliceA
+        ? SpatialNavigationService.getPrimaryAxisDistance
+        : SpatialNavigationService.getSecondaryAxisDistance;
+      const primaryAxisFunctionB = isAdjacentSliceB
         ? SpatialNavigationService.getPrimaryAxisDistance
         : SpatialNavigationService.getSecondaryAxisDistance;
 
-      const secondaryAxisFunction = isAdjacentSlice
+      const secondaryAxisFunctionA = isAdjacentSliceA
+        ? SpatialNavigationService.getSecondaryAxisDistance
+        : SpatialNavigationService.getPrimaryAxisDistance;
+      const secondaryAxisFunctionB = isAdjacentSliceB
         ? SpatialNavigationService.getSecondaryAxisDistance
         : SpatialNavigationService.getPrimaryAxisDistance;
 
-      const primaryAxisDistance = primaryAxisFunction(
+      const primaryAxisDistanceA = primaryAxisFunctionA(
         refCorners,
-        siblingCorners,
+        siblingCornersA,
         isVerticalDirection,
         this.distanceCalculationMethod,
         this.customDistanceCalculationFunction
       );
-      const secondaryAxisDistance = secondaryAxisFunction(
+      const primaryAxisDistanceB = primaryAxisFunctionB(
         refCorners,
-        siblingCorners,
+        siblingCornersB,
+        isVerticalDirection,
+        this.distanceCalculationMethod,
+        this.customDistanceCalculationFunction
+      );
+
+      const secondaryAxisDistanceA = secondaryAxisFunctionA(
+        refCorners,
+        siblingCornersA,
+        isVerticalDirection,
+        this.distanceCalculationMethod,
+        this.customDistanceCalculationFunction
+      );
+      const secondaryAxisDistanceB = secondaryAxisFunctionB(
+        refCorners,
+        siblingCornersB,
         isVerticalDirection,
         this.distanceCalculationMethod,
         this.customDistanceCalculationFunction
@@ -550,46 +574,51 @@ class SpatialNavigationService {
       /**
        * The higher this value is, the less prioritised the candidate is
        */
-      const totalDistancePoints =
-        primaryAxisDistance * MAIN_COORDINATE_WEIGHT + secondaryAxisDistance;
+      const totalDistancePointsA =
+        primaryAxisDistanceA * MAIN_COORDINATE_WEIGHT + secondaryAxisDistanceA;
+      const totalDistancePointsB =
+        primaryAxisDistanceB * MAIN_COORDINATE_WEIGHT + secondaryAxisDistanceB;
 
       /**
        * + 1 here is in case of distance is zero, but we still want to apply Adjacent priority weight
        */
-      const priority =
-        (totalDistancePoints + 1) /
-        (isAdjacentSlice ? ADJACENT_SLICE_WEIGHT : DIAGONAL_SLICE_WEIGHT);
+      const priorityA =
+        (totalDistancePointsA + 1) /
+        (isAdjacentSliceA ? ADJACENT_SLICE_WEIGHT : DIAGONAL_SLICE_WEIGHT);
+      const priorityB =
+        (totalDistancePointsB + 1) /
+        (isAdjacentSliceB ? ADJACENT_SLICE_WEIGHT : DIAGONAL_SLICE_WEIGHT);
 
       this.log(
         'smartNavigate',
-        `distance (primary, secondary, total weighted) for ${sibling.focusKey} relative to ${focusKey} is`,
-        primaryAxisDistance,
-        secondaryAxisDistance,
-        totalDistancePoints
+        `distance (primary, secondary, total weighted) for ${a.focusKey} relative to ${focusKey} is`,
+        primaryAxisDistanceA,
+        secondaryAxisDistanceA,
+        totalDistancePointsA
       );
 
       this.log(
         'smartNavigate',
-        `priority for ${sibling.focusKey} relative to ${focusKey} is`,
-        priority
+        `priority for ${a.focusKey} relative to ${focusKey} is`,
+        priorityA
       );
 
       if (this.visualDebugger) {
         this.visualDebugger.drawPoint(
-          siblingCorners.a.x,
-          siblingCorners.a.y,
+          siblingCornersA.a.x,
+          siblingCornersA.a.y,
           'yellow',
           6
         );
         this.visualDebugger.drawPoint(
-          siblingCorners.b.x,
-          siblingCorners.b.y,
+          siblingCornersA.b.x,
+          siblingCornersA.b.y,
           'yellow',
           6
         );
       }
 
-      return priority;
+      return priorityA - priorityB;
     });
   }
 
@@ -697,7 +726,8 @@ class SpatialNavigationService {
           const draw = () => {
             requestAnimationFrame(() => {
               this.visualDebugger.clearLayouts();
-              forOwn(this.focusableComponents, (component, focusKey) => {
+              Object.keys(this.focusableComponents).forEach((focusKey) => {
+                const component = this.focusableComponents[focusKey];
                 this.visualDebugger.drawLayout(
                   component.layout,
                   focusKey,
@@ -1009,7 +1039,7 @@ class SpatialNavigationService {
     this.log('smartNavigate', 'this.focusKey', this.focusKey);
 
     if (!fromParentFocusKey) {
-      forOwn(this.focusableComponents, (component) => {
+      Object.values(this.focusableComponents).forEach((component) => {
         // eslint-disable-next-line no-param-reassign
         component.layoutUpdated = false;
       });
@@ -1051,7 +1081,7 @@ class SpatialNavigationService {
       /**
        * Get only the siblings with the coords on the way of our moving direction
        */
-      const siblings = filter(this.focusableComponents, (component) => {
+      const siblings = Object.values(this.focusableComponents).filter((component) => {
         if (
           component.parentFocusKey === parentFocusKey &&
           component.focusable
@@ -1116,7 +1146,7 @@ class SpatialNavigationService {
         focusKey
       );
 
-      const nextComponent = first(sortedSiblings);
+      const nextComponent = sortedSiblings[0];
 
       this.log(
         'smartNavigate',
@@ -1160,8 +1190,7 @@ class SpatialNavigationService {
       // eslint-disable-next-line no-console
       console.log(
         `%c${functionName}%c${debugString}`,
-        `background: ${
-          DEBUG_FN_COLORS[this.logIndex % DEBUG_FN_COLORS.length]
+        `background: ${DEBUG_FN_COLORS[this.logIndex % DEBUG_FN_COLORS.length]
         }; color: black; padding: 1px 5px;`,
         'background: #333; color: #BADA55; padding: 1px 5px;',
         ...rest
@@ -1181,8 +1210,7 @@ class SpatialNavigationService {
    * A component closest to the top left viewport corner (0,0) is returned.
    */
   getForcedFocusKey(): string | undefined {
-    const forceFocusableComponents = filter(
-      this.focusableComponents,
+    const forceFocusableComponents = Object.values(this.focusableComponents).filter(
       (component) => component.focusable && component.forceFocus
     );
 
@@ -1207,7 +1235,7 @@ class SpatialNavigationService {
       ROOT_FOCUS_KEY
     );
 
-    return first(sortedForceFocusableComponents)?.focusKey;
+    return sortedForceFocusableComponents[0]?.focusKey;
   }
 
   /**
@@ -1225,10 +1253,8 @@ class SpatialNavigationService {
       return targetFocusKey;
     }
 
-    const children = filter(
-      this.focusableComponents,
-      (component) =>
-        component.parentFocusKey === targetFocusKey && component.focusable
+    const children = Object.values(this.focusableComponents).filter((component) =>
+      component.parentFocusKey === targetFocusKey && component.focusable
     );
 
     if (children.length > 0) {
@@ -1542,7 +1568,7 @@ class SpatialNavigationService {
       this.parentsHavingFocusedChild
     );
 
-    forEach(parentsToRemoveFlag, (parentFocusKey) => {
+    parentsToRemoveFlag.forEach((parentFocusKey) => {
       const parentComponent = this.focusableComponents[parentFocusKey];
 
       if (parentComponent && parentComponent.trackChildren) {
@@ -1551,7 +1577,7 @@ class SpatialNavigationService {
       this.onIntermediateNodeBecameBlurred(parentFocusKey, focusDetails);
     });
 
-    forEach(parentsToAddFlag, (parentFocusKey) => {
+    parentsToAddFlag.forEach((parentFocusKey) => {
       const parentComponent = this.focusableComponents[parentFocusKey];
 
       if (parentComponent && parentComponent.trackChildren) {
@@ -1677,7 +1703,7 @@ class SpatialNavigationService {
       return;
     }
 
-    forOwn(this.focusableComponents, (component, focusKey) => {
+    Object.keys(this.focusableComponents).forEach((focusKey) => {
       this.updateLayout(focusKey);
     });
   }
