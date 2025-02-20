@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# [2.3.0]
+## Added
+- New callback `onArrowRelease`
+
+# [2.2.3]
+## Fixed
+- Enhanced native DOM focus behavior by adding and removing the data-focused attribute during focus transitions.
+
+# [2.2.2]
+## Added
+- New export for `SpatialNavigation` core service with types
+
+## Fixed
+- Some Prettier formatting issues
+
 # [2.2.1]
 ## Added
 - New init config option `distanceCalculationMethod` that allows switching between edge-based, center-based and corner-based (default) distance calculations.

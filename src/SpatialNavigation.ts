@@ -71,6 +71,7 @@ interface FocusableComponent {
   onEnterPress: (details?: KeyPressDetails) => void;
   onEnterRelease: () => void;
   onArrowPress: (direction: string, details: KeyPressDetails) => boolean;
+  onArrowRelease: (direction: string) => void;
   onFocus: (layout: FocusableComponentLayout, details: FocusDetails) => void;
   onBlur: (layout: FocusableComponentLayout, details: FocusDetails) => void;
   onUpdateFocus: (focused: boolean) => void;
@@ -97,6 +98,7 @@ interface FocusableComponentUpdatePayload {
   onEnterPress: (details?: KeyPressDetails) => void;
   onEnterRelease: () => void;
   onArrowPress: (direction: string, details: KeyPressDetails) => boolean;
+  onArrowRelease: (direction: string) => void;
   onFocus: (layout: FocusableComponentLayout, details: FocusDetails) => void;
   onBlur: (layout: FocusableComponentLayout, details: FocusDetails) => void;
 }
@@ -860,6 +862,14 @@ class SpatialNavigationService {
         if (eventType === KEY_ENTER && this.focusKey) {
           this.onEnterRelease();
         }
+
+        if (this.focusKey && (
+          eventType === DIRECTION_LEFT ||
+          eventType === DIRECTION_RIGHT ||
+          eventType === DIRECTION_UP ||
+          eventType === DIRECTION_DOWN)) {
+          this.onArrowRelease(eventType)
+        }
       };
 
       window.addEventListener('keyup', this.keyUpEventListener);
@@ -949,6 +959,28 @@ class SpatialNavigationService {
       component.onArrowPress &&
       component.onArrowPress(direction, keysDetails)
     );
+  }
+
+  onArrowRelease(direction: string) {
+    const component = this.focusableComponents[this.focusKey];
+
+    /* Guard against last-focused component being unmounted at time of onArrowRelease (e.g due to UI fading out) */
+    if (!component) {
+      this.log('onArrowRelease', 'noComponent');
+
+      return;
+    }
+
+    /* Suppress onArrowRelease if the last-focused item happens to lose its 'focused' status. */
+    if (!component.focusable) {
+      this.log('onArrowRelease', 'componentNotFocusable');
+
+      return;
+    }
+
+    if (component.onArrowRelease) {
+      component.onArrowRelease(direction);
+    }
   }
 
   /**
@@ -1301,6 +1333,7 @@ class SpatialNavigationService {
     onEnterPress,
     onEnterRelease,
     onArrowPress,
+    onArrowRelease,
     onFocus,
     onBlur,
     saveLastFocusedChild,
@@ -1321,6 +1354,7 @@ class SpatialNavigationService {
       onEnterPress,
       onEnterRelease,
       onArrowPress,
+      onArrowRelease,
       onFocus,
       onBlur,
       onUpdateFocus,
@@ -1477,6 +1511,8 @@ class SpatialNavigationService {
         focusDetails
       );
 
+      oldComponent.node?.removeAttribute?.('data-focused');
+
       this.log('setCurrentFocusedKey', 'onBlur', oldComponent);
     }
 
@@ -1488,6 +1524,8 @@ class SpatialNavigationService {
       if (this.shouldFocusDOMNode && newComponent.node) {
         newComponent.node.focus(this.domNodeFocusOptions);
       }
+
+      newComponent.node?.setAttribute?.('data-focused', 'true');
 
       newComponent.onUpdateFocus(true);
       newComponent.onFocus(
@@ -1635,7 +1673,7 @@ class SpatialNavigationService {
     // Cancel any pending auto-restore focus calls if we are setting focus manually
     this.setFocusDebounced.cancel();
 
-    if (!this.enabled || this.nativeMode) {
+    if (!this.enabled) {
       return;
     }
 
@@ -1747,7 +1785,6 @@ class SpatialNavigationService {
 /**
  * Export singleton
  */
-/** @internal */
 export const SpatialNavigation = new SpatialNavigationService();
 
 export const {
