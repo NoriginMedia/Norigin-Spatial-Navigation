@@ -37,6 +37,40 @@ jobs:
           mv ./temp/projectA/* ./projectB/docs/$REPO_NAME/
           echo "Readme files moved to /docs/$REPO_NAME/"
 
+          # Special handling for Norigin-Spatial-Navigation
+          # This section combines the README from the repo with detailed content from the dev portal
+          if [ "$REPO_NAME" = "Norigin-Spatial-Navigation" ]; then
+            echo "Combining README with detailed documentation for Spatial Navigation"
+            
+            # Define file paths
+            README_FILE="./projectB/docs/$REPO_NAME/README.md"  # The README pulled from the repo
+            DETAILED_DOCS="./projectB/docs/Spat-Nav/Detailed_README_SpatNav.md"  # The detailed content file
+            
+            # Check if the detailed docs file exists
+            if [ -f "$DETAILED_DOCS" ]; then
+              echo "Found detailed documentation file: $DETAILED_DOCS"
+              
+              # Use sed to replace the marker with the detailed content
+              # The 'r' command reads the file and inserts it after the line containing the marker
+              # The second sed command removes the marker line itself
+              sed -i '/<!-- INSERT_DETAILED_README_SPATNAV_HERE -->/r ./projectB/docs/Spat-Nav/Detailed_README_SpatNav.md' "$README_FILE"
+              sed -i '/<!-- INSERT_DETAILED_README_SPATNAV_HERE -->/d' "$README_FILE"
+              
+              # Remove dev portal link (if it exists) - this prevents the link from appearing in the dev portal
+              # Remove lines containing common dev portal link patterns
+              sed -i '/^# Developer Portal$/d' "$README_FILE"  # Remove the heading
+              sed -i '/\[.*dev.*portal.*\]/d' "$README_FILE"  # Remove markdown links to dev portal
+              sed -i '/\[.*developer.*portal.*\]/d' "$README_FILE"  # Remove markdown links to developer portal
+              sed -i '/https:\/\/.*dev.*portal.*/d' "$README_FILE"  # Remove direct URLs to dev portal
+              sed -i '/For more detailed documentation.*visit our.*Developer Portal/d' "$README_FILE"  # Remove the descriptive text
+              
+              echo "Successfully combined README with detailed documentation"
+            else
+              echo "Warning: Detailed documentation file not found at $DETAILED_DOCS"
+              echo "The marker will remain in the README"
+            fi
+          fi
+
           mkdir -p ./projectB/static/$IMAGES_FOLDER
           mkdir -p ./projectA/$IMAGES_FOLDER
           if [[ `ls ./projectA/$IMAGES_FOLDER` != "" ]]
