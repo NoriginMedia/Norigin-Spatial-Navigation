@@ -88,6 +88,11 @@ interface FocusableComponent {
   saveLastFocusedChild: boolean;
   trackChildren: boolean;
   preferredChildFocusKey?: string;
+  /**
+   * Directions for which children should be focused based on spatial proximity
+   * rather than preferredChildFocusKey or lastFocusedChild
+   */
+  closestChildFocusDirections?: Direction[];
   focusable: boolean;
   isFocusBoundary: boolean;
   focusBoundaryDirections?: Direction[];
@@ -101,6 +106,7 @@ interface FocusableComponent {
 interface FocusableComponentUpdatePayload {
   node: HTMLElement;
   preferredChildFocusKey?: string;
+  closestChildFocusDirections?: Direction[];
   focusable: boolean;
   isFocusBoundary: boolean;
   focusBoundaryDirections?: Direction[];
@@ -1049,14 +1055,33 @@ class SpatialNavigationService {
         );
 
       /**
+       * Find parent containers that have closestChildFocusDirections for this direction.
+       * Their children will participate in sibling navigation with the current component's siblings,
+       * enabling spatial navigation across different parent containers.
+       */
+      const looseChildrenParents = Object.values(this.focusableComponents).reduce((set: Set<string>, c: FocusableComponent) => {
+        if (c.closestChildFocusDirections?.includes(direction as Direction)) {
+          set.add(c.focusKey);
+        }
+        return set;
+      }, new Set<string>());
+
+      /**
        * Get only the siblings with the coords on the way of our moving direction
        */
       const siblings = filter(this.focusableComponents, (component) => {
         if (
-          component.parentFocusKey === parentFocusKey &&
+          (component.parentFocusKey === parentFocusKey || looseChildrenParents.has(component.parentFocusKey)) &&
           component.focusable
         ) {
           this.updateLayout(component.focusKey);
+          /**
+           * Exclude parent containers with closestChildFocusDirections from being siblings themselves.
+           * We want to navigate to their children, not to the container.
+           */
+          if (component.closestChildFocusDirections?.includes(direction as Direction)) {
+            return false;
+          }
           const siblingCutoffCoordinate =
             SpatialNavigationService.getCutoffCoordinate(
               isVerticalDirection,
@@ -1315,6 +1340,7 @@ class SpatialNavigationService {
     onUpdateFocus,
     onUpdateHasFocusedChild,
     preferredChildFocusKey,
+    closestChildFocusDirections,
     autoRestoreFocus,
     forceFocus,
     focusable,
@@ -1336,6 +1362,7 @@ class SpatialNavigationService {
       saveLastFocusedChild,
       trackChildren,
       preferredChildFocusKey,
+      closestChildFocusDirections,
       focusable,
       isFocusBoundary,
       focusBoundaryDirections,
@@ -1706,6 +1733,7 @@ class SpatialNavigationService {
     {
       node,
       preferredChildFocusKey,
+      closestChildFocusDirections,
       focusable,
       isFocusBoundary,
       focusBoundaryDirections,
@@ -1724,6 +1752,7 @@ class SpatialNavigationService {
 
     if (component) {
       component.preferredChildFocusKey = preferredChildFocusKey;
+      component.closestChildFocusDirections = closestChildFocusDirections;
       component.focusable = focusable;
       component.isFocusBoundary = isFocusBoundary;
       component.focusBoundaryDirections = focusBoundaryDirections;
