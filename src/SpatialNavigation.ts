@@ -1080,6 +1080,12 @@ class SpatialNavigationService {
            * We want to navigate to their children, not to the container.
            */
           if (component.closestChildFocusDirections?.includes(direction as Direction)) {
+            this.log(
+              'smartNavigate',
+              'excluding container with closestChildFocusDirections',
+              component.focusKey,
+              `(direction: ${direction})`
+            );
             return false;
           }
           const siblingCutoffCoordinate =
