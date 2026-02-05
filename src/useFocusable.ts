@@ -57,6 +57,13 @@ export interface UseFocusableConfig<P = object> {
   focusBoundaryDirections?: Direction[];
   focusKey?: string;
   preferredChildFocusKey?: string;
+  /**
+   * Directions for which children should be focused based on spatial proximity.
+   * When navigating in these directions, the spatially closest child will be focused
+   * instead of using preferredChildFocusKey or lastFocusedChild.
+   * Useful for grid layouts where you want natural spatial navigation between rows/columns.
+   */
+  closestChildFocusDirections?: Direction[];
   onEnterPress?: EnterPressHandler<P>;
   onEnterRelease?: EnterReleaseHandler<P>;
   onArrowPress?: ArrowPressHandler<P>;
@@ -84,6 +91,7 @@ const useFocusableHook = <P, E = any>({
   focusBoundaryDirections,
   focusKey: propFocusKey,
   preferredChildFocusKey,
+  closestChildFocusDirections,
   onEnterPress = noop,
   onEnterRelease = noop,
   onArrowPress = () => true,
@@ -157,6 +165,7 @@ const useFocusableHook = <P, E = any>({
       node,
       parentFocusKey,
       preferredChildFocusKey,
+      closestChildFocusDirections,
       onEnterPress: onEnterPressHandler,
       onEnterRelease: onEnterReleaseHandler,
       onArrowPress: onArrowPressHandler,
@@ -188,6 +197,7 @@ const useFocusableHook = <P, E = any>({
     SpatialNavigation.updateFocusable(focusKey, {
       node,
       preferredChildFocusKey,
+      closestChildFocusDirections,
       focusable,
       isFocusBoundary,
       focusBoundaryDirections,
@@ -201,6 +211,7 @@ const useFocusableHook = <P, E = any>({
   }, [
     focusKey,
     preferredChildFocusKey,
+    closestChildFocusDirections,
     focusable,
     isFocusBoundary,
     focusBoundaryDirections,
