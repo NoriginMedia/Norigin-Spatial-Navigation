@@ -14,7 +14,7 @@ import {
   FocusDetails,
   KeyPressDetails,
   Direction
-} from './SpatialNavigation';
+} from '@noriginmedia/norigin-spatial-navigation-core';
 import { useFocusContext } from './useFocusContext';
 
 export type EnterPressHandler<P = object> = (
@@ -32,7 +32,7 @@ export type ArrowPressHandler<P = object> = (
 
 export type ArrowReleaseHandler<P = object> = (
   direction: string,
-  props: P,
+  props: P
 ) => void;
 
 export type FocusHandler<P = object> = (
@@ -109,9 +109,12 @@ const useFocusableHook = <P, E = any>({
     [extraProps, onArrowPress]
   );
 
-  const onArrowReleaseHandler = useCallback((direction: string) => {
-    onArrowRelease(direction, extraProps);
-  }, [onArrowRelease, extraProps])
+  const onArrowReleaseHandler = useCallback(
+    (direction: string) => {
+      onArrowRelease(direction, extraProps);
+    },
+    [onArrowRelease, extraProps]
+  );
 
   const onFocusHandler = useCallback(
     (layout: FocusableComponentLayout, details: FocusDetails) => {

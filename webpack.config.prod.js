@@ -16,10 +16,14 @@ module.exports = {
   resolve: {
     extensions: ['.tsx', '.ts', '.js', '.jsx']
   },
-  externals: ['react', /^lodash(\/.+)?$/],
+  externals: [
+    /^@noriginmedia\/norigin-spatial-navigation-(\w+)?$/,
+    'react',
+    /^lodash(\/.+)?$/
+  ],
   output: {
     filename: 'index.js',
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(process.cwd(), 'dist'),
     libraryTarget: 'umd',
     clean: true,
     globalObject: 'this'
