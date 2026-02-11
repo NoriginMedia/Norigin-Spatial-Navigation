@@ -96,6 +96,7 @@ interface FocusableComponent {
   lastFocusedChildKey?: string;
   layout?: FocusableComponentLayout;
   layoutUpdated?: boolean;
+  accessibilityLabel?: string;
 }
 
 interface FocusableComponentUpdatePayload {
@@ -110,6 +111,7 @@ interface FocusableComponentUpdatePayload {
   onArrowRelease: (direction: string) => void;
   onFocus: (layout: FocusableComponentLayout, details: FocusDetails) => void;
   onBlur: (layout: FocusableComponentLayout, details: FocusDetails) => void;
+  accessibilityLabel?: string;
 }
 
 interface FocusableComponentRemovePayload {
@@ -260,6 +262,12 @@ class SpatialNavigationService {
   private distanceCalculationMethod: DistanceCalculationMethod;
 
   private customDistanceCalculationFunction?: DistanceCalculationFunction;
+
+  /**
+   * Callback invoked with concatenated accessibility labels when a focusable component receives focus.
+   * Parent region labels are included only when entering a new region for the first time.
+   */
+  private onUtterText: ((text: string) => void) | null;
 
   /**
    * Used to determine the coordinate that will be used to filter items that are over the "edge"
@@ -650,6 +658,8 @@ class SpatialNavigationService {
       trailing: true
     });
 
+    this.onUtterText = null;
+
     this.debug = false;
     this.visualDebugger = null;
 
@@ -670,7 +680,8 @@ class SpatialNavigationService {
     shouldUseNativeEvents = false,
     rtl = false,
     distanceCalculationMethod = 'corners' as DistanceCalculationMethod,
-    customDistanceCalculationFunction = undefined as DistanceCalculationFunction
+    customDistanceCalculationFunction = undefined as DistanceCalculationFunction,
+    onUtterText = undefined as ((text: string) => void) | undefined
   } = {}) {
     if (!this.enabled) {
       this.domNodeFocusOptions = domNodeFocusOptions;
@@ -684,6 +695,7 @@ class SpatialNavigationService {
       this.distanceCalculationMethod = distanceCalculationMethod;
       this.customDistanceCalculationFunction =
         customDistanceCalculationFunction;
+      this.onUtterText = onUtterText || null;
 
       this.debug = debug;
 
@@ -740,6 +752,7 @@ class SpatialNavigationService {
       this.focusableComponents = {};
       this.paused = false;
       this.keyMap = DEFAULT_KEY_MAP;
+      this.onUtterText = null;
 
       this.unbindEventHandlers();
     }
@@ -833,12 +846,14 @@ class SpatialNavigationService {
           this.onEnterRelease();
         }
 
-        if (this.focusKey && (
-          eventType === DIRECTION_LEFT ||
-          eventType === DIRECTION_RIGHT ||
-          eventType === DIRECTION_UP ||
-          eventType === DIRECTION_DOWN)) {
-          this.onArrowRelease(eventType)
+        if (
+          this.focusKey &&
+          (eventType === DIRECTION_LEFT ||
+            eventType === DIRECTION_RIGHT ||
+            eventType === DIRECTION_UP ||
+            eventType === DIRECTION_DOWN)
+        ) {
+          this.onArrowRelease(eventType);
         }
       };
 
@@ -1319,7 +1334,8 @@ class SpatialNavigationService {
     forceFocus,
     focusable,
     isFocusBoundary,
-    focusBoundaryDirections
+    focusBoundaryDirections,
+    accessibilityLabel
   }: FocusableComponent) {
     this.focusableComponents[focusKey] = {
       focusKey,
@@ -1341,6 +1357,7 @@ class SpatialNavigationService {
       focusBoundaryDirections,
       autoRestoreFocus,
       forceFocus,
+      accessibilityLabel,
       lastFocusedChildKey: null,
       layout: {
         x: 0,
@@ -1643,6 +1660,73 @@ class SpatialNavigationService {
     this.paused = false;
   }
 
+  /**
+   * Builds and utters accessibility labels when focus changes.
+   * Parent region labels are spoken only when entering a new region (similar to aria-label on role=region).
+   * When navigating within the same parent, only the leaf node's label is spoken.
+   *
+   * Must be called BEFORE updateParentsHasFocusedChild so we can compare
+   * the new parent chain against the current one to detect newly entered regions.
+   */
+  private utterAccessibilityLabels(newFocusKey: string) {
+    if (!this.onUtterText) {
+      return;
+    }
+
+    // Don't utter if focus hasn't actually changed
+    if (newFocusKey === this.focusKey) {
+      return;
+    }
+
+    const newComponent = this.focusableComponents[newFocusKey];
+    if (!newComponent) {
+      return;
+    }
+
+    // Walk up the tree to collect all parents of the new focus key (bottom-up)
+    const parentChain: string[] = [];
+    let current = this.focusableComponents[newFocusKey];
+
+    while (current) {
+      const { parentFocusKey } = current;
+      const parentComponent = this.focusableComponents[parentFocusKey];
+
+      if (parentComponent) {
+        parentChain.push(parentFocusKey);
+      }
+
+      current = parentComponent;
+    }
+
+    // Find newly entered parent regions (parents not in the current focused parent chain).
+    // These are regions whose labels should be spoken because focus is entering them for the first time.
+    const newlyEnteredParents = parentChain.filter(
+      (key) => !this.parentsHavingFocusedChild.includes(key)
+    );
+
+    // Reverse to get top-down order (root → leaf) for natural reading order
+    newlyEnteredParents.reverse();
+
+    // Collect labels from newly entered parent regions and the leaf node
+    const labels: string[] = [];
+
+    newlyEnteredParents.forEach((parentKey) => {
+      const parent = this.focusableComponents[parentKey];
+
+      if (parent?.accessibilityLabel) {
+        labels.push(parent.accessibilityLabel);
+      }
+    });
+
+    if (newComponent.accessibilityLabel) {
+      labels.push(newComponent.accessibilityLabel);
+    }
+
+    if (labels.length > 0) {
+      this.onUtterText(labels.join(', '));
+    }
+  }
+
   setFocus(focusKey: string, focusDetails: FocusDetails = {}) {
     // Cancel any pending auto-restore focus calls if we are setting focus manually
     this.setFocusDebounced.cancel();
@@ -1666,6 +1750,9 @@ class SpatialNavigationService {
     const newFocusKey = this.getNextFocusKey(focusKey);
 
     this.log('setFocus', 'newFocusKey', newFocusKey);
+
+    // Utter accessibility labels BEFORE updating parents so we can detect newly entered regions
+    this.utterAccessibilityLabels(newFocusKey);
 
     this.setCurrentFocusedKey(newFocusKey, focusDetails);
     this.updateParentsHasFocusedChild(newFocusKey, focusDetails);
@@ -1713,7 +1800,8 @@ class SpatialNavigationService {
       onEnterRelease,
       onArrowPress,
       onFocus,
-      onBlur
+      onBlur,
+      accessibilityLabel
     }: FocusableComponentUpdatePayload
   ) {
     if (this.nativeMode) {
@@ -1732,6 +1820,7 @@ class SpatialNavigationService {
       component.onArrowPress = onArrowPress;
       component.onFocus = onFocus;
       component.onBlur = onBlur;
+      component.accessibilityLabel = accessibilityLabel;
 
       if (node) {
         component.node = node;
