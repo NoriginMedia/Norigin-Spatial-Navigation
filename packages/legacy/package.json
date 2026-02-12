@@ -31,8 +31,8 @@
   },
   "homepage": "https://github.com/NoriginMedia/norigin-spatial-navigation#readme",
   "dependencies": {
-    "@noriginmedia/norigin-spatial-navigation-core": "*",
-    "@noriginmedia/norigin-spatial-navigation-react": "*"
+    "@noriginmedia/norigin-spatial-navigation-core": "^2.3.0",
+    "@noriginmedia/norigin-spatial-navigation-react": "^2.3.0"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.12.1",
