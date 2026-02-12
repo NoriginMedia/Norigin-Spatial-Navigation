@@ -19,18 +19,16 @@
     "url": "git+https://github.com/NoriginMedia/norigin-spatial-navigation.git"
   },
   "keywords": [
-    "react",
-    "react-hooks",
     "spatial-navigation",
     "remote-control-navigation",
     "tv-navigation"
   ],
-  "author": "Dmitriy Bryokhin <dmitriy.bryokhin@noriginmedia.com>",
+  "author": "Norigin Media",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/NoriginMedia/norigin-spatial-navigation/issues"
   },
-  "homepage": "https://github.com/NoriginMedia/norigin-spatial-navigation#readme",
+  "homepage": "https://devportal.noriginmedia.com/docs/Norigin-Spatial-Navigation/",
   "dependencies": {
     "lodash": "^4.17.21"
   },

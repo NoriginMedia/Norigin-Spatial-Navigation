@@ -24,12 +24,12 @@
     "remote-control-navigation",
     "tv-navigation"
   ],
-  "author": "Dmitriy Bryokhin <dmitriy.bryokhin@noriginmedia.com>",
+  "author": "Norigin Media",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/NoriginMedia/norigin-spatial-navigation/issues"
   },
-  "homepage": "https://github.com/NoriginMedia/norigin-spatial-navigation#readme",
+  "homepage": "https://devportal.noriginmedia.com/docs/Norigin-Spatial-Navigation/",
   "dependencies": {
     "@noriginmedia/norigin-spatial-navigation-core": "^2.3.0",
     "@noriginmedia/norigin-spatial-navigation-react": "^2.3.0"

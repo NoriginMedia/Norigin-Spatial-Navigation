@@ -9,7 +9,7 @@
   "bugs": {
     "url": "https://github.com/NoriginMedia/norigin-spatial-navigation/issues"
   },
-  "homepage": "https://github.com/NoriginMedia/norigin-spatial-navigation#readme",
+  "homepage": "https://devportal.noriginmedia.com/docs/Norigin-Spatial-Navigation/",
   "workspaces": [
     "apps/*",
     "packages/*"
