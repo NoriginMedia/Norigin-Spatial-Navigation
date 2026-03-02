@@ -1,7 +1,7 @@
 {
   "name": "@noriginmedia/norigin-spatial-navigation-core",
   "version": "2.3.0",
-  "description": "React hooks based Spatial Navigation solution",
+  "description": "Core spatial navigation logic for web and TV.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
