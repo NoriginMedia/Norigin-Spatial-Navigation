@@ -10,7 +10,7 @@
   "scripts": {
     "eslint": "eslint src",
     "build": "webpack --config webpack.config.prod.js",
-    "prepublishOnly": "npm run eslint"
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
