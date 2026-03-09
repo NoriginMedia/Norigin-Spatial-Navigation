@@ -19,7 +19,7 @@ import {
   KeyPressDetails
 } from '@noriginmedia/norigin-spatial-navigation';
 
-const logo = require('./logo.png').default;
+import logo from './logo.png';
 
 init({
   debug: false,

@@ -2,14 +2,22 @@
   "name": "@noriginmedia/norigin-spatial-navigation-react",
   "version": "2.3.0",
   "description": "React hooks based Spatial Navigation solution",
-  "main": "dist/index.js",
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "files": [
     "dist"
   ],
   "scripts": {
     "eslint": "eslint src",
-    "build": "webpack --config webpack.config.prod.js",
+    "build": "rm -rf dist && rollup -c && tsc --emitDeclarationOnly",
     "prepublishOnly": "npm run build"
   },
   "repository": {
@@ -37,20 +45,18 @@
     "@noriginmedia/norigin-spatial-navigation-core": "^2.3.0"
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^29.0.0",
+    "@rollup/plugin-node-resolve": "^16.0.0",
+    "@rollup/plugin-typescript": "^12.1.2",
     "@types/lodash": "^4.14.179",
     "@types/react": "^18.0.18",
     "@types/react-dom": "^18.0.6",
     "@types/styled-components": "^5.1.24",
-    "file-loader": "^6.2.0",
-    "html-webpack-plugin": "^5.5.0",
     "prettier": "^2.5.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "rollup": "^4.28.1",
     "styled-components": "^5.3.3",
-    "ts-loader": "^9.2.6",
-    "typescript": "^5.9.3",
-    "webpack": "^5.69.1",
-    "webpack-cli": "^4.9.2",
-    "webpack-dev-server": "^4.7.4"
+    "typescript": "^5.9.3"
   }
 }
