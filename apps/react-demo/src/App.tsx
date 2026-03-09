@@ -424,7 +424,7 @@ const DIRECTION_RIGHT = 'right';
 
 function ProgressBar() {
   const [percent, setPercent] = useState(defaultPercent);
-  const timerRef = useRef<NodeJS.Timer | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
   const { ref, focused } = useFocusable<object, HTMLDivElement>({
     onArrowPress: (direction: string) => {
       if (direction === DIRECTION_RIGHT && timerRef.current === null) {
