@@ -13,8 +13,7 @@ export default defineConfig({
   external: [
     'react',
     '@noriginmedia/norigin-spatial-navigation-core',
-    'lodash',
-    /^lodash\/.+$/
+    'lodash-es'
   ],
   plugins: [resolve(), commonjs(), typescript({ tsconfig: './tsconfig.json' })]
 });

@@ -10,6 +10,6 @@ export default defineConfig({
     { file: 'dist/index.mjs', format: 'es' },
     { file: 'dist/index.cjs', format: 'cjs' }
   ],
-  external: ['lodash', /^lodash\/.+$/],
+  external: ['lodash-es'],
   plugins: [resolve(), commonjs(), typescript({ tsconfig: './tsconfig.json' })]
 });

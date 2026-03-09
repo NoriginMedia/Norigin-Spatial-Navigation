@@ -8,7 +8,7 @@ import React, { useCallback, useEffect, useState, useRef } from 'react';
 import ReactDOMClient from 'react-dom/client';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import styled, { createGlobalStyle } from 'styled-components';
-import shuffle from 'lodash/shuffle';
+import { shuffle } from 'lodash-es';
 
 import {
   useFocusable,

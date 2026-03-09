@@ -10,7 +10,7 @@
     "jsx": "react",
     "allowSyntheticDefaultImports": true,
     "lib": ["es2017", "dom"],
-    "types": ["jest", "react", "lodash"]
+    "types": ["jest", "react"]
   },
   "exclude": ["node_modules"]
 }

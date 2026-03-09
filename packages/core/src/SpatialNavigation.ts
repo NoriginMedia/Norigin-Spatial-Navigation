@@ -1,13 +1,15 @@
-import { DebouncedFunc } from 'lodash';
-import debounce from 'lodash/debounce';
-import difference from 'lodash/difference';
-import filter from 'lodash/filter';
-import findKey from 'lodash/findKey';
-import first from 'lodash/first';
-import forEach from 'lodash/forEach';
-import forOwn from 'lodash/forOwn';
-import sortBy from 'lodash/sortBy';
-import throttle from 'lodash/throttle';
+import {
+  type DebouncedFunc,
+  debounce,
+  difference,
+  filter,
+  findKey,
+  first,
+  forEach,
+  forOwn,
+  sortBy,
+  throttle
+} from 'lodash-es';
 import VisualDebugger from './VisualDebugger';
 import WritingDirection from './WritingDirection';
 import measureLayout, { getBoundingClientRect } from './measureLayout';
