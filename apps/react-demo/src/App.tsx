@@ -9,6 +9,7 @@ import ReactDOMClient from 'react-dom/client';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import styled, { createGlobalStyle } from 'styled-components';
 import shuffle from 'lodash/shuffle';
+
 import {
   useFocusable,
   init,
@@ -16,9 +17,9 @@ import {
   FocusDetails,
   FocusableComponentLayout,
   KeyPressDetails
-} from './index';
+} from '@noriginmedia/norigin-spatial-navigation';
 
-const logo = require('../logo.png').default;
+const logo = require('./logo.png').default;
 
 init({
   debug: false,

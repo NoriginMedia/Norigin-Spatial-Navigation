@@ -1,0 +1,20 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
+  "tasks": {
+    "eslint": {},
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["./dist", "./lib"]
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "outputs": ["./coverage"]
+    },
+    "start": {
+      "dependsOn": ["^build"],
+      "persistent": true,
+      "cache": false
+    }
+  }
+}

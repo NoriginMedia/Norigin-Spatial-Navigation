@@ -1,0 +1,56 @@
+{
+  "name": "@noriginmedia/norigin-spatial-navigation-react",
+  "version": "2.3.0",
+  "description": "React hooks based Spatial Navigation solution",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "eslint": "eslint src",
+    "build": "webpack --config webpack.config.prod.js",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NoriginMedia/norigin-spatial-navigation.git"
+  },
+  "keywords": [
+    "react",
+    "react-hooks",
+    "spatial-navigation",
+    "remote-control-navigation",
+    "tv-navigation"
+  ],
+  "author": "Norigin Media",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/NoriginMedia/norigin-spatial-navigation/issues"
+  },
+  "homepage": "https://devportal.noriginmedia.com/docs/Norigin-Spatial-Navigation/",
+  "peerDependencies": {
+    "react": ">=16.8.0"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "@noriginmedia/norigin-spatial-navigation-core": "^2.3.0"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.179",
+    "@types/react": "^18.0.18",
+    "@types/react-dom": "^18.0.6",
+    "@types/styled-components": "^5.1.24",
+    "file-loader": "^6.2.0",
+    "html-webpack-plugin": "^5.5.0",
+    "prettier": "^2.5.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "styled-components": "^5.3.3",
+    "ts-loader": "^9.2.6",
+    "typescript": "^4.5.5",
+    "webpack": "^5.69.1",
+    "webpack-cli": "^4.9.2",
+    "webpack-dev-server": "^4.7.4"
+  }
+}

@@ -9,13 +9,8 @@
     "target": "ES5",
     "jsx": "react",
     "allowSyntheticDefaultImports": true,
-    "lib": [
-      "es5",
-      "es2015",
-      "dom"
-    ]
+    "lib": ["es2017", "dom"],
+    "types": ["jest", "react", "lodash"]
   },
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }

@@ -17,3 +17,6 @@ dist
 
 # Ignore test coverage reports
 coverage
+
+# Ignore turbo logs
+.turbo
