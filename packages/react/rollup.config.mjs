@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import typescript from '@rollup/plugin-typescript';
@@ -15,9 +16,5 @@ export default defineConfig({
     'lodash',
     /^lodash\/.+$/
   ],
-  plugins: [
-    resolve(),
-    commonjs(),
-    typescript({ tsconfig: './tsconfig.json' })
-  ]
+  plugins: [resolve(), commonjs(), typescript({ tsconfig: './tsconfig.json' })]
 });
