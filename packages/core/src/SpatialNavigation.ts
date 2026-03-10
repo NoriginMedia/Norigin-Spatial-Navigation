@@ -96,6 +96,10 @@ interface FocusableComponent {
   lastFocusedChildKey?: string;
   layout?: FocusableComponentLayout;
   layoutUpdated?: boolean;
+  /** @internal bound mouse event handlers for cleanup */
+  mouseEnterHandler?: (e: MouseEvent) => void;
+  mouseLeaveHandler?: () => void;
+  clickHandler?: (e: MouseEvent) => void;
 }
 
 interface FocusableComponentUpdatePayload {
@@ -142,6 +146,13 @@ export interface FocusDetails {
   event?: Event;
   nativeEvent?: Event;
   [key: string]: any;
+}
+
+/**
+ * Pointer (mouse) event details passed on mouse callbacks
+ */
+export interface PointerDetails {
+  event: MouseEvent;
 }
 
 export type BackwardsCompatibleKeyMap = {
@@ -193,6 +204,12 @@ class SpatialNavigationService {
   private shouldFocusDOMNode: boolean;
 
   private shouldUseNativeEvents: boolean;
+
+  /**
+   * Enables pointer (mouse/trackpad) support for LG WebOS and similar platforms.
+   * When enabled, mouseenter sets spatial focus and click triggers onEnterPress.
+   */
+  private mouseSupport: boolean;
 
   /**
    * This collection contains focus keys of the elements that are having a child focused
@@ -618,6 +635,7 @@ class SpatialNavigationService {
     this.useGetBoundingClientRect = false;
     this.shouldFocusDOMNode = false;
     this.shouldUseNativeEvents = false;
+    this.mouseSupport = false;
     this.writingDirection = WritingDirection.LTR;
 
     this.pressedKeys = {};
@@ -668,6 +686,7 @@ class SpatialNavigationService {
     shouldFocusDOMNode = false,
     domNodeFocusOptions = {},
     shouldUseNativeEvents = false,
+    mouseSupport = false,
     rtl = false,
     distanceCalculationMethod = 'corners' as DistanceCalculationMethod,
     customDistanceCalculationFunction = undefined as DistanceCalculationFunction
@@ -680,6 +699,7 @@ class SpatialNavigationService {
       this.useGetBoundingClientRect = useGetBoundingClientRect;
       this.shouldFocusDOMNode = shouldFocusDOMNode && !nativeMode;
       this.shouldUseNativeEvents = shouldUseNativeEvents;
+      this.mouseSupport = mouseSupport;
       this.writingDirection = rtl ? WritingDirection.RTL : WritingDirection.LTR;
       this.distanceCalculationMethod = distanceCalculationMethod;
       this.customDistanceCalculationFunction =
@@ -733,6 +753,7 @@ class SpatialNavigationService {
     if (this.enabled) {
       this.enabled = false;
       this.nativeMode = false;
+      this.mouseSupport = false;
       this.throttle = 0;
       this.throttleKeypresses = false;
       this.focusKey = null;
@@ -1374,6 +1395,46 @@ class SpatialNavigationService {
 
     this.updateLayout(focusKey);
 
+    /**
+     * Bind pointer (mouse) event listeners when mouseSupport is enabled.
+     * Supports LG WebOS magic remote and standard mouse/trackpad devices.
+     * - mouseenter: move spatial focus to this component
+     * - click: trigger onEnterPress (same as pressing OK/Enter on remote)
+     */
+    if (this.mouseSupport && node) {
+      const component = this.focusableComponents[focusKey];
+
+      const mouseEnterHandler = (event: MouseEvent) => {
+        if (this.paused || !component.focusable) {
+          return;
+        }
+        this.setFocus(focusKey, { event });
+      };
+
+      const mouseLeaveHandler = () => {
+        // onBlur is already handled by setCurrentFocusedKey when focus moves away.
+        // Reserved for future use (e.g. hide pointer cursor indication).
+      };
+
+      const clickHandler = (event: MouseEvent) => {
+        if (this.paused || !component.focusable) {
+          return;
+        }
+        if (this.focusKey !== focusKey) {
+          this.setFocus(focusKey, { event });
+        }
+        this.onEnterPress({ pressedKeys: {} });
+      };
+
+      node.addEventListener('mouseenter', mouseEnterHandler);
+      node.addEventListener('mouseleave', mouseLeaveHandler);
+      node.addEventListener('click', clickHandler);
+
+      component.mouseEnterHandler = mouseEnterHandler;
+      component.mouseLeaveHandler = mouseLeaveHandler;
+      component.clickHandler = clickHandler;
+    }
+
     this.log(
       'addFocusable',
       'Component added: ',
@@ -1407,9 +1468,24 @@ class SpatialNavigationService {
     const componentToRemove = this.focusableComponents[focusKey];
 
     if (componentToRemove) {
-      const { parentFocusKey, onUpdateFocus } = componentToRemove;
+      const { parentFocusKey, onUpdateFocus, node } = componentToRemove;
 
       onUpdateFocus(false);
+
+      /**
+       * Clean up bound mouse event listeners to prevent memory leaks
+       */
+      if (this.mouseSupport && node) {
+        if (componentToRemove.mouseEnterHandler) {
+          node.removeEventListener('mouseenter', componentToRemove.mouseEnterHandler);
+        }
+        if (componentToRemove.mouseLeaveHandler) {
+          node.removeEventListener('mouseleave', componentToRemove.mouseLeaveHandler);
+        }
+        if (componentToRemove.clickHandler) {
+          node.removeEventListener('click', componentToRemove.clickHandler);
+        }
+      }
 
       this.log('removeFocusable', 'Component removed: ', componentToRemove);
 
@@ -1743,6 +1819,10 @@ class SpatialNavigationService {
     return this.nativeMode;
   }
 
+  isMouseSupportEnabled() {
+    return this.mouseSupport;
+  }
+
   doesFocusableExist(focusKey: string) {
     return !!this.focusableComponents[focusKey];
   }
@@ -1773,5 +1853,6 @@ export const {
   updateAllLayouts,
   getCurrentFocusKey,
   doesFocusableExist,
-  updateRtl
+  updateRtl,
+  isMouseSupportEnabled
 } = SpatialNavigation;

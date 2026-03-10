@@ -13,6 +13,7 @@ import {
   FocusableComponentLayout,
   FocusDetails,
   KeyPressDetails,
+  PointerDetails,
   Direction
 } from '@noriginmedia/norigin-spatial-navigation-core';
 import { useFocusContext } from './useFocusContext';
@@ -47,6 +48,33 @@ export type BlurHandler<P = object> = (
   details: FocusDetails
 ) => void;
 
+/**
+ * Called when the mouse pointer enters the focusable element.
+ * Only fired when `mouseSupport: true` is passed to `init()`.
+ */
+export type MouseEnterHandler<P = object> = (
+  props: P,
+  details: PointerDetails
+) => void;
+
+/**
+ * Called when the mouse pointer leaves the focusable element.
+ * Only fired when `mouseSupport: true` is passed to `init()`.
+ */
+export type MouseLeaveHandler<P = object> = (
+  props: P,
+  details: PointerDetails
+) => void;
+
+/**
+ * Called when the focusable element is clicked.
+ * Only fired when `mouseSupport: true` is passed to `init()`.
+ */
+export type ClickHandler<P = object> = (
+  props: P,
+  details: PointerDetails
+) => void;
+
 export interface UseFocusableConfig<P = object> {
   focusable?: boolean;
   saveLastFocusedChild?: boolean;
@@ -63,6 +91,21 @@ export interface UseFocusableConfig<P = object> {
   onArrowRelease?: ArrowReleaseHandler<P>;
   onFocus?: FocusHandler<P>;
   onBlur?: BlurHandler<P>;
+  /**
+   * Called when the mouse pointer enters this focusable element.
+   * Requires `mouseSupport: true` in `init()`.
+   */
+  onMouseEnter?: MouseEnterHandler<P>;
+  /**
+   * Called when the mouse pointer leaves this focusable element.
+   * Requires `mouseSupport: true` in `init()`.
+   */
+  onMouseLeave?: MouseLeaveHandler<P>;
+  /**
+   * Called when this focusable element is clicked.
+   * Requires `mouseSupport: true` in `init()`.
+   */
+  onClick?: ClickHandler<P>;
   extraProps?: P;
 }
 
@@ -90,6 +133,9 @@ const useFocusableHook = <P, E = any>({
   onArrowRelease = noop,
   onFocus = noop,
   onBlur = noop,
+  onMouseEnter = noop,
+  onMouseLeave = noop,
+  onClick = noop,
   extraProps
 }: UseFocusableConfig<P> = {}): UseFocusableResult<E> => {
   const onEnterPressHandler = useCallback(
@@ -151,6 +197,46 @@ const useFocusableHook = <P, E = any>({
     },
     [focusKey]
   );
+
+  /**
+   * Attach per-component mouse event listeners when mouseSupport is enabled.
+   * These are separate from the global handlers in SpatialNavigation so that
+   * component-level callbacks (onMouseEnter / onMouseLeave / onClick) fire
+   * even when a parent handles spatial focus change.
+   */
+  useEffect(() => {
+    if (!SpatialNavigation.isMouseSupportEnabled()) {
+      return undefined;
+    }
+
+    const node = ref.current as unknown as HTMLElement | null;
+
+    if (!node) {
+      return undefined;
+    }
+
+    const handleMouseEnter = (event: MouseEvent) => {
+      onMouseEnter(extraProps, { event });
+    };
+
+    const handleMouseLeave = (event: MouseEvent) => {
+      onMouseLeave(extraProps, { event });
+    };
+
+    const handleClick = (event: MouseEvent) => {
+      onClick(extraProps, { event });
+    };
+
+    node.addEventListener('mouseenter', handleMouseEnter);
+    node.addEventListener('mouseleave', handleMouseLeave);
+    node.addEventListener('click', handleClick);
+
+    return () => {
+      node.removeEventListener('mouseenter', handleMouseEnter);
+      node.removeEventListener('mouseleave', handleMouseLeave);
+      node.removeEventListener('click', handleClick);
+    };
+  }, [onMouseEnter, onMouseLeave, onClick, extraProps]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const node: any = ref.current;
