@@ -29,7 +29,7 @@ All options are optional.
 | `trackChildren`           | `boolean`                | `false`        | Update `hasFocusedChild` when any descendant gains or loses focus. Must be `true` to use `hasFocusedChild` for styling.   |
 | `autoRestoreFocus`        | `boolean`                | `true`         | If this component is focused when it unmounts, automatically restore focus to the nearest other component.                |
 | `forceFocus`              | `boolean`                | `false`        | Mark this component as the preferred fallback target when focus is lost and no other candidate exists.                    |
-| `isFocusBoundary`         | `boolean`                | `false`        | Prevent focus from leaving this container in any direction. See [Focus Boundaries](./focus-boundaries.md).                |
+| `isFocusBoundary`         | `boolean`                | `false`        | Prevent focus from leaving this container in any direction. See [Focus Boundaries](../guides/focus-boundaries.md).        |
 | `focusBoundaryDirections` | `Direction[]`            | `undefined`    | Limit boundary behavior to specific directions only (e.g., `['up', 'left']`). Only used when `isFocusBoundary` is `true`. |
 | `focusKey`                | `string`                 | auto-generated | A stable, unique identifier for this component. Required for programmatic focus via `setFocus`.                           |
 | `preferredChildFocusKey`  | `string`                 | `undefined`    | Focus key of the child that should receive focus when this container is first entered.                                    |
@@ -86,7 +86,7 @@ type BlurHandler<P = object> = (
 ) => void;
 ```
 
-See [Event Callbacks](./event-callbacks.md) for the full type definitions of `KeyPressDetails`, `FocusDetails`, and `FocusableComponentLayout`.
+See [Event Callbacks](../guides/event-callbacks.md) for the full type definitions of `KeyPressDetails`, `FocusDetails`, and `FocusableComponentLayout`.
 
 ---
 

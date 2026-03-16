@@ -70,8 +70,8 @@ init(config?: {
 | `domNodeFocusOptions`               | `FocusOptions`                     | `undefined` | Options passed to `HTMLElement.focus()` when `shouldFocusDOMNode` is `true`.                                                            |
 | `shouldUseNativeEvents`             | `boolean`                          | `false`     | Do not call `preventDefault()` on key events, allowing the browser to handle them natively as well.                                     |
 | `rtl`                               | `boolean`                          | `false`     | Enable right-to-left layout mode. Left and right navigation directions are swapped.                                                     |
-| `distanceCalculationMethod`         | `'center' \| 'edges' \| 'corners'` | `'corners'` | Algorithm used to calculate distance between components. See [Distance Calculation](./distance-calculation.md).                         |
-| `customDistanceCalculationFunction` | `function`                         | `undefined` | Override the secondary-axis distance calculation. See [Distance Calculation](./distance-calculation.md).                                |
+| `distanceCalculationMethod`         | `'center' \| 'edges' \| 'corners'` | `'corners'` | Algorithm used to calculate distance between components. See [Distance Calculation](../guides/distance-calculation.md).                 |
+| `customDistanceCalculationFunction` | `function`                         | `undefined` | Override the secondary-axis distance calculation. See [Distance Calculation](../guides/distance-calculation.md).                        |
 
 ### Example
 
@@ -300,7 +300,7 @@ updateRtl(true); // enable RTL
 updateRtl(false); // revert to LTR
 ```
 
-See [RTL Support](./rtl-support.md) for more.
+See [RTL Support](../guides/rtl-support.md) for more.
 
 ---
 
