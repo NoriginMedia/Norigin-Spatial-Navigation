@@ -1,8 +1,8 @@
 # Norigin Spatial Navigation
 
 [![GitHub License](https://img.shields.io/github/license/NoriginMedia/Norigin-Spatial-Navigation?color=blue)](https://github.com/NoriginMedia/Norigin-Spatial-Navigation/blob/master/LICENSE)
-[![NPM Version](https://img.shields.io/npm/v/%40noriginmedia%2Fnorigin-spatial-navigation?color=green)
-![NPM Downloads](https://img.shields.io/npm/dm/%40noriginmedia%2Fnorigin-spatial-navigation?color=green)](https://www.npmjs.com/package/@noriginmedia/norigin-spatial-navigation)
+[![NPM Version](https://img.shields.io/npm/v/%40noriginmedia%2Fnorigin-spatial-navigation?color=green)](https://www.npmjs.com/package/@noriginmedia/norigin-spatial-navigation)
+[![NPM Downloads](https://img.shields.io/npm/dm/%40noriginmedia%2Fnorigin-spatial-navigation?color=green)](https://www.npmjs.com/package/@noriginmedia/norigin-spatial-navigation)
 
 <h3 align="center">
 The missing piece between your app and the TV remote.
