@@ -10,16 +10,17 @@ Norigin Spatial Navigation is an open-source library that handles directional fo
 
 ## Platform Support
 
-| Platform                                        | Support                                                       |
-| ----------------------------------------------- | ------------------------------------------------------------- |
-| Chrome, Firefox, Safari                         | ✅ Fully supported                                            |
-| Samsung Tizen 4+                                | ✅ Fully supported                                            |
-| LG webOS 4+                                     | ✅ Fully supported                                            |
-| Hisense VIDAA                                   | ✅ Fully supported                                            |
-| Vizio SmartCast                                 | ✅ Fully supported                                            |
-| Chromium-based STBs (Ekioh, Webkit)             | ✅ Fully supported                                            |
-| Android TV · React Native via react-native-tvos | ⚠️ Partially supported — key mapping may require custom setup |
-| Apple TV · React Native via react-native-tvos   | ⚠️ Partially supported — spatial algorithm has limitations    |
+| Platform                                          | Support                |
+| ------------------------------------------------- | ---------------------- |
+| Chrome, Firefox, Safari                           | ✅ Fully supported     |
+| Samsung Tizen                                     | ✅ Fully supported     |
+| LG webOS                                          | ✅ Fully supported     |
+| Hisense VIDAA                                     | ✅ Fully supported     |
+| Vizio OS                                          | ✅ Fully supported     |
+| Titan OS                                          | ✅ Fully supported     |
+| Chromium, Eikoh, and WebKit-based STBs            | ✅ Fully supported     |
+| Android TV · React Native via `react-native-tvos` | ⚠️ Partially supported |
+| Apple TV · React Native via `react-native-tvos`   | ⚠️ Partially supported |
 
 ## Packages
 
