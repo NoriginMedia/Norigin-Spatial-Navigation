@@ -29,18 +29,11 @@ jobs:
 
           echo "Creating folder /docs/$REPO_NAME/"
           mkdir -p ./dev-portal/docs/$REPO_NAME/
+          ls -la ./dev-portal/docs/$REPO_NAME/
           rm -rf ./dev-portal/docs/$REPO_NAME/*
-          mkdir -p ./temp
+          ls -la ./dev-portal/docs/$REPO_NAME/
           cp -R ./project/docs/ ./dev-portal/docs/$REPO_NAME/
+          ls -la ./project/docs/
+          echo "------"
+          ls -la ./dev-portal/docs/$REPO_NAME/
           echo "Markdown files moved to /docs/$REPO_NAME/"
-
-          mkdir -p ./dev-portal/static/$IMAGES_FOLDER
-          mkdir -p ./project/$IMAGES_FOLDER
-          if [[ `ls ./project/$IMAGES_FOLDER` != "" ]]
-          then
-            cp -rf ./project/$IMAGES_FOLDER/* ./dev-portal/static/$IMAGES_FOLDER
-            echo "Images moved to /static/$IMAGES_FOLDER"
-          fi
-
-          ls -lRa ./dev-portal/
-
