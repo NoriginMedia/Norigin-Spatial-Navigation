@@ -34,9 +34,9 @@ jobs:
           echo "rm -rf ./dev-portal/docs/$REPO_NAME/*"
           rm -rf ./dev-portal/docs/$REPO_NAME/*
           ls -la ./dev-portal/docs/$REPO_NAME/
-          echo "cp -R ./project/docs/ ./dev-portal/docs/$REPO_NAME/"
-          cp -R ./project/docs/ ./dev-portal/docs/$REPO_NAME/
-          ls -la ./project/docs/
+          echo "cp -R ./project/docs/* ./dev-portal/docs/$REPO_NAME/"
+          cp -R ./project/docs/* ./dev-portal/docs/$REPO_NAME/
+
           echo "Final structure"
           ls -la ./dev-portal/docs/$REPO_NAME/
 
