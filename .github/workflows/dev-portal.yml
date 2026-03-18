@@ -30,8 +30,7 @@ jobs:
           echo "Creating folder /docs/$REPO_NAME/"
           mkdir -p ./dev-portal/docs/$REPO_NAME/
           rm -rf ./dev-portal/docs/$REPO_NAME/*
-          mkdir -p ./temp
-          cp -R ./project/docs/ ./dev-portal/docs/$REPO_NAME/
+          cp -R ./project/docs/* ./dev-portal/docs/$REPO_NAME/
           echo "Markdown files moved to /docs/$REPO_NAME/"
 
           mkdir -p ./dev-portal/static/$IMAGES_FOLDER
