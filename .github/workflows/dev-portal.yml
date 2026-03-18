@@ -3,7 +3,7 @@ name: dev-portal
 on:
   push:
     branches:
-      - main
+      - '*'
 
 jobs:
   replicate-file:
@@ -42,18 +42,5 @@ jobs:
             echo "Images moved to /static/$IMAGES_FOLDER"
           fi
 
-      - name: Push Project B
-        run: |
-          REPO_NAME=`basename "$PWD"`
-          cd ./dev-portal
-          if [[ -z $(git status -s) ]]
-          then
-            echo "Tree is clean. Nothing to commit"
-          else
-            git add .
-            git config user.name github-actions
-            git config user.email github-actions@github.com
-            git commit -am "Replicated from $REPO_NAME"
-            git push
-            exit
-          fi
+          ls /dev-portal/
+
