@@ -42,5 +42,5 @@ jobs:
             echo "Images moved to /static/$IMAGES_FOLDER"
           fi
 
-          ls /dev-portal/
+          ls ./dev-portal/
 
