@@ -258,7 +258,7 @@ setKeyMap(keyMap: {
 }): void
 ```
 
-See [11-key-mapping.md](./key-mapping.md) for full documentation and examples.
+See [Key Mapping](../guides/key-mapping.md) for full documentation and examples.
 
 ---
 
