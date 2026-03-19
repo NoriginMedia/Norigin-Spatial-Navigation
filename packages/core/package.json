@@ -49,6 +49,7 @@
     "prettier": "^2.5.1",
     "rollup": "^4.28.1",
     "ts-jest": "^29.1.4",
+    "tslib": "^2.8.1",
     "typescript": "^5.9.3"
   }
 }
