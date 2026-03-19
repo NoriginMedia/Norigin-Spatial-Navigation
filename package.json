@@ -20,7 +20,7 @@
     "test": "turbo test",
     "lint": "turbo run eslint",
     "changeset": "changeset",
-    "changeset:version": "changeset version",
+    "changeset:version": "changeset version && npm install --no-frozen-lockfile",
     "changeset:publish": "changeset publish"
   },
   "devDependencies": {
@@ -40,5 +40,7 @@
     "prettier": "^2.5.1",
     "turbo": "^2.0.0"
   },
-  "pre-commit": ["lint"]
+  "pre-commit": [
+    "lint"
+  ]
 }
