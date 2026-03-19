@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "lodash-es": "^4.17.21",
-    "@noriginmedia/norigin-spatial-navigation": "^2.3.0"
+    "@noriginmedia/norigin-spatial-navigation": "^3.0.0"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",
