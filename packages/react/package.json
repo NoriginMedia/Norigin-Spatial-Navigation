@@ -17,8 +17,7 @@
   ],
   "scripts": {
     "eslint": "eslint src",
-    "build": "rm -rf dist && rollup -c && tsc --emitDeclarationOnly",
-    "prepublishOnly": "npm run build"
+    "build": "rm -rf dist && rollup -c && tsc --emitDeclarationOnly"
   },
   "repository": {
     "type": "git",
