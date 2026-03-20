@@ -220,8 +220,13 @@ export const measureLayoutWithGetBoundingClientRect = async (
   node: component.node
 });
 
-export const DEFAULT_LAYOUT_ADAPTER_OPTIONS: LayoutAdapterOptions = {
+export const defaultLayoutAdapter: LayoutAdapterOptions = {
   measureLayout: defaultMeasureLayout,
+  focusNode: (component) => component.node.focus()
+};
+
+export const getBoundingClientRectAdapter: LayoutAdapterOptions = {
+  measureLayout: measureLayoutWithGetBoundingClientRect,
   focusNode: (component) => component.node.focus()
 };
 
@@ -237,7 +242,7 @@ const DEFAULT_SPATIAL_NAVIGATION_SERVICE_OPTIONS: SpatialNavigationServiceOption
     domNodeFocusOptions: {},
     shouldUseNativeEvents: false,
     rtl: false,
-    layoutAdapter: DEFAULT_LAYOUT_ADAPTER_OPTIONS,
+    layoutAdapter: defaultLayoutAdapter,
     distanceCalculationMethod: 'corners',
     customDistanceCalculationFunction: undefined
   };
@@ -746,7 +751,7 @@ class SpatialNavigationService {
         throttleKeypresses ??
         DEFAULT_SPATIAL_NAVIGATION_SERVICE_OPTIONS.throttleKeypresses;
       this.layoutAdapter = {
-        ...DEFAULT_LAYOUT_ADAPTER_OPTIONS,
+        ...defaultLayoutAdapter,
         ...(layoutAdapter ?? {})
       };
 
