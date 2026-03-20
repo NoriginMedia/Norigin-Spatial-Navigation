@@ -20,10 +20,7 @@ jobs:
         run: npm ci
 
       - name: Run eslint check
-        uses: sibiraj-s/action-eslint@v3
-        with:
-          all-files: true
-          ignore-path: .eslintignore
-          ignore-patterns: |
-            dist/
-            lib/
+        run: npm run lint
+
+      - name: Run tests
+        run: npm run test
