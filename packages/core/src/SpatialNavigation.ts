@@ -10,6 +10,7 @@ import {
   sortBy,
   throttle
 } from 'lodash-es';
+import AsyncQueue from './AsyncQueue';
 import VisualDebugger from './VisualDebugger';
 import WritingDirection from './WritingDirection';
 import { measureLayout, getBoundingClientRect } from './measureLayout';
@@ -329,6 +330,13 @@ class SpatialNavigationService {
   private distanceCalculationMethod: DistanceCalculationMethod;
 
   private customDistanceCalculationFunction?: DistanceCalculationFunction;
+
+  private queue = new AsyncQueue();
+
+  private enqueue =
+    <A extends unknown[], R>(fn: (...args: A) => R | Promise<R>) =>
+    (...args: A) =>
+      this.queue.enqueue(async () => fn.bind(this)(...args));
 
   /**
    * Used to determine the coordinate that will be used to filter items that are over the "edge"
@@ -703,8 +711,10 @@ class SpatialNavigationService {
     this.pause = this.pause.bind(this);
     this.resume = this.resume.bind(this);
     this.setFocus = this.setFocus.bind(this);
-    this.updateAllLayouts = this.updateAllLayouts.bind(this);
-    this.navigateByDirection = this.navigateByDirection.bind(this);
+    this.updateAllLayouts = this.enqueue(this.updateAllLayouts);
+    this.navigateByDirection = this.enqueue(this.navigateByDirection);
+    this.addFocusable = this.enqueue(this.addFocusable);
+    this.removeFocusable = this.enqueue(this.removeFocusable);
     this.init = this.init.bind(this);
     this.setThrottle = this.setThrottle.bind(this);
     this.destroy = this.destroy.bind(this);
@@ -848,56 +858,58 @@ class SpatialNavigationService {
     // We check both because the React Native remote debugger implements window, but not window.addEventListener.
     if (typeof window !== 'undefined' && window.addEventListener) {
       this.keyDownEventListener = (event: KeyboardEvent) => {
-        if (this.paused === true) {
-          return;
-        }
+        this.queue.enqueue(async () => {
+          if (this.paused === true) {
+            return;
+          }
 
-        if (this.debug) {
-          this.logIndex += 1;
-        }
+          if (this.debug) {
+            this.logIndex += 1;
+          }
 
-        const keyCode = SpatialNavigationService.getKeyCode(event);
-        const eventType = this.getEventType(keyCode);
+          const keyCode = SpatialNavigationService.getKeyCode(event);
+          const eventType = this.getEventType(keyCode);
 
-        if (!eventType) {
-          return;
-        }
+          if (!eventType) {
+            return;
+          }
 
-        this.pressedKeys[eventType] = this.pressedKeys[eventType]
-          ? this.pressedKeys[eventType] + 1
-          : 1;
+          this.pressedKeys[eventType] = this.pressedKeys[eventType]
+            ? this.pressedKeys[eventType] + 1
+            : 1;
 
-        if (!this.shouldUseNativeEvents) {
-          event.preventDefault();
-          event.stopPropagation();
-        }
+          if (!this.shouldUseNativeEvents) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
 
-        const keysDetails = {
-          pressedKeys: this.pressedKeys
-        };
+          const keysDetails = {
+            pressedKeys: this.pressedKeys
+          };
 
-        if (eventType === KEY_ENTER && this.focusKey) {
-          this.onEnterPress(keysDetails);
+          if (eventType === KEY_ENTER && this.focusKey) {
+            this.onEnterPress(keysDetails);
 
-          return;
-        }
+            return;
+          }
 
-        const preventDefaultNavigation =
-          this.onArrowPress(eventType, keysDetails) === false;
+          const preventDefaultNavigation =
+            this.onArrowPress(eventType, keysDetails) === false;
 
-        if (this.visualDebugger) {
-          this.visualDebugger.clear();
-        }
+          if (this.visualDebugger) {
+            this.visualDebugger.clear();
+          }
 
-        if (preventDefaultNavigation) {
-          this.log('keyDownEventListener', 'default navigation prevented');
-        } else {
-          const direction = findKey(this.getKeyMap(), (codeList) =>
-            codeList.includes(keyCode)
-          );
+          if (preventDefaultNavigation) {
+            this.log('keyDownEventListener', 'default navigation prevented');
+          } else {
+            const direction = findKey(this.getKeyMap(), (codeList) =>
+              codeList.includes(keyCode)
+            );
 
-          this.smartNavigate(direction, null, { event });
-        }
+            await this.smartNavigate(direction, null, { event });
+          }
+        });
       };
 
       // Apply throttle only if the option we got is > 0 to avoid limiting the listener to every animation frame
@@ -1116,7 +1128,7 @@ class SpatialNavigationService {
      * the Focusable Containers, that have "forceFocus" flag enabled.
      */
     if (!fromParentFocusKey && !currentComponent) {
-      this.setFocus(this.getForcedFocusKey());
+      await this.setFocus(this.getForcedFocusKey());
       return;
     }
 
@@ -1233,7 +1245,7 @@ class SpatialNavigationService {
       );
 
       if (nextComponent) {
-        this.setFocus(nextComponent.focusKey, focusDetails);
+        await this.setFocus(nextComponent.focusKey, focusDetails);
       } else {
         const parentComponent = this.focusableComponents[parentFocusKey];
 
@@ -1242,7 +1254,7 @@ class SpatialNavigationService {
           : [];
 
         if (!parentComponent || !focusBoundaryDirections.includes(direction)) {
-          this.smartNavigate(direction, parentFocusKey, focusDetails);
+          await this.smartNavigate(direction, parentFocusKey, focusDetails);
         }
       }
     }
@@ -1408,7 +1420,7 @@ class SpatialNavigationService {
     return targetFocusKey;
   }
 
-  addFocusable({
+  async addFocusable({
     focusKey,
     node,
     parentFocusKey,
@@ -1480,7 +1492,7 @@ class SpatialNavigationService {
       return;
     }
 
-    this.updateLayout(focusKey);
+    await this.updateLayout(focusKey);
 
     this.log(
       'addFocusable',
@@ -1492,7 +1504,7 @@ class SpatialNavigationService {
      * If for some reason this component was already focused before it was added, call the update
      */
     if (focusKey === this.focusKey) {
-      this.setFocus(preferredChildFocusKey || focusKey);
+      await this.setFocus(preferredChildFocusKey || focusKey);
     }
 
     /**
