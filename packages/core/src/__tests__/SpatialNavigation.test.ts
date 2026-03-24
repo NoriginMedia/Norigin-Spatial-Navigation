@@ -6,6 +6,11 @@ import {
 } from '../SpatialNavigation';
 import { createHorizontalLayout, createVerticalLayout } from './domNodes';
 
+const settle = () =>
+  new Promise<void>((resolve) => {
+    setTimeout(resolve, 0);
+  });
+
 describe('SpatialNavigation', () => {
   beforeEach(() => {
     window.innerWidth = 1920;
@@ -22,24 +27,24 @@ describe('SpatialNavigation', () => {
 
     expect(SpatialNavigation.getCurrentFocusKey()).not.toBe('child-1');
 
-    await SpatialNavigation.setFocus(ROOT_FOCUS_KEY);
-
+    SpatialNavigation.setFocus(ROOT_FOCUS_KEY);
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-1');
 
-    await SpatialNavigation.navigateByDirection('right', {});
-
+    SpatialNavigation.navigateByDirection('right', {});
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-2');
 
-    await SpatialNavigation.navigateByDirection('up', {});
-
+    SpatialNavigation.navigateByDirection('up', {});
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-2');
 
-    await SpatialNavigation.navigateByDirection('left', {});
-
+    SpatialNavigation.navigateByDirection('left', {});
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-1');
 
-    await SpatialNavigation.navigateByDirection('down', {});
-
+    SpatialNavigation.navigateByDirection('down', {});
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-1');
   });
 
@@ -48,28 +53,28 @@ describe('SpatialNavigation', () => {
 
     expect(SpatialNavigation.getCurrentFocusKey()).not.toBe('child-1');
 
-    await SpatialNavigation.setFocus(ROOT_FOCUS_KEY);
-
+    SpatialNavigation.setFocus(ROOT_FOCUS_KEY);
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-1');
 
-    await SpatialNavigation.navigateByDirection('right', {});
-
+    SpatialNavigation.navigateByDirection('right', {});
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-1');
 
-    await SpatialNavigation.navigateByDirection('up', {});
-
+    SpatialNavigation.navigateByDirection('up', {});
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-1');
 
-    await SpatialNavigation.navigateByDirection('left', {});
-
+    SpatialNavigation.navigateByDirection('left', {});
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-1');
 
-    await SpatialNavigation.navigateByDirection('down', {});
-
+    SpatialNavigation.navigateByDirection('down', {});
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-2');
 
-    await SpatialNavigation.navigateByDirection('down', {});
-
+    SpatialNavigation.navigateByDirection('down', {});
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-2');
   });
 
@@ -78,8 +83,8 @@ describe('SpatialNavigation', () => {
 
     expect(SpatialNavigation.getCurrentFocusKey()).not.toBe('child-1');
 
-    await SpatialNavigation.setFocus('child-2');
-
+    SpatialNavigation.setFocus('child-2');
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-2');
   });
 
@@ -87,12 +92,12 @@ describe('SpatialNavigation', () => {
     createHorizontalLayout();
     SpatialNavigation.pause();
 
-    await SpatialNavigation.setFocus('child-1');
-
+    SpatialNavigation.setFocus('child-1');
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-1');
 
-    await SpatialNavigation.navigateByDirection('right', {});
-
+    SpatialNavigation.navigateByDirection('right', {});
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-1');
   });
 
@@ -101,8 +106,8 @@ describe('SpatialNavigation', () => {
 
     expect(SpatialNavigation.getCurrentFocusKey()).not.toBe('child-1');
 
-    await SpatialNavigation.setFocus(ROOT_FOCUS_KEY);
-
+    SpatialNavigation.setFocus(ROOT_FOCUS_KEY);
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-1');
 
     SpatialNavigation.updateFocusable('child-2', {
@@ -137,12 +142,12 @@ describe('SpatialNavigation', () => {
       onArrowRelease: () => {}
     });
 
-    await SpatialNavigation.navigateByDirection('right', {});
-
+    SpatialNavigation.navigateByDirection('right', {});
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-3');
 
-    await SpatialNavigation.navigateByDirection('right', {});
-
+    SpatialNavigation.navigateByDirection('right', {});
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-2');
   });
 
@@ -151,14 +156,14 @@ describe('SpatialNavigation', () => {
 
     expect(SpatialNavigation.getCurrentFocusKey()).not.toBe('child-1');
 
-    await SpatialNavigation.setFocus(ROOT_FOCUS_KEY);
-
+    SpatialNavigation.setFocus(ROOT_FOCUS_KEY);
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-1');
 
     SpatialNavigation.removeFocusable({ focusKey: 'child-2' });
 
-    await SpatialNavigation.navigateByDirection('right', {});
-
+    SpatialNavigation.navigateByDirection('right', {});
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-3');
   });
 });

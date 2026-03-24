@@ -13,6 +13,7 @@ import {
 import VisualDebugger from './VisualDebugger';
 import WritingDirection from './WritingDirection';
 import { measureLayout, getBoundingClientRect } from './measureLayout';
+import Scheduler from './Scheduler';
 
 const DIRECTION_LEFT = 'left';
 const DIRECTION_RIGHT = 'right';
@@ -331,6 +332,8 @@ class SpatialNavigationService {
   private distanceCalculationMethod: DistanceCalculationMethod;
 
   private customDistanceCalculationFunction?: DistanceCalculationFunction;
+
+  private scheduler = new Scheduler();
 
   /**
    * Used to determine the coordinate that will be used to filter items that are over the "edge"
@@ -705,8 +708,13 @@ class SpatialNavigationService {
     this.pause = this.pause.bind(this);
     this.resume = this.resume.bind(this);
     this.setFocus = this.setFocus.bind(this);
-    this.updateAllLayouts = this.updateAllLayouts.bind(this);
-    this.navigateByDirection = this.navigateByDirection.bind(this);
+    this.updateAllLayouts = this.scheduler.bind(this.updateAllLayouts, this);
+    this.navigateByDirection = this.scheduler.bind(
+      this.navigateByDirection,
+      this
+    );
+    this.addFocusable = this.scheduler.bind(this.addFocusable, this);
+    this.removeFocusable = this.scheduler.bind(this.removeFocusable, this);
     this.init = this.init.bind(this);
     this.setThrottle = this.setThrottle.bind(this);
     this.destroy = this.destroy.bind(this);
@@ -1739,7 +1747,7 @@ class SpatialNavigationService {
     this.paused = false;
   }
 
-  async setFocus(focusKey: string, focusDetails: FocusDetails = {}) {
+  setFocus(focusKey: string, focusDetails: FocusDetails = {}) {
     // Cancel any pending auto-restore focus calls if we are setting focus manually
     this.setFocusDebounced.cancel();
 
@@ -1759,13 +1767,13 @@ class SpatialNavigationService {
       focusKey = this.getForcedFocusKey();
     }
 
-    const newFocusKey = await this.getNextFocusKey(focusKey);
+    this.getNextFocusKey(focusKey).then((newFocusKey) => {
+      this.log('setFocus', 'newFocusKey', newFocusKey);
 
-    this.log('setFocus', 'newFocusKey', newFocusKey);
-
-    this.setCurrentFocusedKey(newFocusKey, focusDetails);
-    this.updateParentsHasFocusedChild(newFocusKey, focusDetails);
-    this.updateParentsLastFocusedChild(newFocusKey);
+      this.setCurrentFocusedKey(newFocusKey, focusDetails);
+      this.updateParentsHasFocusedChild(newFocusKey, focusDetails);
+      this.updateParentsLastFocusedChild(newFocusKey);
+    });
   }
 
   async updateAllLayouts() {
