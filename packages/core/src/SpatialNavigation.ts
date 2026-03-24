@@ -56,6 +56,8 @@ const MAIN_COORDINATE_WEIGHT = 5;
 
 const AUTO_RESTORE_FOCUS_DELAY = 300;
 
+const LAYOUT_STALE_TIME = 16; // 60fps
+
 const DEBUG_FN_COLORS = ['#0FF', '#FF0', '#F0F'];
 
 const THROTTLE_OPTIONS = {
@@ -97,7 +99,7 @@ interface FocusableComponent {
   forceFocus: boolean;
   lastFocusedChildKey?: string;
   layout?: FocusableComponentLayout;
-  layoutUpdated?: boolean;
+  layoutUpdatedAt?: number;
 }
 
 interface FocusableComponentUpdatePayload {
@@ -1101,13 +1103,6 @@ class SpatialNavigationService {
     this.log('smartNavigate', 'fromParentFocusKey', fromParentFocusKey);
     this.log('smartNavigate', 'this.focusKey', this.focusKey);
 
-    if (!fromParentFocusKey) {
-      forOwn(this.focusableComponents, (component) => {
-        // eslint-disable-next-line no-param-reassign
-        component.layoutUpdated = false;
-      });
-    }
-
     const currentComponent =
       this.focusableComponents[fromParentFocusKey || this.focusKey];
 
@@ -1144,16 +1139,16 @@ class SpatialNavigationService {
       /**
        * Get only the siblings with the coords on the way of our moving direction
        */
+      const threshold = Date.now() - LAYOUT_STALE_TIME;
       await Promise.all(
-        Object.values(this.focusableComponents).map((component) => {
-          if (
-            component.parentFocusKey === parentFocusKey &&
-            component.focusable
-          ) {
-            return this.updateLayout(component.focusKey);
-          }
-          return undefined;
-        })
+        Object.values(this.focusableComponents)
+          .filter(
+            (component) =>
+              component.parentFocusKey === parentFocusKey &&
+              component.focusable &&
+              component.layoutUpdatedAt > threshold
+          )
+          .map((component) => this.updateLayout(component.focusKey))
       );
 
       const siblings = filter(this.focusableComponents, (component) => {
@@ -1464,8 +1459,7 @@ class SpatialNavigationService {
          * Node ref is also duplicated in layout to be reported in onFocus callback
          */
         node
-      },
-      layoutUpdated: false
+      }
     };
 
     if (!node) {
@@ -1789,11 +1783,12 @@ class SpatialNavigationService {
   async updateLayout(focusKey: string) {
     const component = this.focusableComponents[focusKey];
 
-    if (!component || this.nativeMode || component.layoutUpdated) {
+    if (!component || this.nativeMode) {
       return;
     }
 
     component.layout = await this.layoutAdapter.measureLayout(component);
+    component.layoutUpdatedAt = Date.now();
   }
 
   updateFocusable(
