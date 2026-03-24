@@ -1245,7 +1245,7 @@ class SpatialNavigationService {
           : [];
 
         if (!parentComponent || !focusBoundaryDirections.includes(direction)) {
-          this.smartNavigate(direction, parentFocusKey, focusDetails);
+          await this.smartNavigate(direction, parentFocusKey, focusDetails);
         }
       }
     }
