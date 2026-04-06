@@ -19,10 +19,12 @@ export default class Scheduler {
         Promise.all(this.nextPriorityTasks.map((task) => task()));
       this.nextPriorityTasks = [];
       await this.tick();
-    } else {
+    } else if (this.nextTask) {
       this.currentTask = this.nextTask;
       this.nextTask = undefined;
       await this.tick();
+    } else {
+      this.currentTask = undefined;
     }
   }
 
