@@ -858,56 +858,58 @@ class SpatialNavigationService {
     // We check both because the React Native remote debugger implements window, but not window.addEventListener.
     if (typeof window !== 'undefined' && window.addEventListener) {
       this.keyDownEventListener = (event: KeyboardEvent) => {
-        if (this.paused === true) {
-          return;
-        }
+        this.scheduler.schedule(async () => {
+          if (this.paused === true) {
+            return;
+          }
 
-        if (this.debug) {
-          this.logIndex += 1;
-        }
+          if (this.debug) {
+            this.logIndex += 1;
+          }
 
-        const keyCode = SpatialNavigationService.getKeyCode(event);
-        const eventType = this.getEventType(keyCode);
+          const keyCode = SpatialNavigationService.getKeyCode(event);
+          const eventType = this.getEventType(keyCode);
 
-        if (!eventType) {
-          return;
-        }
+          if (!eventType) {
+            return;
+          }
 
-        this.pressedKeys[eventType] = this.pressedKeys[eventType]
-          ? this.pressedKeys[eventType] + 1
-          : 1;
+          this.pressedKeys[eventType] = this.pressedKeys[eventType]
+            ? this.pressedKeys[eventType] + 1
+            : 1;
 
-        if (!this.shouldUseNativeEvents) {
-          event.preventDefault();
-          event.stopPropagation();
-        }
+          if (!this.shouldUseNativeEvents) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
 
-        const keysDetails = {
-          pressedKeys: this.pressedKeys
-        };
+          const keysDetails = {
+            pressedKeys: this.pressedKeys
+          };
 
-        if (eventType === KEY_ENTER && this.focusKey) {
-          this.onEnterPress(keysDetails);
+          if (eventType === KEY_ENTER && this.focusKey) {
+            this.onEnterPress(keysDetails);
 
-          return;
-        }
+            return;
+          }
 
-        const preventDefaultNavigation =
-          this.onArrowPress(eventType, keysDetails) === false;
+          const preventDefaultNavigation =
+            this.onArrowPress(eventType, keysDetails) === false;
 
-        if (this.visualDebugger) {
-          this.visualDebugger.clear();
-        }
+          if (this.visualDebugger) {
+            this.visualDebugger.clear();
+          }
 
-        if (preventDefaultNavigation) {
-          this.log('keyDownEventListener', 'default navigation prevented');
-        } else {
-          const direction = findKey(this.getKeyMap(), (codeList) =>
-            codeList.includes(keyCode)
-          );
+          if (preventDefaultNavigation) {
+            this.log('keyDownEventListener', 'default navigation prevented');
+          } else {
+            const direction = findKey(this.getKeyMap(), (codeList) =>
+              codeList.includes(keyCode)
+            );
 
-          this.smartNavigate(direction, null, { event });
-        }
+            await this.smartNavigate(direction, null, { event });
+          }
+        });
       };
 
       // Apply throttle only if the option we got is > 0 to avoid limiting the listener to every animation frame
@@ -1747,7 +1749,7 @@ class SpatialNavigationService {
     this.paused = false;
   }
 
-  setFocus(focusKey: string, focusDetails: FocusDetails = {}) {
+  async setFocus(focusKey: string, focusDetails: FocusDetails = {}) {
     // Cancel any pending auto-restore focus calls if we are setting focus manually
     this.setFocusDebounced.cancel();
 
@@ -1767,13 +1769,12 @@ class SpatialNavigationService {
       focusKey = this.getForcedFocusKey();
     }
 
-    this.getNextFocusKey(focusKey).then((newFocusKey) => {
-      this.log('setFocus', 'newFocusKey', newFocusKey);
+    const newFocusKey = await this.getNextFocusKey(focusKey);
+    this.log('setFocus', 'newFocusKey', newFocusKey);
 
-      this.setCurrentFocusedKey(newFocusKey, focusDetails);
-      this.updateParentsHasFocusedChild(newFocusKey, focusDetails);
-      this.updateParentsLastFocusedChild(newFocusKey);
-    });
+    this.setCurrentFocusedKey(newFocusKey, focusDetails);
+    this.updateParentsHasFocusedChild(newFocusKey, focusDetails);
+    this.updateParentsLastFocusedChild(newFocusKey);
   }
 
   async updateAllLayouts() {
