@@ -20,5 +20,6 @@ export interface LayoutAdapter {
   measureLayout: (
     component: FocusableComponent
   ) => Promise<FocusableComponentLayout>;
+  blurNode: (component: FocusableComponent) => void;
   focusNode: (component: FocusableComponent) => void;
 }

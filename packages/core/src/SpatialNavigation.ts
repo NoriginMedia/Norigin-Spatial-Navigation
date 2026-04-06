@@ -1556,7 +1556,7 @@ export class SpatialNavigationService {
     ) {
       const oldComponent = this.focusableComponents[this.focusKey];
       oldComponent.onUpdateFocus(false);
-      oldComponent.node?.removeAttribute?.('data-focused');
+      this.layoutAdapter.blurNode(oldComponent);
 
       this.getNodeLayoutByFocusKey(this.focusKey).then((layout) => {
         oldComponent.onBlur(layout, focusDetails);
@@ -1569,11 +1569,7 @@ export class SpatialNavigationService {
     if (this.isFocusableComponent(this.focusKey)) {
       const newComponent = this.focusableComponents[this.focusKey];
 
-      if (this.shouldFocusDOMNode && newComponent.node) {
-        newComponent.node.focus(this.domNodeFocusOptions);
-      }
-
-      newComponent.node?.setAttribute?.('data-focused', 'true');
+      this.layoutAdapter.focusNode(newComponent);
 
       newComponent.onUpdateFocus(true);
       this.getNodeLayoutByFocusKey(this.focusKey).then((layout) => {
