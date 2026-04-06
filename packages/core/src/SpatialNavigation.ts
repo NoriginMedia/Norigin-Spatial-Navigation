@@ -1156,7 +1156,7 @@ class SpatialNavigationService {
             (component) =>
               component.parentFocusKey === parentFocusKey &&
               component.focusable &&
-              component.layoutUpdatedAt > threshold
+              component.layoutUpdatedAt <= threshold
           )
           .map((component) => this.updateLayout(component.focusKey))
       );
