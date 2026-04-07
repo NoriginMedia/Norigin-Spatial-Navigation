@@ -1455,6 +1455,7 @@ class SpatialNavigationService {
       autoRestoreFocus,
       forceFocus,
       lastFocusedChildKey: null,
+      layoutUpdatedAt: 0,
       layout: {
         x: 0,
         y: 0,
@@ -1831,6 +1832,8 @@ class SpatialNavigationService {
       component.onArrowPress = onArrowPress;
       component.onFocus = onFocus;
       component.onBlur = onBlur;
+      // Reset layout updated at to force a layout update
+      component.layoutUpdatedAt = 0;
 
       if (node) {
         component.node = node;
