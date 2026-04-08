@@ -1,5 +1,6 @@
 import {
   type DebouncedFunc,
+  assign,
   debounce,
   difference,
   filter,
@@ -208,12 +209,10 @@ export type SpatialNavigationServiceOptions = {
   rtl: boolean;
   /**
    * Can be a class (constructor) that implements LayoutAdapter,
-   * an instance of a class that implements LayoutAdapter,
    * or an object that partially implements LayoutAdapter.
    */
   layoutAdapter?:
     | (new (...args: any[]) => LayoutAdapter)
-    | LayoutAdapter
     | Partial<LayoutAdapter>;
   distanceCalculationMethod: DistanceCalculationMethod;
   customDistanceCalculationFunction?: DistanceCalculationFunction;
@@ -766,10 +765,7 @@ export class SpatialNavigationService {
 
         // Override specific methods
         if (layoutAdapter) {
-          this.layoutAdapter = {
-            ...this.layoutAdapter,
-            ...layoutAdapter
-          };
+          assign(this.layoutAdapter, layoutAdapter);
         }
       }
 
