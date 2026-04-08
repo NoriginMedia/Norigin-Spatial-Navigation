@@ -6,6 +6,11 @@ import {
 } from '../SpatialNavigation';
 import { createHorizontalLayout, createVerticalLayout } from './domNodes';
 
+const settle = () =>
+  new Promise<void>((resolve) => {
+    setTimeout(resolve, 0);
+  });
+
 describe('SpatialNavigation', () => {
   beforeEach(() => {
     window.innerWidth = 1920;
@@ -17,92 +22,92 @@ describe('SpatialNavigation', () => {
     destroy();
   });
 
-  it('should allow horizontal navigation', () => {
+  it('should allow horizontal navigation', async () => {
     createHorizontalLayout();
 
     expect(SpatialNavigation.getCurrentFocusKey()).not.toBe('child-1');
 
     SpatialNavigation.setFocus(ROOT_FOCUS_KEY);
-
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-1');
 
     SpatialNavigation.navigateByDirection('right', {});
-
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-2');
 
     SpatialNavigation.navigateByDirection('up', {});
-
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-2');
 
     SpatialNavigation.navigateByDirection('left', {});
-
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-1');
 
     SpatialNavigation.navigateByDirection('down', {});
-
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-1');
   });
 
-  it('should allow vertical navigation', () => {
+  it('should allow vertical navigation', async () => {
     createVerticalLayout();
 
     expect(SpatialNavigation.getCurrentFocusKey()).not.toBe('child-1');
 
     SpatialNavigation.setFocus(ROOT_FOCUS_KEY);
-
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-1');
 
     SpatialNavigation.navigateByDirection('right', {});
-
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-1');
 
     SpatialNavigation.navigateByDirection('up', {});
-
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-1');
 
     SpatialNavigation.navigateByDirection('left', {});
-
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-1');
 
     SpatialNavigation.navigateByDirection('down', {});
-
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-2');
 
     SpatialNavigation.navigateByDirection('down', {});
-
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-2');
   });
 
-  it('should allow manual focus', () => {
+  it('should allow manual focus', async () => {
     createHorizontalLayout();
 
     expect(SpatialNavigation.getCurrentFocusKey()).not.toBe('child-1');
 
     SpatialNavigation.setFocus('child-2');
-
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-2');
   });
 
-  it('should ignore events if paused', () => {
+  it('should ignore events if paused', async () => {
     createHorizontalLayout();
     SpatialNavigation.pause();
 
     SpatialNavigation.setFocus('child-1');
-
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-1');
 
     SpatialNavigation.navigateByDirection('right', {});
-
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-1');
   });
 
-  it('should be able to update a focusable reference', () => {
+  it('should be able to update a focusable reference', async () => {
     createHorizontalLayout();
 
     expect(SpatialNavigation.getCurrentFocusKey()).not.toBe('child-1');
 
     SpatialNavigation.setFocus(ROOT_FOCUS_KEY);
-
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-1');
 
     SpatialNavigation.updateFocusable('child-2', {
@@ -134,31 +139,31 @@ describe('SpatialNavigation', () => {
       onFocus: () => {},
       onBlur: () => {},
       onArrowPress: () => true,
-      onArrowRelease: () => {},
+      onArrowRelease: () => {}
     });
 
     SpatialNavigation.navigateByDirection('right', {});
-
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-3');
 
     SpatialNavigation.navigateByDirection('right', {});
-
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-2');
   });
 
-  it('should be able to remove a focusable reference', () => {
+  it('should be able to remove a focusable reference', async () => {
     createHorizontalLayout();
 
     expect(SpatialNavigation.getCurrentFocusKey()).not.toBe('child-1');
 
     SpatialNavigation.setFocus(ROOT_FOCUS_KEY);
-
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-1');
 
     SpatialNavigation.removeFocusable({ focusKey: 'child-2' });
 
     SpatialNavigation.navigateByDirection('right', {});
-
+    await settle();
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-3');
   });
 });
