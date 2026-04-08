@@ -13,7 +13,12 @@ export default class Scheduler {
   private nextPriorityTasks: Array<Task> = [];
 
   private async tick(): Promise<void> {
-    await this.currentTask?.();
+    // Run current task
+    const { currentTask } = this;
+    this.currentTask = undefined;
+    await currentTask?.();
+
+    // Check if there are additional tasks
     if (this.nextPriorityTasks.length > 0) {
       this.currentTask = () =>
         Promise.all(this.nextPriorityTasks.map((task) => task()));
@@ -23,8 +28,6 @@ export default class Scheduler {
       this.currentTask = this.nextTask;
       this.nextTask = undefined;
       await this.tick();
-    } else {
-      this.currentTask = undefined;
     }
   }
 
