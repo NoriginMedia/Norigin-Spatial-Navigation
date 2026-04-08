@@ -24,8 +24,12 @@ import {
   setKeyMap,
   setThrottle,
   updateRtl,
-  ROOT_FOCUS_KEY
+  ROOT_FOCUS_KEY,
+  defaultLayoutAdapter,
+  getBoundingClientRectAdapter
 } from '@noriginmedia/norigin-spatial-navigation-core';
+
+import type { LayoutAdapterOptions } from '@noriginmedia/norigin-spatial-navigation-core';
 ```
 
 ---
@@ -41,11 +45,15 @@ init(config?: {
   nativeMode?: boolean;
   throttle?: number;
   throttleKeypresses?: boolean;
+  /**
+   * @deprecated Use `layoutAdapter: getBoundingClientRectAdapter` instead.
+   */
   useGetBoundingClientRect?: boolean;
   shouldFocusDOMNode?: boolean;
   domNodeFocusOptions?: FocusOptions;
   shouldUseNativeEvents?: boolean;
   rtl?: boolean;
+  layoutAdapter?: Partial<LayoutAdapterOptions>;
   distanceCalculationMethod?: 'center' | 'edges' | 'corners';
   customDistanceCalculationFunction?: (
     refCorners: Corners,
@@ -58,20 +66,21 @@ init(config?: {
 
 ### Config options
 
-| Option                              | Type                               | Default     | Description                                                                                                                             |
-| ----------------------------------- | ---------------------------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `debug`                             | `boolean`                          | `false`     | Log navigation decisions to the browser console.                                                                                        |
-| `visualDebug`                       | `boolean`                          | `false`     | Draw a canvas overlay showing component bounding boxes and navigation paths.                                                            |
-| `nativeMode`                        | `boolean`                          | `false`     | **Deprecated.** Disable DOM key event listeners (for React Native). You must drive navigation manually.                                 |
-| `throttle`                          | `number`                           | `0`         | Milliseconds to wait between processing repeated key presses. `0` means no throttle.                                                    |
-| `throttleKeypresses`                | `boolean`                          | `false`     | When `true` and `throttle > 0`, throttle key repeat events while a key is held down.                                                    |
-| `useGetBoundingClientRect`          | `boolean`                          | `false`     | Use `getBoundingClientRect()` instead of `offsetLeft/Top` for layout measurement. Use this when elements are CSS-transformed or scaled. |
-| `shouldFocusDOMNode`                | `boolean`                          | `false`     | Call `HTMLElement.focus()` on the focused component's DOM node, enabling native browser focus behavior and accessibility.               |
-| `domNodeFocusOptions`               | `FocusOptions`                     | `undefined` | Options passed to `HTMLElement.focus()` when `shouldFocusDOMNode` is `true`.                                                            |
-| `shouldUseNativeEvents`             | `boolean`                          | `false`     | Do not call `preventDefault()` on key events, allowing the browser to handle them natively as well.                                     |
-| `rtl`                               | `boolean`                          | `false`     | Enable right-to-left layout mode. Left and right navigation directions are swapped.                                                     |
-| `distanceCalculationMethod`         | `'center' \| 'edges' \| 'corners'` | `'corners'` | Algorithm used to calculate distance between components. See [Distance Calculation](../guides/distance-calculation.md).                 |
-| `customDistanceCalculationFunction` | `function`                         | `undefined` | Override the secondary-axis distance calculation. See [Distance Calculation](../guides/distance-calculation.md).                        |
+| Option                              | Type                               | Default                | Description                                                                                                                   |
+| ----------------------------------- | ---------------------------------- | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `debug`                             | `boolean`                          | `false`                | Log navigation decisions to the browser console.                                                                              |
+| `visualDebug`                       | `boolean`                          | `false`                | Draw a canvas overlay showing component bounding boxes and navigation paths.                                                  |
+| `nativeMode`                        | `boolean`                          | `false`                | **Deprecated.** Disable DOM key event listeners (for React Native). You must drive navigation manually.                       |
+| `throttle`                          | `number`                           | `0`                    | Milliseconds to wait between processing repeated key presses. `0` means no throttle.                                          |
+| `throttleKeypresses`                | `boolean`                          | `false`                | When `true` and `throttle > 0`, throttle key repeat events while a key is held down.                                          |
+| `layoutAdapter`                     | `Partial<LayoutAdapterOptions>`    | `defaultLayoutAdapter` | Overrides for layout measurement and DOM focus. Merged with the default adapter. See [Layout adapter](#layout-adapter) below. |
+| `useGetBoundingClientRect`          | `boolean`                          | `false`                | **Deprecated.** Use `layoutAdapter: getBoundingClientRectAdapter` instead. If `true`, the service logs a deprecation warning. |
+| `shouldFocusDOMNode`                | `boolean`                          | `false`                | Call `HTMLElement.focus()` on the focused component's DOM node, enabling native browser focus behavior and accessibility.     |
+| `domNodeFocusOptions`               | `FocusOptions`                     | `undefined`            | Options passed to `HTMLElement.focus()` when `shouldFocusDOMNode` is `true`.                                                  |
+| `shouldUseNativeEvents`             | `boolean`                          | `false`                | Do not call `preventDefault()` on key events, allowing the browser to handle them natively as well.                           |
+| `rtl`                               | `boolean`                          | `false`                | Enable right-to-left layout mode. Left and right navigation directions are swapped.                                           |
+| `distanceCalculationMethod`         | `'center' \| 'edges' \| 'corners'` | `'corners'`            | Algorithm used to calculate distance between components. See [Distance Calculation](../guides/distance-calculation.md).       |
+| `customDistanceCalculationFunction` | `function`                         | `undefined`            | Override the secondary-axis distance calculation. See [Distance Calculation](../guides/distance-calculation.md).              |
 
 ### Example
 
@@ -89,6 +98,39 @@ init({
 
 ---
 
+## Layout adapter
+
+Layout is supplied by a **`layoutAdapter`**: an object with:
+
+- **`measureLayout(component)`** — Must return a **`Promise`** resolving to the focusable component’s layout (position and size). The default uses offset-based measurement; **`getBoundingClientRectAdapter`** uses `getBoundingClientRect()`.
+- **`focusNode(component)`** — Called to move native focus when applicable (default: `component.node.focus()`).
+
+Exported adapters:
+
+| Export                         | Role                                                                   |
+| ------------------------------ | ---------------------------------------------------------------------- |
+| `defaultLayoutAdapter`         | Offset-based measurement (fast; ignores CSS transforms on ancestors).  |
+| `getBoundingClientRectAdapter` | Viewport-relative rects; use when transforms or scaling affect layout. |
+
+`init` merges `layoutAdapter` **partially** over `defaultLayoutAdapter`, so you can override only `measureLayout` or only `focusNode`.
+
+**Migration from `useGetBoundingClientRect: true`:**
+
+```typescript
+import {
+  init,
+  getBoundingClientRectAdapter
+} from '@noriginmedia/norigin-spatial-navigation-core';
+
+init({
+  layoutAdapter: getBoundingClientRectAdapter
+});
+```
+
+**Custom async measurement** — Implement `measureLayout` as an async function (or return `Promise.resolve(...)` for synchronous work). The library awaits layout before navigating or focusing.
+
+---
+
 ## `destroy()`
 
 Disables the service, removes all event listeners, and clears all registered components. Call this when tearing down the application.
@@ -98,7 +140,7 @@ destroy(): void
 ```
 
 ```typescript
-import { destroy } from '@noriginmedia/norigin-spatial-navigation-react';
+import { destroy } from '@noriginmedia/norigin-spatial-navigation-core';
 
 // In a test afterEach or app cleanup:
 destroy();
@@ -108,10 +150,10 @@ destroy();
 
 ## `setFocus(focusKey, focusDetails?)`
 
-Programmatically move focus to the component with the given focus key.
+Programmatically move focus to the component with the given focus key. This method is **asynchronous** because it may re-measure layout via the configured `layoutAdapter`.
 
 ```typescript
-setFocus(focusKey: string, focusDetails?: FocusDetails): void
+setFocus(focusKey: string, focusDetails?: FocusDetails): Promise<void>
 ```
 
 | Parameter      | Description                                                                                                              |
@@ -119,37 +161,37 @@ setFocus(focusKey: string, focusDetails?: FocusDetails): void
 | `focusKey`     | The focus key of the target component. Use `ROOT_FOCUS_KEY` to focus the root, which routes to the first eligible child. |
 | `focusDetails` | Optional object passed through to the target component's `onFocus` handler.                                              |
 
+Use **`await`** when you need to run code after focus has settled. In `useEffect` or fire-and-forget call sites, `void setFocus('KEY')` is a common pattern to satisfy linters that flag floating promises.
+
 ```typescript
 import {
   setFocus,
   ROOT_FOCUS_KEY
-} from '@noriginmedia/norigin-spatial-navigation-react';
+} from '@noriginmedia/norigin-spatial-navigation-core';
 
-// Focus a specific component
-setFocus('PLAY_BUTTON');
-
-// Focus the root (boots navigation to first child)
-setFocus(ROOT_FOCUS_KEY);
-
-// Focus with context data
-setFocus('MENU_ITEM_3', { event: someEvent });
+await setFocus('PLAY_BUTTON');
+await setFocus(ROOT_FOCUS_KEY);
+await setFocus('MENU_ITEM_3', { event: someEvent });
 ```
 
 ---
 
 ## `navigateByDirection(direction, focusDetails?)`
 
-Simulate a directional key press, moving focus in the specified direction from the currently focused component.
+Simulate a directional key press, moving focus in the specified direction from the currently focused component. **Asynchronous** (layout may be updated first).
 
 ```typescript
-navigateByDirection(direction: 'up' | 'down' | 'left' | 'right', focusDetails?: FocusDetails): void
+navigateByDirection(
+  direction: 'up' | 'down' | 'left' | 'right',
+  focusDetails?: FocusDetails
+): Promise<void>
 ```
 
 ```typescript
-import { navigateByDirection } from '@noriginmedia/norigin-spatial-navigation-react';
+import { navigateByDirection } from '@noriginmedia/norigin-spatial-navigation-core';
 
-navigateByDirection('right');
-navigateByDirection('down', { source: 'programmatic' });
+await navigateByDirection('right');
+await navigateByDirection('down', { source: 'programmatic' });
 ```
 
 ---
@@ -163,7 +205,7 @@ pause(): void
 ```
 
 ```typescript
-import { pause } from '@noriginmedia/norigin-spatial-navigation-react';
+import { pause } from '@noriginmedia/norigin-spatial-navigation-core';
 
 // While a video is playing full-screen:
 pause();
@@ -180,7 +222,7 @@ resume(): void
 ```
 
 ```typescript
-import { resume } from '@noriginmedia/norigin-spatial-navigation-react';
+import { resume } from '@noriginmedia/norigin-spatial-navigation-core';
 
 resume();
 ```
@@ -196,7 +238,7 @@ getCurrentFocusKey(): string
 ```
 
 ```typescript
-import { getCurrentFocusKey } from '@noriginmedia/norigin-spatial-navigation-react';
+import { getCurrentFocusKey } from '@noriginmedia/norigin-spatial-navigation-core';
 
 const currentKey = getCurrentFocusKey();
 console.log('Currently focused:', currentKey);
@@ -216,10 +258,10 @@ doesFocusableExist(focusKey: string): boolean
 import {
   doesFocusableExist,
   setFocus
-} from '@noriginmedia/norigin-spatial-navigation-react';
+} from '@noriginmedia/norigin-spatial-navigation-core';
 
 if (doesFocusableExist('SIDEBAR_ITEM_2')) {
-  setFocus('SIDEBAR_ITEM_2');
+  await setFocus('SIDEBAR_ITEM_2');
 }
 ```
 
@@ -227,14 +269,14 @@ if (doesFocusableExist('SIDEBAR_ITEM_2')) {
 
 ## `updateAllLayouts()`
 
-Force the library to re-measure the screen positions of all registered components. Call this after layout changes that are invisible to React (e.g., after a CSS animation completes or after a window resize that changes element positions).
+Force the library to re-measure the screen positions of all registered components. Call this after layout changes that are invisible to React (e.g., after a CSS animation completes or after a window resize that changes element positions). **Asynchronous.**
 
 ```typescript
-updateAllLayouts(): void
+updateAllLayouts(): Promise<void>
 ```
 
 ```typescript
-import { updateAllLayouts } from '@noriginmedia/norigin-spatial-navigation-react';
+import { updateAllLayouts } from '@noriginmedia/norigin-spatial-navigation-core';
 
 // After a scale animation finishes:
 setTimeout(() => {
@@ -274,7 +316,7 @@ setThrottle(options?: {
 ```
 
 ```typescript
-import { setThrottle } from '@noriginmedia/norigin-spatial-navigation-react';
+import { setThrottle } from '@noriginmedia/norigin-spatial-navigation-core';
 
 // Slow down navigation for a video scrubber
 setThrottle({ throttle: 200, throttleKeypresses: true });
@@ -294,7 +336,7 @@ updateRtl(rtl: boolean): void
 ```
 
 ```typescript
-import { updateRtl } from '@noriginmedia/norigin-spatial-navigation-react';
+import { updateRtl } from '@noriginmedia/norigin-spatial-navigation-core';
 
 updateRtl(true); // enable RTL
 updateRtl(false); // revert to LTR
@@ -312,7 +354,7 @@ A constant string (`'SN:ROOT'`) representing the root of the focus tree. Pass it
 import {
   ROOT_FOCUS_KEY,
   setFocus
-} from '@noriginmedia/norigin-spatial-navigation-react';
+} from '@noriginmedia/norigin-spatial-navigation-core';
 
-setFocus(ROOT_FOCUS_KEY);
+await setFocus(ROOT_FOCUS_KEY);
 ```
