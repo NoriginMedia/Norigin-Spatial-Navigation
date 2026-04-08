@@ -75,8 +75,7 @@ export default class BaseWebAdapter implements LayoutAdapter {
   focusNode = (component: FocusableComponent) => {
     if (component.node && this.service.options.shouldFocusDOMNode) {
       component.node.focus(this.service.options.domNodeFocusOptions);
-
-      component.node?.setAttribute?.('data-focused', 'true');
     }
+    component.node?.setAttribute?.('data-focused', 'true');
   };
 }
