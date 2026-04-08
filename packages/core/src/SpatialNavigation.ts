@@ -852,7 +852,7 @@ export class SpatialNavigationService {
 
   bindEventHandlers() {
     this.keyDownEventListener = (key: Key, event: Event) => {
-      this.scheduler.schedule(() => {
+      this.scheduler.schedule(async () => {
         if (this.paused === true) {
           return;
         }
@@ -881,7 +881,7 @@ export class SpatialNavigationService {
         if (preventDefaultNavigation) {
           this.log('keyDownEventListener', 'default navigation prevented');
         } else {
-          this.smartNavigate(key, null, { event });
+          await this.smartNavigate(key, null, { event });
         }
       });
     };
