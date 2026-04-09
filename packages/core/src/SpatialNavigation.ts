@@ -961,7 +961,7 @@ class SpatialNavigationService {
    * @example
    * navigateByDirection('right') // The focus is moved to right
    */
-  navigateByDirection(direction: string, focusDetails: FocusDetails) {
+  navigateByDirection(direction: string, focusDetails: FocusDetails = {}) {
     if (this.paused === true || !this.enabled || this.nativeMode) {
       return;
     }
