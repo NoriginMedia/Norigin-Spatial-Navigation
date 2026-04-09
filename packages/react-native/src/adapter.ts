@@ -9,13 +9,14 @@ import {
   UIManager
 } from 'react-native';
 
-import type {
-  AddEventListenersOptions,
-  FocusableComponent,
-  FocusableComponentLayout,
-  Key,
-  LayoutAdapter,
-  SpatialNavigationService
+import {
+  BaseWebAdapter,
+  type AddEventListenersOptions,
+  type FocusableComponent,
+  type FocusableComponentLayout,
+  type Key,
+  type LayoutAdapter,
+  type SpatialNavigationService
 } from '@noriginmedia/norigin-spatial-navigation-core';
 
 type ReactNativeNode = {
@@ -75,7 +76,7 @@ const EMPTY_LAYOUT: FocusableComponentLayout = {
 
 const { width: windowWidth, height: windowHeight } = Dimensions.get('window');
 
-export default class ReactNativeLayoutAdapter implements LayoutAdapter {
+class ReactNativeLayoutAdapter implements LayoutAdapter {
   private keyMap = DEFAULT_KEY_MAP;
 
   private isPanning = false;
@@ -233,3 +234,8 @@ export default class ReactNativeLayoutAdapter implements LayoutAdapter {
     });
   }
 }
+
+// Conditionally export the appropriate adapter based on the platform
+export default Platform.OS === 'web'
+  ? BaseWebAdapter
+  : ReactNativeLayoutAdapter;
