@@ -29,6 +29,12 @@ const DIRECTION_UP = 'up';
 const DIRECTION_DOWN = 'down';
 const KEY_ENTER = 'enter';
 
+// Use this interface to allow node type to be overridden by the adapter
+export interface NodeTypeOverrides {}
+export type NodeType = NodeTypeOverrides extends { node: infer N }
+  ? N
+  : HTMLElement;
+
 export type Direction = 'up' | 'down' | 'left' | 'right';
 
 type DistanceCalculationMethod = 'center' | 'edges' | 'corners';
@@ -83,12 +89,12 @@ export interface FocusableComponentLayout {
   height: number;
   x: number;
   y: number;
-  node: HTMLElement;
+  node: NodeType;
 }
 
 export interface FocusableComponent {
   focusKey: string;
-  node: HTMLElement;
+  node: NodeType;
   parentFocusKey: string;
   onEnterPress: (details?: KeyPressDetails) => void;
   onEnterRelease: () => void;
@@ -112,7 +118,7 @@ export interface FocusableComponent {
 }
 
 interface FocusableComponentUpdatePayload {
-  node: HTMLElement;
+  node: NodeType;
   preferredChildFocusKey?: string;
   focusable: boolean;
   isFocusBoundary: boolean;
