@@ -1,5 +1,5 @@
-# Norigin Spatial Navigation React
+# @noriginmedia/norigin-spatial-navigation-react-native
 
-Norigin Spatial Navigation React is a React-specific module providing the hooks for spatial navigation in TV applications.
+React hooks and a **React Native TV layout adapter** for Norigin Spatial Navigation.
 
-For more detailed documentation and usage examples, visit our [Developer Portal](https://devportal.noriginmedia.com/docs/Norigin-Spatial-Navigation/)
+## [Documentation](https://devportal.noriginmedia.com/docs/Norigin-Spatial-Navigation/)

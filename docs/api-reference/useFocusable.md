@@ -14,7 +14,7 @@ function useFocusable<P = object, E = any>(
 ): UseFocusableResult<E>;
 ```
 
-The generic parameter `P` is the type of `extraProps`. The parameter `E` is the type of the DOM element referenced by `ref` (defaults to `any`).
+The generic parameter `P` is the type of `extraProps`. The parameter `E` is the type of the element referenced by **`ref`** (defaults to `any`): on the web this is typically a DOM element type; on React Native TV it is the native view type you attach the ref to. See [React Native TV](../guides/react-native-tv.md).
 
 ---
 
@@ -47,7 +47,7 @@ All options are optional.
 
 | Property          | Type                                    | Description                                                                                                                   |
 | ----------------- | --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `ref`             | `RefObject<E>`                          | Attach to the DOM element that represents this focusable. The library measures this element's position to perform navigation. |
+| `ref`             | `RefObject<E>`                          | On the web, attach to the DOM element for this focusable. On React Native TV, attach to the native view the adapter measures. The library uses this ref for layout and navigation. See [React Native TV](../guides/react-native-tv.md). |
 | `focused`         | `boolean`                               | `true` when this exact component is the current focus target.                                                                 |
 | `hasFocusedChild` | `boolean`                               | `true` when any descendant of this component is focused. Only meaningful when `trackChildren: true`.                          |
 | `focusKey`        | `string`                                | The focus key in use (either the one you provided or the auto-generated one).                                                 |
