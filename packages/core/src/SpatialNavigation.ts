@@ -835,12 +835,14 @@ class SpatialNavigationService {
           this.onEnterRelease();
         }
 
-        if (this.focusKey && (
-          eventType === DIRECTION_LEFT ||
-          eventType === DIRECTION_RIGHT ||
-          eventType === DIRECTION_UP ||
-          eventType === DIRECTION_DOWN)) {
-          this.onArrowRelease(eventType)
+        if (
+          this.focusKey &&
+          (eventType === DIRECTION_LEFT ||
+            eventType === DIRECTION_RIGHT ||
+            eventType === DIRECTION_UP ||
+            eventType === DIRECTION_DOWN)
+        ) {
+          this.onArrowRelease(eventType);
         }
       };
 
@@ -1025,7 +1027,18 @@ class SpatialNavigationService {
      * the Focusable Containers, that have "forceFocus" flag enabled.
      */
     if (!fromParentFocusKey && !currentComponent) {
-      this.setFocus(this.getForcedFocusKey());
+      const forcedKey = this.getForcedFocusKey();
+
+      if (forcedKey) {
+        this.setFocus(forcedKey);
+      } else {
+        this.log(
+          'smartNavigate',
+          'Aborted due to missing current component and force-focusable key'
+        );
+      }
+
+      // Current component is null (e.g. nothing to navigate from)
       return;
     }
 
@@ -1663,9 +1676,20 @@ class SpatialNavigationService {
     if (!focusKey || focusKey === ROOT_FOCUS_KEY) {
       // eslint-disable-next-line no-param-reassign
       focusKey = this.getForcedFocusKey();
+
+      // If there is no force-focusable key either then we abort
+      if (!focusKey) {
+        this.log('setFocus', 'Aborted due to missing force-focusable key');
+        return;
+      }
     }
 
     const newFocusKey = this.getNextFocusKey(focusKey);
+
+    if (!newFocusKey) {
+      this.log('setFocus', 'Aborted due to missing next focus key');
+      return;
+    }
 
     this.log('setFocus', 'newFocusKey', newFocusKey);
 
