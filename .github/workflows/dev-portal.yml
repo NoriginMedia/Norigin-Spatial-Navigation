@@ -12,12 +12,12 @@ jobs:
 
     steps:
       - name: Checkout Project A
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
         with:
           path: ./project
 
       - name: Checkout Project B
-        uses: actions/checkout@master
+        uses: actions/checkout@v6
         with:
           repository: Norigin/dev-portal
           token: ${{ secrets.NM_GH_TOKEN }}
