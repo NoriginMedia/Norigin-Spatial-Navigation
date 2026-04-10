@@ -11,9 +11,11 @@ export default defineConfig({
     { file: 'dist/index.cjs', format: 'cjs' }
   ],
   external: [
-    'react',
     '@noriginmedia/norigin-spatial-navigation-core',
-    'lodash-es'
+    '@noriginmedia/norigin-spatial-navigation-react',
+    'lodash-es',
+    'react',
+    'react-native'
   ],
   plugins: [resolve(), commonjs(), typescript({ tsconfig: './tsconfig.json' })]
 });
