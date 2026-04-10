@@ -663,6 +663,10 @@ class SpatialNavigationService {
   init({
     debug = false,
     visualDebug = false,
+    /**
+     * @deprecated
+     * Native mode will be removed in the next version
+     */
     nativeMode = false,
     throttle: throttleParam = 0,
     throttleKeypresses = false,
@@ -712,6 +716,10 @@ class SpatialNavigationService {
 
           draw();
         }
+      } else {
+        console.warn(
+          'nativeMode option is deprecated and will be removed in the next version.'
+        );
       }
     }
   }
@@ -1765,6 +1773,10 @@ class SpatialNavigationService {
     }
   }
 
+  /**
+   * @deprecated
+   * Native mode will be removed in the next version
+   */
   isNativeMode() {
     return this.nativeMode;
   }
