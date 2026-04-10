@@ -162,7 +162,7 @@ class ReactNativeLayoutAdapter implements LayoutAdapter {
           ) => {
             if (typeof rawX === 'undefined') {
               // This is needed in case of androidTV
-              resolve(undefined);
+              resolve(EMPTY_LAYOUT);
 
               if (__DEV__ && Platform.OS === 'android') {
                 node.measureInWindow((windowX) => {
