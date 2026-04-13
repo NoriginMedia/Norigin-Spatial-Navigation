@@ -50,13 +50,12 @@ init(config?: Partial<SpatialNavigationServiceOptions>): void
 | ----------------------------------- | ----------------------------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `debug`                             | `boolean`                                 | `false`        | Log navigation decisions to the browser console.                                                                                                                                                            |
 | `visualDebug`                       | `boolean`                                 | `false`        | Draw a canvas overlay showing component bounding boxes and navigation paths.                                                                                                                                |
-| `nativeMode`                        | `boolean`                                 | `false`        | Disable DOM key event listeners (for React Native). You must drive navigation manually.                                                                                                                     |
 | `throttle`                          | `number`                                  | `0`            | Milliseconds to wait between processing repeated key presses. `0` means no throttle.                                                                                                                        |
 | `throttleKeypresses`                | `boolean`                                 | `false`        | When `true` and `throttle > 0`, throttle key repeat events while a key is held down.                                                                                                                        |
-| `layoutAdapter`                     | `LayoutAdapter \| Partial<LayoutAdapter>` | BaseWebAdapter | Constructor or partial object merged onto the built-in web adapter. See [Layout adapter](#layout-adapter) below.                                                                                            |
+| `layoutAdapter`                     | `LayoutAdapter \| Partial<LayoutAdapter>` | BaseWebAdapter | Constructor or partial object merged onto the built-in web adapter. **React Native TV:** pass `ReactNativeLayoutAdapter` from [`@noriginmedia/norigin-spatial-navigation-react-native`](../guides/react-native-tv.md) so measurement and input use native/TV APIs instead of `window`. See [Layout adapter](#layout-adapter). |
 | `useGetBoundingClientRect`          | `boolean`                                 | `false`        | **Deprecated.** Prefer `init({ layoutAdapter: GetBoundingClientRectAdapter })`, or keep this flag until you migrate (logs a warning). If `true`, the service uses viewport-relative measurement internally. |
 | `shouldFocusDOMNode`                | `boolean`                                 | `false`        | Call `HTMLElement.focus()` on the focused component's DOM node, enabling native browser focus behavior and accessibility.                                                                                   |
-| `domNodeFocusOptions`               | `FocusOptions`                            | `undefined`    | Options passed to `HTMLElement.focus()` when `shouldFocusDOMNode` is `true`.                                                                                                                                |
+| `domNodeFocusOptions`               | `FocusOptions`                            | `undefined`    | Options passed to `HTMLElement.focus()` when `shouldFocusDOMNode` is `true`.                                                                                                                                 |
 | `shouldUseNativeEvents`             | `boolean`                                 | `false`        | Do not call `preventDefault()` on key events, allowing the browser to handle them natively as well.                                                                                                         |
 | `rtl`                               | `boolean`                                 | `false`        | Enable right-to-left layout mode. Left and right navigation directions are swapped.                                                                                                                         |
 | `distanceCalculationMethod`         | `'center' \| 'edges' \| 'corners'`        | `'corners'`    | Algorithm used to calculate distance between components. See [Distance Calculation](../guides/distance-calculation.md).                                                                                     |
@@ -78,9 +77,20 @@ init({
 
 ---
 
+## Node type and NodeTypeOverrides {#node-type-and-node-type-overrides}
+
+The core types **`FocusableComponent`** and **`FocusableComponentLayout`** expose a **`node`** field for the underlying platform instance the adapter measures and focuses.
+
+- **`NodeType`** defaults to **`HTMLElement`** when you do not customize it.
+- Declare an empty **`NodeTypeOverrides`** interface in core; packages (such as the React Native adapter) use **TypeScript module augmentation** to set `node` to their host type so `layout.node` and component **`node`** stay correctly typed.
+
+For React Native TV, see [React Native TV](../guides/react-native-tv.md).
+
+---
+
 ## Layout adapter
 
-The engine uses an internal **layout adapter** to measure focusables, move DOM focus when enabled, and attach platform-specific key listeners. You configure it with `init({ layoutAdapter: … })`.
+The engine uses an internal **layout adapter** to measure focusables, move DOM focus when enabled, and attach platform-specific key listeners. You configure it with `init({ layoutAdapter: … })`. There is **no separate “native mode” option**: passing a non-web adapter (for example the React Native TV adapter) is how you avoid registering `window` key listeners and use platform-appropriate measurement and input instead.
 
 ### What `layoutAdapter` can be
 
@@ -94,10 +104,18 @@ If you do **not** pass `layoutAdapter`, the service builds a default web adapter
 
 ### Bundled adapters (exported classes)
 
+These ship from **`@noriginmedia/norigin-spatial-navigation-core`**:
+
 | Export                         | Role                                                                                                                                   |
 | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
 | `BaseWebAdapter`               | Web adapter using offset-based `measureLayout` (fast; ignores CSS transforms on ancestors). Equivalent to what `init` uses by default. |
 | `GetBoundingClientRectAdapter` | Extends `BaseWebAdapter` with `measureLayout` based on `getBoundingClientRect()`. Use when transforms or scaling affect layout.        |
+
+### React Native TV (`@noriginmedia/norigin-spatial-navigation-react-native`)
+
+| Export                     | Role                                                                                                                                                                                                                                                                 |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ReactNativeLayoutAdapter` | TV/native layout adapter: measures React Native host refs, wires TV remote / pan events, and coordinates TV focus. **Import from the React Native package**, not from core. On **`Platform.OS === 'web'`**, the same export resolves to **`BaseWebAdapter`** so shared or web bundles avoid loading TV-only native code; on iOS/Android/tvOS it is the real TV adapter. See [React Native TV](../guides/react-native-tv.md). |
 
 Pass the **class** to `init` when you want the full adapter implementation (the service instantiates it with `new Adapter(this)`):
 
@@ -109,6 +127,17 @@ import {
 
 init({
   layoutAdapter: GetBoundingClientRectAdapter
+});
+```
+
+React Native TV:
+
+```typescript
+import { init } from '@noriginmedia/norigin-spatial-navigation-core';
+import { ReactNativeLayoutAdapter } from '@noriginmedia/norigin-spatial-navigation-react-native';
+
+init({
+  layoutAdapter: ReactNativeLayoutAdapter
 });
 ```
 

@@ -1,0 +1,12 @@
+{
+  "extends": ["../../.eslintrc.json"],
+  "parserOptions": {
+    "project": "./tsconfig.json",
+    "rules": {
+      "class-methods-use-this": "off",
+      "import/no-extraneous-dependencies": "off",
+      "import/prefer-default-export": "off",
+      "no-nested-ternary": "off"
+    }
+  }
+}

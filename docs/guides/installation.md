@@ -20,6 +20,24 @@ yarn add @noriginmedia/norigin-spatial-navigation-core @noriginmedia/norigin-spa
 
 This package exports `useFocusable`, `FocusContext`, and all type definitions you need.
 
+## React Native TV
+
+For React Native TV apps (Android TV, Apple TV, and similar targets), install the package that bundles the React hooks and the TV layout adapter:
+
+```bash
+npm install @noriginmedia/norigin-spatial-navigation-react-native
+```
+
+```bash
+yarn add @noriginmedia/norigin-spatial-navigation-react-native
+```
+
+**Peer dependencies:** React >= 16.8.0 and React Native >= 0.73.7.
+
+This package depends on **`react-native-tvos`** as the React Native fork.
+
+See [React Native TV](./react-native-tv.md) for initialization and adapter usage.
+
 ## Core Package (Framework-Agnostic)
 
 If you need the navigation service without React bindings:
