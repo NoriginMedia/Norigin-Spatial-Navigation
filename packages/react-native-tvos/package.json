@@ -1,5 +1,5 @@
 {
-  "name": "@noriginmedia/norigin-spatial-navigation-react-native",
+  "name": "@noriginmedia/norigin-spatial-navigation-react-native-tvos",
   "version": "3.0.0",
   "description": "React hooks based Spatial Navigation solution",
   "main": "dist/index.cjs",
