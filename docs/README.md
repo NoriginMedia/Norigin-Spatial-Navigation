@@ -15,6 +15,10 @@ Norigin Spatial Navigation is an open-source library that handles directional fo
 
 ---
 
+<div align="center">
+  <img src="https://raw.githubusercontent.com/NoriginMedia/Norigin-Spatial-Navigation/main/readme-assets/norigin-spatial-navigation/norigin-spatial-navigation.webp" alt="Spatial Navigation" style={{ borderRadius: 30 }} />
+</div>
+
 ## Supported platforms
 
 <table align="center" style={{background: "white"}}>
