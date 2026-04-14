@@ -1,5 +1,13 @@
 # @noriginmedia/norigin-spatial-navigation-core
 
+## 3.0.1
+
+### Patch Changes
+
+- 74b4165: - Fixed missing null checks for `getForcedFocusKey` in `smartNavigate` and `setFocus`
+- 98bef7c: - Deprecate `nativeMode` option
+- ed4186e: - Make `focusDetails` optional in `navigateByDirection`
+
 ## 3.0.0
 
 ### Major Changes
