@@ -15,6 +15,10 @@ The missing piece between your app and the TV remote.
 - **Light and low-dependency**: Simple API, minimal footprint, no runtime surprises
   on constrained TV hardware.
 
+<div align="center">
+  <img src="https://raw.githubusercontent.com/NoriginMedia/Norigin-Spatial-Navigation/main/readme-assets/norigin-spatial-navigation/navigation.webp" alt="Norigin Spatial Navigation" />
+</div>
+
 ## [Documentation](https://devportal.noriginmedia.com/docs/Norigin-Spatial-Navigation/)
 
 For more detailed documentation and usage examples, visit our [Developer Portal](https://devportal.noriginmedia.com/docs/Norigin-Spatial-Navigation/)
