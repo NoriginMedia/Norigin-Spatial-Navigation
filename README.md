@@ -16,7 +16,7 @@ The missing piece between your app and the TV remote.
   on constrained TV hardware.
 
 <div align="center">
-  <img src="/readme-assets/norigin-spatial-navigation/navigation.webp" alt="Norigin Spatial Navigation" />
+  <img src="/readme-assets/norigin-spatial-navigation/navigation.gif" alt="Norigin Spatial Navigation" />
 </div>
 
 ## [Documentation](https://devportal.noriginmedia.com/docs/Norigin-Spatial-Navigation/)
