@@ -1,5 +1,6 @@
 import {
   type DebouncedFunc,
+  assign,
   debounce,
   difference,
   filter,
@@ -10,9 +11,16 @@ import {
   sortBy,
   throttle
 } from 'lodash-es';
+import {
+  type LayoutAdapter,
+  type KeyDownEventListener,
+  type KeyUpEventListener,
+  Key
+} from './adapter/types';
+import BaseWebAdapter from './adapter/web';
+import GetBoundingClientRectAdapter from './adapter/getboundingclientrect';
 import VisualDebugger from './VisualDebugger';
 import WritingDirection from './WritingDirection';
-import { measureLayout, getBoundingClientRect } from './measureLayout';
 import Scheduler from './Scheduler';
 
 const DIRECTION_LEFT = 'left';
@@ -78,7 +86,7 @@ export interface FocusableComponentLayout {
   node: HTMLElement;
 }
 
-interface FocusableComponent {
+export interface FocusableComponent {
   focusKey: string;
   node: HTMLElement;
   parentFocusKey: string;
@@ -185,13 +193,6 @@ const normalizeKeyMap = (keyMap: BackwardsCompatibleKeyMap) => {
   return newKeyMap;
 };
 
-export type LayoutAdapterOptions = {
-  measureLayout: (
-    component: FocusableComponent
-  ) => Promise<FocusableComponentLayout>;
-  focusNode: (component: FocusableComponent) => void;
-};
-
 export type SpatialNavigationServiceOptions = {
   debug: boolean;
   visualDebug: boolean;
@@ -210,31 +211,15 @@ export type SpatialNavigationServiceOptions = {
   domNodeFocusOptions: FocusOptions;
   shouldUseNativeEvents: boolean;
   rtl: boolean;
-  layoutAdapter: Partial<LayoutAdapterOptions>;
+  /**
+   * Can be a class (constructor) that implements LayoutAdapter,
+   * or an object that partially implements LayoutAdapter.
+   */
+  layoutAdapter?:
+    | (new (...args: any[]) => LayoutAdapter)
+    | Partial<LayoutAdapter>;
   distanceCalculationMethod: DistanceCalculationMethod;
   customDistanceCalculationFunction?: DistanceCalculationFunction;
-};
-
-const defaultMeasureLayout = async (component: FocusableComponent) => ({
-  ...measureLayout(component.node),
-  node: component.node
-});
-
-export const measureLayoutWithGetBoundingClientRect = async (
-  component: FocusableComponent
-) => ({
-  ...getBoundingClientRect(component.node),
-  node: component.node
-});
-
-export const defaultLayoutAdapter: LayoutAdapterOptions = {
-  measureLayout: defaultMeasureLayout,
-  focusNode: (component) => component.node.focus()
-};
-
-export const getBoundingClientRectAdapter: LayoutAdapterOptions = {
-  measureLayout: measureLayoutWithGetBoundingClientRect,
-  focusNode: (component) => component.node.focus()
 };
 
 const DEFAULT_SPATIAL_NAVIGATION_SERVICE_OPTIONS: SpatialNavigationServiceOptions =
@@ -249,12 +234,11 @@ const DEFAULT_SPATIAL_NAVIGATION_SERVICE_OPTIONS: SpatialNavigationServiceOption
     domNodeFocusOptions: {},
     shouldUseNativeEvents: false,
     rtl: false,
-    layoutAdapter: defaultLayoutAdapter,
     distanceCalculationMethod: 'corners',
     customDistanceCalculationFunction: undefined
   };
 
-class SpatialNavigationService {
+export class SpatialNavigationService {
   private focusableComponents: { [index: string]: FocusableComponent };
 
   private visualDebugger: VisualDebugger;
@@ -308,20 +292,13 @@ class SpatialNavigationService {
    */
   private paused: boolean;
 
-  /**
-   * Enables/disables getBoundingClientRect
-   */
-  private useGetBoundingClientRect: boolean;
+  private layoutAdapter: LayoutAdapter;
 
-  private layoutAdapter: LayoutAdapterOptions;
+  private keyDownEventListener: KeyDownEventListener;
 
-  private keyDownEventListener: (event: KeyboardEvent) => void;
+  private keyDownEventListenerThrottled: DebouncedFunc<KeyDownEventListener>;
 
-  private keyDownEventListenerThrottled: DebouncedFunc<
-    (event: KeyboardEvent) => void
-  >;
-
-  private keyUpEventListener: (event: KeyboardEvent) => void;
+  private keyUpEventListener: KeyUpEventListener;
 
   private keyMap: KeyMap;
 
@@ -338,6 +315,14 @@ class SpatialNavigationService {
   private customDistanceCalculationFunction?: DistanceCalculationFunction;
 
   private scheduler = new Scheduler();
+
+  get options() {
+    return {
+      shouldFocusDOMNode: this.shouldFocusDOMNode,
+      domNodeFocusOptions: this.domNodeFocusOptions,
+      shouldUseNativeEvents: this.shouldUseNativeEvents
+    };
+  }
 
   /**
    * Used to determine the coordinate that will be used to filter items that are over the "edge"
@@ -764,17 +749,28 @@ class SpatialNavigationService {
       this.throttleKeypresses =
         throttleKeypresses ??
         DEFAULT_SPATIAL_NAVIGATION_SERVICE_OPTIONS.throttleKeypresses;
-      this.layoutAdapter = {
-        ...defaultLayoutAdapter,
-        ...(layoutAdapter ?? {})
-      };
 
-      if (useGetBoundingClientRect) {
-        console.warn(
-          'useGetBoundingClientRect is deprecated. Please use layoutAdapter API instead.'
-        );
-        this.layoutAdapter.measureLayout =
-          measureLayoutWithGetBoundingClientRect;
+      /*
+       * If layoutAdapter is a constructor, create a new instance of the class
+       * If it's an object, merge it with the default adapter
+       */
+      if (typeof layoutAdapter === 'function') {
+        const LayoutAdapterClass = layoutAdapter;
+        this.layoutAdapter = new LayoutAdapterClass(this);
+      } else {
+        if (useGetBoundingClientRect) {
+          console.warn(
+            'useGetBoundingClientRect is deprecated. Please use layoutAdapter API instead.'
+          );
+          this.layoutAdapter = new GetBoundingClientRectAdapter(this);
+        } else {
+          this.layoutAdapter = new BaseWebAdapter(this);
+        }
+
+        // Override specific methods
+        if (layoutAdapter) {
+          assign(this.layoutAdapter, layoutAdapter);
+        }
       }
 
       this.shouldFocusDOMNode = shouldFocusDOMNode && !nativeMode;
@@ -858,126 +854,89 @@ class SpatialNavigationService {
     return findKey(this.getKeyMap(), (codeList) => codeList.includes(keyCode));
   }
 
-  static getKeyCode(event: KeyboardEvent) {
-    return event.keyCode || event.code || event.key;
-  }
-
   bindEventHandlers() {
-    // We check both because the React Native remote debugger implements window, but not window.addEventListener.
-    if (typeof window !== 'undefined' && window.addEventListener) {
-      this.keyDownEventListener = (event: KeyboardEvent) => {
-        this.scheduler.schedule(async () => {
-          if (this.paused === true) {
-            return;
-          }
+    this.keyDownEventListener = (key: Key, event: Event) => {
+      this.scheduler.schedule(async () => {
+        if (this.paused === true) {
+          return;
+        }
 
-          if (this.debug) {
-            this.logIndex += 1;
-          }
+        if (this.debug) {
+          this.logIndex += 1;
+        }
 
-          const keyCode = SpatialNavigationService.getKeyCode(event);
-          const eventType = this.getEventType(keyCode);
+        this.pressedKeys[key] = this.pressedKeys[key]
+          ? this.pressedKeys[key] + 1
+          : 1;
 
-          if (!eventType) {
-            return;
-          }
+        if (key === KEY_ENTER && this.focusKey) {
+          this.onEnterPress({ pressedKeys: this.pressedKeys });
 
-          this.pressedKeys[eventType] = this.pressedKeys[eventType]
-            ? this.pressedKeys[eventType] + 1
-            : 1;
+          return;
+        }
 
-          if (!this.shouldUseNativeEvents) {
-            event.preventDefault();
-            event.stopPropagation();
-          }
+        const preventDefaultNavigation =
+          this.onArrowPress(key, { pressedKeys: this.pressedKeys }) === false;
 
-          const keysDetails = {
-            pressedKeys: this.pressedKeys
-          };
+        if (this.visualDebugger) {
+          this.visualDebugger.clear();
+        }
 
-          if (eventType === KEY_ENTER && this.focusKey) {
-            this.onEnterPress(keysDetails);
+        if (preventDefaultNavigation) {
+          this.log('keyDownEventListener', 'default navigation prevented');
+        } else {
+          await this.smartNavigate(key, null, { event });
+        }
+      });
+    };
 
-            return;
-          }
+    // Apply throttle only if the option we got is > 0 to avoid limiting the listener to every animation frame
+    if (this.throttle) {
+      this.keyDownEventListenerThrottled = throttle(
+        this.keyDownEventListener.bind(this),
+        this.throttle,
+        THROTTLE_OPTIONS
+      );
+    }
 
-          const preventDefaultNavigation =
-            this.onArrowPress(eventType, keysDetails) === false;
-
-          if (this.visualDebugger) {
-            this.visualDebugger.clear();
-          }
-
-          if (preventDefaultNavigation) {
-            this.log('keyDownEventListener', 'default navigation prevented');
-          } else {
-            const direction = findKey(this.getKeyMap(), (codeList) =>
-              codeList.includes(keyCode)
-            );
-
-            await this.smartNavigate(direction, null, { event });
-          }
-        });
-      };
-
-      // Apply throttle only if the option we got is > 0 to avoid limiting the listener to every animation frame
-      if (this.throttle) {
-        this.keyDownEventListenerThrottled = throttle(
-          this.keyDownEventListener.bind(this),
-          this.throttle,
-          THROTTLE_OPTIONS
-        );
-      }
-
-      // When throttling then make sure to only throttle key down and cancel any queued functions in case of key up
-      this.keyUpEventListener = (event: KeyboardEvent) => {
-        const keyCode = SpatialNavigationService.getKeyCode(event);
-        const eventType = this.getEventType(keyCode);
-
-        delete this.pressedKeys[eventType];
+    // When throttling then make sure to only throttle key down and cancel any queued functions in case of key up
+    this.keyUpEventListener = (key: Key) => {
+      this.scheduler.schedule(() => {
+        delete this.pressedKeys[key];
 
         if (this.throttle && !this.throttleKeypresses) {
           this.keyDownEventListenerThrottled.cancel();
         }
 
-        if (eventType === KEY_ENTER && this.focusKey) {
+        if (key === KEY_ENTER && this.focusKey) {
           this.onEnterRelease();
         }
 
         if (
           this.focusKey &&
-          (eventType === DIRECTION_LEFT ||
-            eventType === DIRECTION_RIGHT ||
-            eventType === DIRECTION_UP ||
-            eventType === DIRECTION_DOWN)
+          (key === DIRECTION_LEFT ||
+            key === DIRECTION_RIGHT ||
+            key === DIRECTION_UP ||
+            key === DIRECTION_DOWN)
         ) {
-          this.onArrowRelease(eventType);
+          this.onArrowRelease(key);
         }
-      };
+      });
+    };
 
-      window.addEventListener('keyup', this.keyUpEventListener);
-      window.addEventListener(
-        'keydown',
-        this.throttle
-          ? this.keyDownEventListenerThrottled
-          : this.keyDownEventListener
-      );
-    }
+    this.layoutAdapter.addEventListeners({
+      keyDown: this.throttle
+        ? this.keyDownEventListenerThrottled
+        : this.keyDownEventListener,
+      keyUp: this.keyUpEventListener
+    });
   }
 
   unbindEventHandlers() {
-    // We check both because the React Native remote debugger implements window, but not window.removeEventListener.
-    if (typeof window !== 'undefined' && window.removeEventListener) {
-      window.removeEventListener('keyup', this.keyUpEventListener);
-      this.keyUpEventListener = null;
-
-      const listener = this.throttle
-        ? this.keyDownEventListenerThrottled
-        : this.keyDownEventListener;
-
-      window.removeEventListener('keydown', listener);
-      this.keyDownEventListener = null;
-    }
+    this.layoutAdapter.removeEventListeners();
+    this.keyUpEventListener = null;
+    this.keyDownEventListener = null;
+    this.keyDownEventListenerThrottled = null;
   }
 
   onEnterPress(keysDetails: KeyPressDetails) {
@@ -1615,7 +1574,7 @@ class SpatialNavigationService {
     ) {
       const oldComponent = this.focusableComponents[this.focusKey];
       oldComponent.onUpdateFocus(false);
-      oldComponent.node?.removeAttribute?.('data-focused');
+      this.layoutAdapter.blurNode(oldComponent);
 
       this.getNodeLayoutByFocusKey(this.focusKey).then((layout) => {
         oldComponent.onBlur(layout, focusDetails);
@@ -1628,11 +1587,7 @@ class SpatialNavigationService {
     if (this.isFocusableComponent(this.focusKey)) {
       const newComponent = this.focusableComponents[this.focusKey];
 
-      if (this.shouldFocusDOMNode && newComponent.node) {
-        newComponent.node.focus(this.domNodeFocusOptions);
-      }
-
-      newComponent.node?.setAttribute?.('data-focused', 'true');
+      this.layoutAdapter.focusNode(newComponent);
 
       newComponent.onUpdateFocus(true);
       this.getNodeLayoutByFocusKey(this.focusKey).then((layout) => {
