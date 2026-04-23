@@ -38,11 +38,11 @@ init({
 
 A few examples of what `platformTTS.speak` might look like in practice:
 
-| Platform     | Typical entry point                                                                             |
-| ------------ | ----------------------------------------------------------------------------------------------- |
+| Platform           | Typical entry point                                                                           |
+| ------------------ | --------------------------------------------------------------------------------------------- |
 | Tizen (Samsung TV) | `tizen.tvinputdevice` + custom TTS bridge, or `window.webapis.tts.speak(text)` on some models |
-| webOS (LG TV)      | `webOS.service.request('luna://com.webos.service.tts', { method: 'speak', ... })`    |
-| Browser dev env    | `window.speechSynthesis.speak(new SpeechSynthesisUtterance(text))`                           |
+| webOS (LG TV)      | `webOS.service.request('luna://com.webos.service.tts', { method: 'speak', ... })`             |
+| Browser dev env    | `window.speechSynthesis.speak(new SpeechSynthesisUtterance(text))`                            |
 
 During development, logging to the console is usually enough:
 
@@ -130,11 +130,11 @@ Content (label="Recommended")
 
 Navigating `Home` → `Inception` → `Interstellar` → `Breaking Bad` produces:
 
-| Step                   | `onUtterText` argument                 | Why                                                                       |
-| ---------------------- | -------------------------------------- | ------------------------------------------------------------------------- |
-| `Home` → `Inception`   | `"Recommended, Movies, Inception"`     | Entered `Content` and `Row 1` for the first time, plus the leaf label     |
-| `Inception` → `Interstellar` | `"Interstellar"`                 | Still inside `Row 1`; no new parent region entered — only the leaf label  |
-| `Interstellar` → `Breaking Bad` | `"Series, Breaking Bad"`      | Left `Row 1` and entered `Row 2`; `Content` is unchanged, so it's skipped |
+| Step                            | `onUtterText` argument             | Why                                                                       |
+| ------------------------------- | ---------------------------------- | ------------------------------------------------------------------------- |
+| `Home` → `Inception`            | `"Recommended, Movies, Inception"` | Entered `Content` and `Row 1` for the first time, plus the leaf label     |
+| `Inception` → `Interstellar`    | `"Interstellar"`                   | Still inside `Row 1`; no new parent region entered — only the leaf label  |
+| `Interstellar` → `Breaking Bad` | `"Series, Breaking Bad"`           | Left `Row 1` and entered `Row 2`; `Content` is unchanged, so it's skipped |
 
 ### When nothing is uttered
 
@@ -157,7 +157,13 @@ Prefer the concrete item over the element type. `"Play"` is more useful than `"B
 `accessibilityLabel` is one of the few `useFocusable` options that _is_ reactive after mount. Passing a new value triggers an update; the next focus change on that component will use the new label. This is useful for toggles and counters:
 
 ```typescript
-function Favorite({ title, isFavorited }: { title: string; isFavorited: boolean }) {
+function Favorite({
+  title,
+  isFavorited
+}: {
+  title: string;
+  isFavorited: boolean;
+}) {
   const { ref, focused } = useFocusable({
     accessibilityLabel: isFavorited
       ? `Remove ${title} from favorites`
@@ -187,9 +193,9 @@ If you expect fast, repeated key presses (e.g. holding the arrow key), consider 
 
 ## API summary
 
-| Location                                                 | Purpose                                                                              |
-| -------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| [`init({ onUtterText })`](../api-reference/SpatialNavigation.md#init-config) | Global callback fired with the text to be uttered when focus changes.                |
-| [`useFocusable({ accessibilityLabel })`](../api-reference/useFocusable.md#accessibilitylabel) | Per-component label. Set on both leaf items and containers.                          |
+| Location                                                                                      | Purpose                                                               |
+| --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| [`init({ onUtterText })`](../api-reference/SpatialNavigation.md#init-config)                  | Global callback fired with the text to be uttered when focus changes. |
+| [`useFocusable({ accessibilityLabel })`](../api-reference/useFocusable.md#accessibilitylabel) | Per-component label. Set on both leaf items and containers.           |
 
 See also: [`useFocusable`](../api-reference/useFocusable.md) and [`SpatialNavigation`](../api-reference/SpatialNavigation.md).
