@@ -19,13 +19,16 @@
     "build": "turbo build",
     "test": "turbo test",
     "lint": "turbo run eslint",
+    "prettier": "prettier --check .",
+    "prettier:fix": "prettier --write .",
+    "prepare": "husky",
     "changeset": "changeset",
     "changeset:version": "changeset version && npm install --no-frozen-lockfile",
     "changeset:publish": "changeset publish"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.29.0",
     "@changesets/changelog-github": "^0.5.2",
+    "@changesets/cli": "^2.29.0",
     "@typescript-eslint/eslint-plugin": "^5.12.1",
     "@typescript-eslint/parser": "^5.12.1",
     "eslint": "^8.9.0",
@@ -36,11 +39,9 @@
     "eslint-plugin-jsx-a11y": "^6.5.1",
     "eslint-plugin-react": "^7.29.4",
     "eslint-plugin-react-hooks": "^4.4.0",
-    "pre-commit": "^1.2.2",
+    "husky": "^9.1.7",
     "prettier": "^2.5.1",
+    "rimraf": "^5.0.10",
     "turbo": "^2.0.0"
-  },
-  "pre-commit": [
-    "lint"
-  ]
+  }
 }

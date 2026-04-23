@@ -17,7 +17,7 @@
   ],
   "scripts": {
     "eslint": "eslint src",
-    "build": "rm -rf dist && rollup -c && tsc --emitDeclarationOnly",
+    "build": "rimraf dist && rollup -c && tsc --emitDeclarationOnly",
     "test": "jest --collect-coverage"
   },
   "repository": {
