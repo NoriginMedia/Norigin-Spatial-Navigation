@@ -24,7 +24,11 @@ import logo from './logo.png';
 init({
   debug: false,
   visualDebug: false,
-  distanceCalculationMethod: 'center'
+  distanceCalculationMethod: 'center',
+  onUtterText: (text: string) => {
+    // eslint-disable-next-line no-console
+    console.log('onUtterText', text);
+  }
 });
 
 const rows = shuffle([
@@ -233,6 +237,7 @@ function Asset({
   index
 }: AssetProps) {
   const { ref, focused } = useFocusable<object, HTMLDivElement>({
+    accessibilityLabel: title,
     onEnterPress,
     onFocus,
     extraProps: {
@@ -298,6 +303,7 @@ function ContentRow({
   isShuffleSize
 }: ContentRowProps) {
   const { ref, focusKey } = useFocusable<object, HTMLDivElement>({
+    accessibilityLabel: rowTitle,
     onFocus
   });
 

@@ -53,25 +53,27 @@ init(config?: {
     isVerticalDirection: boolean,
     distanceCalculationMethod: string
   ) => number;
+  onUtterText?: (text: string) => void;
 }): void
 ```
 
 ### Config options
 
-| Option                              | Type                               | Default     | Description                                                                                                                             |
-| ----------------------------------- | ---------------------------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `debug`                             | `boolean`                          | `false`     | Log navigation decisions to the browser console.                                                                                        |
-| `visualDebug`                       | `boolean`                          | `false`     | Draw a canvas overlay showing component bounding boxes and navigation paths.                                                            |
-| `nativeMode`                        | `boolean`                          | `false`     | **Deprecated.** Disable DOM key event listeners (for React Native). You must drive navigation manually.                                 |
-| `throttle`                          | `number`                           | `0`         | Milliseconds to wait between processing repeated key presses. `0` means no throttle.                                                    |
-| `throttleKeypresses`                | `boolean`                          | `false`     | When `true` and `throttle > 0`, throttle key repeat events while a key is held down.                                                    |
-| `useGetBoundingClientRect`          | `boolean`                          | `false`     | Use `getBoundingClientRect()` instead of `offsetLeft/Top` for layout measurement. Use this when elements are CSS-transformed or scaled. |
-| `shouldFocusDOMNode`                | `boolean`                          | `false`     | Call `HTMLElement.focus()` on the focused component's DOM node, enabling native browser focus behavior and accessibility.               |
-| `domNodeFocusOptions`               | `FocusOptions`                     | `undefined` | Options passed to `HTMLElement.focus()` when `shouldFocusDOMNode` is `true`.                                                            |
-| `shouldUseNativeEvents`             | `boolean`                          | `false`     | Do not call `preventDefault()` on key events, allowing the browser to handle them natively as well.                                     |
-| `rtl`                               | `boolean`                          | `false`     | Enable right-to-left layout mode. Left and right navigation directions are swapped.                                                     |
-| `distanceCalculationMethod`         | `'center' \| 'edges' \| 'corners'` | `'corners'` | Algorithm used to calculate distance between components. See [Distance Calculation](../guides/distance-calculation.md).                 |
-| `customDistanceCalculationFunction` | `function`                         | `undefined` | Override the secondary-axis distance calculation. See [Distance Calculation](../guides/distance-calculation.md).                        |
+| Option                              | Type                               | Default     | Description                                                                                                                                                                                                             |
+| ----------------------------------- | ---------------------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `debug`                             | `boolean`                          | `false`     | Log navigation decisions to the browser console.                                                                                                                                                                        |
+| `visualDebug`                       | `boolean`                          | `false`     | Draw a canvas overlay showing component bounding boxes and navigation paths.                                                                                                                                            |
+| `nativeMode`                        | `boolean`                          | `false`     | **Deprecated.** Disable DOM key event listeners (for React Native). You must drive navigation manually.                                                                                                                 |
+| `throttle`                          | `number`                           | `0`         | Milliseconds to wait between processing repeated key presses. `0` means no throttle.                                                                                                                                    |
+| `throttleKeypresses`                | `boolean`                          | `false`     | When `true` and `throttle > 0`, throttle key repeat events while a key is held down.                                                                                                                                    |
+| `useGetBoundingClientRect`          | `boolean`                          | `false`     | Use `getBoundingClientRect()` instead of `offsetLeft/Top` for layout measurement. Use this when elements are CSS-transformed or scaled.                                                                                 |
+| `shouldFocusDOMNode`                | `boolean`                          | `false`     | Call `HTMLElement.focus()` on the focused component's DOM node, enabling native browser focus behavior and accessibility.                                                                                               |
+| `domNodeFocusOptions`               | `FocusOptions`                     | `undefined` | Options passed to `HTMLElement.focus()` when `shouldFocusDOMNode` is `true`.                                                                                                                                            |
+| `shouldUseNativeEvents`             | `boolean`                          | `false`     | Do not call `preventDefault()` on key events, allowing the browser to handle them natively as well.                                                                                                                     |
+| `rtl`                               | `boolean`                          | `false`     | Enable right-to-left layout mode. Left and right navigation directions are swapped.                                                                                                                                     |
+| `distanceCalculationMethod`         | `'center' \| 'edges' \| 'corners'` | `'corners'` | Algorithm used to calculate distance between components. See [Distance Calculation](../guides/distance-calculation.md).                                                                                                 |
+| `customDistanceCalculationFunction` | `function`                         | `undefined` | Override the secondary-axis distance calculation. See [Distance Calculation](../guides/distance-calculation.md).                                                                                                        |
+| `onUtterText`                       | `(text: string) => void`           | `undefined` | Global callback invoked with a concatenated accessibility label string whenever focus changes. Wire this to your platform's Text-To-Speech engine. See the [Accessibility Labels](../guides/accessibility-labels.md) guide. |
 
 ### Example
 
@@ -83,7 +85,11 @@ init({
   visualDebug: false,
   distanceCalculationMethod: 'center',
   throttle: 150,
-  throttleKeypresses: true
+  throttleKeypresses: true,
+  onUtterText: (text) => {
+    // Hand the string off to the platform's Text-To-Speech engine
+    platformTTS.speak(text);
+  }
 });
 ```
 
