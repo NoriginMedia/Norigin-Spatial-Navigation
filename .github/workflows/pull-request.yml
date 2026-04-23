@@ -27,3 +27,6 @@ jobs:
           ignore-patterns: |
             dist/
             lib/
+
+      - name: Run prettier check
+        run: npm run prettier

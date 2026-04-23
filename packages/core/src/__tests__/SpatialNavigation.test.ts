@@ -134,7 +134,7 @@ describe('SpatialNavigation', () => {
       onFocus: () => {},
       onBlur: () => {},
       onArrowPress: () => true,
-      onArrowRelease: () => {},
+      onArrowRelease: () => {}
     });
 
     SpatialNavigation.navigateByDirection('right', {});
