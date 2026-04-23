@@ -42,7 +42,6 @@ A few examples of what `platformTTS.speak` might look like in practice:
 | ------------ | ----------------------------------------------------------------------------------------------- |
 | Tizen (Samsung TV) | `tizen.tvinputdevice` + custom TTS bridge, or `window.webapis.tts.speak(text)` on some models |
 | webOS (LG TV)      | `webOS.service.request('luna://com.webos.service.tts', { method: 'speak', ... })`    |
-| Android TV         | Web app running inside a native shell that forwards to `TextToSpeech.speak()`                |
 | Browser dev env    | `window.speechSynthesis.speak(new SpeechSynthesisUtterance(text))`                           |
 
 During development, logging to the console is usually enough:
