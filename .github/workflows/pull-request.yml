@@ -19,14 +19,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run eslint check
-        uses: sibiraj-s/action-eslint@v3
-        with:
-          all-files: true
-          ignore-path: .eslintignore
-          ignore-patterns: |
-            dist/
-            lib/
-
       - name: Run prettier check
         run: npm run prettier
+
+      - name: Run eslint check
+        run: npm run lint
+
+      - name: Run tests
+        run: npm run test
+
+
