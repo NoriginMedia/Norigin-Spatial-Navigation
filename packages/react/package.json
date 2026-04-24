@@ -1,6 +1,6 @@
 {
   "name": "@noriginmedia/norigin-spatial-navigation-react",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "React hooks based Spatial Navigation solution",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
@@ -41,7 +41,7 @@
   },
   "dependencies": {
     "lodash-es": "^4.17.21",
-    "@noriginmedia/norigin-spatial-navigation-core": "^3.0.0"
+    "@noriginmedia/norigin-spatial-navigation-core": "^3.1.0"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.0",
