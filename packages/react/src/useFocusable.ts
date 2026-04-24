@@ -63,6 +63,13 @@ export interface UseFocusableConfig<P = object> {
   onFocus?: FocusHandler<P>;
   onBlur?: BlurHandler<P>;
   extraProps?: P;
+  /**
+   * Accessibility label for this focusable component.
+   * When focus lands on a leaf node, the labels of all newly-entered parent
+   * regions (in tree order) are concatenated with the leaf's own label and
+   * passed to the `onUtterText` callback provided during `init()`.
+   */
+  accessibilityLabel?: string;
 }
 
 export interface UseFocusableResult<E = any> {
@@ -89,7 +96,8 @@ const useFocusableHook = <P, E = any>({
   onArrowRelease = noop,
   onFocus = noop,
   onBlur = noop,
-  extraProps
+  extraProps,
+  accessibilityLabel
 }: UseFocusableConfig<P> = {}): UseFocusableResult<E> => {
   const onEnterPressHandler = useCallback(
     (details: KeyPressDetails) => {
@@ -174,7 +182,8 @@ const useFocusableHook = <P, E = any>({
       focusBoundaryDirections,
       autoRestoreFocus,
       forceFocus,
-      focusable
+      focusable,
+      accessibilityLabel
     });
 
     return () => {
@@ -198,7 +207,8 @@ const useFocusableHook = <P, E = any>({
       onArrowPress: onArrowPressHandler,
       onArrowRelease: onArrowReleaseHandler,
       onFocus: onFocusHandler,
-      onBlur: onBlurHandler
+      onBlur: onBlurHandler,
+      accessibilityLabel
     });
   }, [
     focusKey,
@@ -211,7 +221,8 @@ const useFocusableHook = <P, E = any>({
     onArrowPressHandler,
     onArrowReleaseHandler,
     onFocusHandler,
-    onBlurHandler
+    onBlurHandler,
+    accessibilityLabel
   ]);
 
   return {
