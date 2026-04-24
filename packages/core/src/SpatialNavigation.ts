@@ -31,6 +31,25 @@ type DistanceCalculationFunction = (
   distanceCalculationMethod: DistanceCalculationMethod
 ) => number;
 
+export interface SpatialNavigationServiceInit {
+  debug?: boolean;
+  visualDebug?: boolean;
+  /**
+   * @deprecated Native mode will be removed in the next version
+   */
+  nativeMode?: boolean;
+  throttle?: number;
+  throttleKeypresses?: boolean;
+  useGetBoundingClientRect?: boolean;
+  shouldFocusDOMNode?: boolean;
+  domNodeFocusOptions?: FocusOptions;
+  shouldUseNativeEvents?: boolean;
+  rtl?: boolean;
+  distanceCalculationMethod?: DistanceCalculationMethod;
+  customDistanceCalculationFunction?: DistanceCalculationFunction;
+  onUtterText?: (text: string) => void;
+}
+
 const DEFAULT_KEY_MAP = {
   [DIRECTION_LEFT]: [37, 'ArrowLeft'],
   [DIRECTION_UP]: [38, 'ArrowUp'],
@@ -269,7 +288,7 @@ class SpatialNavigationService {
    * Callback invoked with concatenated accessibility labels when a focusable component receives focus.
    * Parent region labels are included only when entering a new region for the first time.
    */
-  private onUtterText: ((text: string) => void) | null;
+  private onUtterText: ((text: string) => void) | undefined;
 
   /**
    * Used to determine the coordinate that will be used to filter items that are over the "edge"
@@ -660,7 +679,7 @@ class SpatialNavigationService {
       trailing: true
     });
 
-    this.onUtterText = null;
+    this.onUtterText = undefined;
 
     this.debug = false;
     this.visualDebugger = null;
@@ -687,8 +706,8 @@ class SpatialNavigationService {
     rtl = false,
     distanceCalculationMethod = 'corners' as DistanceCalculationMethod,
     customDistanceCalculationFunction = undefined as DistanceCalculationFunction,
-    onUtterText = undefined as ((text: string) => void) | undefined
-  } = {}) {
+    onUtterText
+  }: SpatialNavigationServiceInit = {}) {
     if (!this.enabled) {
       this.domNodeFocusOptions = domNodeFocusOptions;
       this.enabled = true;
@@ -701,7 +720,7 @@ class SpatialNavigationService {
       this.distanceCalculationMethod = distanceCalculationMethod;
       this.customDistanceCalculationFunction =
         customDistanceCalculationFunction;
-      this.onUtterText = onUtterText || null;
+      this.onUtterText = onUtterText ?? undefined;
 
       this.debug = debug;
 
@@ -762,7 +781,7 @@ class SpatialNavigationService {
       this.focusableComponents = {};
       this.paused = false;
       this.keyMap = DEFAULT_KEY_MAP;
-      this.onUtterText = null;
+      this.onUtterText = undefined;
 
       this.unbindEventHandlers();
     }
