@@ -1,6 +1,6 @@
 {
   "name": "@noriginmedia/norigin-spatial-navigation-core",
-  "version": "3.0.1",
+  "version": "3.1.0",
   "description": "Core spatial navigation logic for web and TV.",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
