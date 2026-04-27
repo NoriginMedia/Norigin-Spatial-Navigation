@@ -46,25 +46,6 @@ type DistanceCalculationFunction = (
   distanceCalculationMethod: DistanceCalculationMethod
 ) => number;
 
-export interface SpatialNavigationServiceInit {
-  debug?: boolean;
-  visualDebug?: boolean;
-  /**
-   * @deprecated Native mode will be removed in the next version
-   */
-  nativeMode?: boolean;
-  throttle?: number;
-  throttleKeypresses?: boolean;
-  useGetBoundingClientRect?: boolean;
-  shouldFocusDOMNode?: boolean;
-  domNodeFocusOptions?: FocusOptions;
-  shouldUseNativeEvents?: boolean;
-  rtl?: boolean;
-  distanceCalculationMethod?: DistanceCalculationMethod;
-  customDistanceCalculationFunction?: DistanceCalculationFunction;
-  onUtterText?: (text: string) => void;
-}
-
 const DEFAULT_KEY_MAP = {
   [DIRECTION_LEFT]: [37, 'ArrowLeft'],
   [DIRECTION_UP]: [38, 'ArrowUp'],
