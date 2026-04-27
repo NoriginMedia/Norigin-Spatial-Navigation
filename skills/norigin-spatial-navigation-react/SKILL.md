@@ -40,7 +40,7 @@ Every focusable component **must** attach the returned `ref` to a real DOM eleme
 Call `init` once at app startup (e.g. in `App.tsx`):
 
 ```tsx
-import { init as initNavigation } from '@noriginmedia/norigin-spatial-navigation';
+import { init as initNavigation } from '@noriginmedia/norigin-spatial-navigation-core';
 
 initNavigation({
   debug: false,
@@ -57,7 +57,7 @@ If you ship custom remote keys, also configure key mapping (see `docs/guides/key
 ### Leaf (button, menu item)
 
 ```tsx
-import { useFocusable } from '@noriginmedia/norigin-spatial-navigation';
+import { useFocusable } from '@noriginmedia/norigin-spatial-navigation-react';
 
 function Button({ label, onPress }: Props) {
   const { ref, focused } = useFocusable({ onEnterPress: onPress });
@@ -75,7 +75,7 @@ function Button({ label, onPress }: Props) {
 import {
   useFocusable,
   FocusContext
-} from '@noriginmedia/norigin-spatial-navigation';
+} from '@noriginmedia/norigin-spatial-navigation-react';
 
 function Menu({ items }: Props) {
   const { ref, focusKey, hasFocusedChild } = useFocusable({
@@ -121,7 +121,7 @@ For partial trapping (e.g. block only horizontal), use `focusBoundaryDirections`
 import {
   setFocus,
   doesFocusableExist
-} from '@noriginmedia/norigin-spatial-navigation';
+} from '@noriginmedia/norigin-spatial-navigation-core';
 
 const KEY = 'primary-cta';
 useFocusable({ focusKey: KEY });
@@ -168,7 +168,7 @@ import {
   setKeyMap,
   setThrottle,
   destroy
-} from '@noriginmedia/norigin-spatial-navigation';
+} from '@noriginmedia/norigin-spatial-navigation-core';
 ```
 
 See `docs/api-reference/SpatialNavigation.md` for the full list and signatures.
