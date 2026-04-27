@@ -25,12 +25,14 @@ import {
   setThrottle,
   updateRtl,
   ROOT_FOCUS_KEY,
-  defaultLayoutAdapter,
-  getBoundingClientRectAdapter
+  BaseWebAdapter,
+  GetBoundingClientRectAdapter
 } from '@noriginmedia/norigin-spatial-navigation-core';
 
-import type { LayoutAdapterOptions } from '@noriginmedia/norigin-spatial-navigation-core';
+import type { SpatialNavigationServiceOptions } from '@noriginmedia/norigin-spatial-navigation-core';
 ```
+
+`init` accepts `Partial<SpatialNavigationServiceOptions>`. The package also exports **`BaseWebAdapter`** (offset-based measurement) and **`GetBoundingClientRectAdapter`** (viewport-relative measurement); pass a class constructor to `init({ layoutAdapter: … })` or merge a partial object onto the adapter the service builds—see [Layout adapter](#layout-adapter).
 
 ---
 
@@ -39,30 +41,7 @@ import type { LayoutAdapterOptions } from '@noriginmedia/norigin-spatial-navigat
 Initializes the spatial navigation service. Must be called once before any components mount, typically at the top of your application module.
 
 ```typescript
-init(config?: {
-  debug?: boolean;
-  visualDebug?: boolean;
-  nativeMode?: boolean;
-  throttle?: number;
-  throttleKeypresses?: boolean;
-  /**
-   * @deprecated Use `layoutAdapter: getBoundingClientRectAdapter` instead.
-   */
-  useGetBoundingClientRect?: boolean;
-  shouldFocusDOMNode?: boolean;
-  domNodeFocusOptions?: FocusOptions;
-  shouldUseNativeEvents?: boolean;
-  rtl?: boolean;
-  layoutAdapter?: Partial<LayoutAdapterOptions>;
-  distanceCalculationMethod?: 'center' | 'edges' | 'corners';
-  customDistanceCalculationFunction?: (
-    refCorners: Corners,
-    siblingCorners: Corners,
-    isVerticalDirection: boolean,
-    distanceCalculationMethod: string
-  ) => number;
-  onUtterText?: (text: string) => void;
-}): void
+init(config?: Partial<SpatialNavigationServiceOptions>): void
 ```
 
 ### Config options
@@ -106,34 +85,70 @@ init({
 
 ## Layout adapter
 
-Layout is supplied by a **`layoutAdapter`**: an object with:
+The engine uses an internal **layout adapter** to measure focusables, move DOM focus when enabled, and attach platform-specific key listeners. You configure it with `init({ layoutAdapter: … })`.
 
-- **`measureLayout(component)`** — Must return a **`Promise`** resolving to the focusable component’s layout (position and size). The default uses offset-based measurement; **`getBoundingClientRectAdapter`** uses `getBoundingClientRect()`.
-- **`focusNode(component)`** — Called to move native focus when applicable (default: `component.node.focus()`).
+### What `layoutAdapter` can be
 
-Exported adapters:
+`init` supports three forms:
 
-| Export                         | Role                                                                   |
-| ------------------------------ | ---------------------------------------------------------------------- |
-| `defaultLayoutAdapter`         | Offset-based measurement (fast; ignores CSS transforms on ancestors).  |
-| `getBoundingClientRectAdapter` | Viewport-relative rects; use when transforms or scaling affect layout. |
+1. **A class (constructor)** — `new YourAdapter(spatialNavigationService)` is used when you pass a function whose `typeof` is `"function"` and the service treats it as a constructor. A custom class must implement the full adapter contract (see below).
+2. **A full adapter instance** — Same contract, but passed as an object that already implements every method.
+3. **A plain object (partial)** — Merged onto the adapter the service constructs by default: the **offset-based** web adapter, or—when `useGetBoundingClientRect: true` is set—the internal viewport-relative adapter. Use this to override only `measureLayout`, `focusNode`, etc.
 
-`init` merges `layoutAdapter` **partially** over `defaultLayoutAdapter`, so you can override only `measureLayout` or only `focusNode`.
+If you do **not** pass `layoutAdapter`, the service builds a default web adapter: **offset** measurement (`offsetLeft` / `offsetTop` style layout).
 
-**Migration from `useGetBoundingClientRect: true`:**
+### Bundled adapters (exported classes)
+
+| Export                         | Role                                                                                                                                   |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `BaseWebAdapter`               | Web adapter using offset-based `measureLayout` (fast; ignores CSS transforms on ancestors). Equivalent to what `init` uses by default. |
+| `GetBoundingClientRectAdapter` | Extends `BaseWebAdapter` with `measureLayout` based on `getBoundingClientRect()`. Use when transforms or scaling affect layout.        |
+
+Pass the **class** to `init` when you want the full adapter implementation (the service instantiates it with `new Adapter(this)`):
 
 ```typescript
 import {
   init,
-  getBoundingClientRectAdapter
+  GetBoundingClientRectAdapter
 } from '@noriginmedia/norigin-spatial-navigation-core';
 
 init({
-  layoutAdapter: getBoundingClientRectAdapter
+  layoutAdapter: GetBoundingClientRectAdapter
+});
+```
+
+### Adapter responsibilities (conceptual contract)
+
+A full adapter provides:
+
+- **`measureLayout(component)`** — Returns a **`Promise`** of layout (`left`, `top`, `right`, `bottom`, `width`, `height`, `x`, `y`, `node`). The default path uses fast offset-based layout; viewport-relative measurement uses `getBoundingClientRect()`.
+- **`focusNode(component)`** — Applies native focus when `shouldFocusDOMNode` is enabled (e.g. `HTMLElement.focus()` and focus styling).
+- **`blurNode(component)`** — Clears native focus styling when focus leaves (e.g. removing a `data-focused` attribute when DOM focus mode is on).
+- **`addEventListeners({ keyDown, keyUp })`** — Wires directional keys to the service (on web, the default adapter listens on `window`).
+- **`removeEventListeners()`** — Tears down those listeners.
+
+Partial objects only need to supply the methods you want to override; the rest come from the merged default adapter.
+
+### Migration from `useGetBoundingClientRect: true`
+
+Recommended: pass the bundled viewport-relative adapter class:
+
+```typescript
+import {
+  init,
+  GetBoundingClientRectAdapter
+} from '@noriginmedia/norigin-spatial-navigation-core';
+
+init({
+  layoutAdapter: GetBoundingClientRectAdapter
 });
 ```
 
 **Custom async measurement** — Implement `measureLayout` as an async function (or return `Promise.resolve(...)` for synchronous work). The library awaits layout before navigating or focusing.
+
+### Async work ordering
+
+Navigation, focus, and related updates are processed through an internal **scheduler** so overlapping async work is handled in a defined order. Prefer **`await setFocus`** / **`await navigateByDirection`** when subsequent logic must run after the engine has finished its pending work for that call.
 
 ---
 
