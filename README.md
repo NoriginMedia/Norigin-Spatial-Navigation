@@ -31,17 +31,17 @@ For more detailed documentation and usage examples, visit our [Developer Portal]
 
 ## Supported Devices
 
-| Platform                                          | Support                |
-| ------------------------------------------------- | ---------------------- |
-| Chrome, Firefox, Safari                           | ✅ Fully supported     |
-| Samsung Tizen                                     | ✅ Fully supported     |
-| LG webOS                                          | ✅ Fully supported     |
-| Hisense VIDAA                                     | ✅ Fully supported     |
-| Vizio OS                                          | ✅ Fully supported     |
-| Titan OS                                          | ✅ Fully supported     |
-| Chromium, Eikoh, and WebKit-based STBs            | ✅ Fully supported     |
-| Android TV · React Native via `react-native-tvos` | ⚠️ Partially supported |
-| Apple TV · React Native via `react-native-tvos`   | ⚠️ Partially supported |
+| Platform                                                                            | Support                                                                                                              |
+| ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Chrome, Firefox, Safari                                                             | ✅ Fully supported                                                                                                   |
+| Samsung Tizen                                                                       | ✅ Fully supported                                                                                                   |
+| LG webOS                                                                            | ✅ Fully supported                                                                                                   |
+| Hisense VIDAA                                                                       | ✅ Fully supported                                                                                                   |
+| Vizio OS                                                                            | ✅ Fully supported                                                                                                   |
+| Titan OS                                                                            | ✅ Fully supported                                                                                                   |
+| Chromium, Eikoh, and WebKit-based STBs                                              | ✅ Fully supported                                                                                                   |
+| Android TV · React Native (`@noriginmedia/norigin-spatial-navigation-react-native`) | ✅ Supported ([see docs](https://devportal.noriginmedia.com/docs/Norigin-Spatial-Navigation/guides/react-native-tv)) |
+| Apple TV · React Native (`@noriginmedia/norigin-spatial-navigation-react-native`)   | ✅ Supported ([see docs](https://devportal.noriginmedia.com/docs/Norigin-Spatial-Navigation/guides/react-native-tv)) |
 
 ## Demo
 

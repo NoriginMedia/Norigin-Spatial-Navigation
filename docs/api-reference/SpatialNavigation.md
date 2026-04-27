@@ -83,9 +83,20 @@ init({
 
 ---
 
+## Node type and NodeTypeOverrides {#node-type-and-node-type-overrides}
+
+The core types **`FocusableComponent`** and **`FocusableComponentLayout`** expose a **`node`** field for the underlying platform instance the adapter measures and focuses.
+
+- **`NodeType`** defaults to **`HTMLElement`** when you do not customize it.
+- Declare an empty **`NodeTypeOverrides`** interface in core; packages (such as the React Native adapter) use **TypeScript module augmentation** to set `node` to their host type so `layout.node` and component **`node`** stay correctly typed.
+
+For React Native TV, see [React Native TV](../guides/react-native-tv.md).
+
+---
+
 ## Layout adapter
 
-The engine uses an internal **layout adapter** to measure focusables, move DOM focus when enabled, and attach platform-specific key listeners. You configure it with `init({ layoutAdapter: … })`.
+The engine uses an internal **layout adapter** to measure focusables, move DOM focus when enabled, and attach platform-specific key listeners. You configure it with `init({ layoutAdapter: … })`. There is **no separate “native mode” option**: passing a non-web adapter (for example the React Native TV adapter) is how you avoid registering `window` key listeners and use platform-appropriate measurement and input instead.
 
 ### What `layoutAdapter` can be
 
@@ -99,10 +110,18 @@ If you do **not** pass `layoutAdapter`, the service builds a default web adapter
 
 ### Bundled adapters (exported classes)
 
+These ship from **`@noriginmedia/norigin-spatial-navigation-core`**:
+
 | Export                         | Role                                                                                                                                   |
 | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
 | `BaseWebAdapter`               | Web adapter using offset-based `measureLayout` (fast; ignores CSS transforms on ancestors). Equivalent to what `init` uses by default. |
 | `GetBoundingClientRectAdapter` | Extends `BaseWebAdapter` with `measureLayout` based on `getBoundingClientRect()`. Use when transforms or scaling affect layout.        |
+
+### React Native TV (`@noriginmedia/norigin-spatial-navigation-react-native`)
+
+| Export                     | Role                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ReactNativeLayoutAdapter` | TV/native layout adapter: measures React Native host refs, wires TV remote / pan events, and coordinates TV focus. **Import from the React Native package**, not from core. On **`Platform.OS === 'web'`**, the same export resolves to **`BaseWebAdapter`** so shared or web bundles avoid loading TV-only native code; on iOS/Android/tvOS it is the real TV adapter. See [React Native TV](../guides/react-native-tv.md). |
 
 Pass the **class** to `init` when you want the full adapter implementation (the service instantiates it with `new Adapter(this)`):
 
@@ -114,6 +133,17 @@ import {
 
 init({
   layoutAdapter: GetBoundingClientRectAdapter
+});
+```
+
+React Native TV:
+
+```typescript
+import { init } from '@noriginmedia/norigin-spatial-navigation-core';
+import { ReactNativeLayoutAdapter } from '@noriginmedia/norigin-spatial-navigation-react-native';
+
+init({
+  layoutAdapter: ReactNativeLayoutAdapter
 });
 ```
 
