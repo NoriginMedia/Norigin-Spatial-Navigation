@@ -37,6 +37,12 @@ export type NodeType = NodeTypeOverrides extends { node: infer N }
 
 export type Direction = 'up' | 'down' | 'left' | 'right';
 
+export type NavigationStrategy = (
+  direction: Direction,
+  focusKey: string,
+  siblings: FocusableComponent[]
+) => FocusableComponent | null;
+
 type DistanceCalculationMethod = 'center' | 'edges' | 'corners';
 
 type DistanceCalculationFunction = (
@@ -112,6 +118,7 @@ export interface FocusableComponent {
   focusBoundaryDirections?: Direction[];
   autoRestoreFocus: boolean;
   forceFocus: boolean;
+  navigationStrategy?: NavigationStrategy;
   lastFocusedChildKey?: string;
   layout?: FocusableComponentLayout;
   layoutUpdatedAt?: number;
@@ -131,6 +138,7 @@ interface FocusableComponentUpdatePayload {
   onFocus: (layout: FocusableComponentLayout, details: FocusDetails) => void;
   onBlur: (layout: FocusableComponentLayout, details: FocusDetails) => void;
   accessibilityLabel?: string;
+  navigationStrategy?: NavigationStrategy;
 }
 
 interface FocusableComponentRemovePayload {
@@ -1133,73 +1141,99 @@ export class SpatialNavigationService {
           .map((component) => this.updateLayout(component.focusKey))
       );
 
-      const siblings = filter(this.focusableComponents, (component) => {
-        if (
-          component.parentFocusKey === parentFocusKey &&
-          component.focusKey !== currentComponent.focusKey &&
-          component.focusable &&
-          component.layout
-        ) {
-          const siblingCutoffCoordinate =
-            SpatialNavigationService.getCutoffCoordinate(
-              isVerticalDirection,
-              isIncrementalDirection,
-              true,
-              component.layout,
-              this.writingDirection
-            );
+      let nextComponent: FocusableComponent | null = null;
 
-          return isVerticalDirection
-            ? isIncrementalDirection
-              ? siblingCutoffCoordinate >= currentCutoffCoordinate // vertical next
-              : siblingCutoffCoordinate <= currentCutoffCoordinate // vertical previous
-            : this.writingDirection === WritingDirection.LTR
-            ? isIncrementalDirection
-              ? siblingCutoffCoordinate >= currentCutoffCoordinate // horizontal LTR next
-              : siblingCutoffCoordinate <= currentCutoffCoordinate // horizontal LTR previous
-            : isIncrementalDirection
-            ? siblingCutoffCoordinate <= currentCutoffCoordinate // horizontal RTL next
-            : siblingCutoffCoordinate >= currentCutoffCoordinate; // horizontal RTL previous
+      const { navigationStrategy } =
+        this.focusableComponents[parentFocusKey] ?? {};
+
+      if (navigationStrategy) {
+        const siblings = filter(
+          this.focusableComponents,
+          (component) =>
+            component.parentFocusKey === parentFocusKey && component.focusable
+        );
+        nextComponent = navigationStrategy(
+          direction as Direction,
+          focusKey,
+          siblings
+        );
+
+        if (this.debug) {
+          this.log(
+            'smartNavigate',
+            'navigation overrided by navigationStrategy',
+            nextComponent
+          );
+        }
+      } else {
+        const siblings = filter(this.focusableComponents, (component) => {
+          if (
+            component.parentFocusKey === parentFocusKey &&
+            component.focusKey !== currentComponent.focusKey &&
+            component.focusable &&
+            component.layout
+          ) {
+            const siblingCutoffCoordinate =
+              SpatialNavigationService.getCutoffCoordinate(
+                isVerticalDirection,
+                isIncrementalDirection,
+                true,
+                component.layout,
+                this.writingDirection
+              );
+
+            return isVerticalDirection
+              ? isIncrementalDirection
+                ? siblingCutoffCoordinate >= currentCutoffCoordinate // vertical next
+                : siblingCutoffCoordinate <= currentCutoffCoordinate // vertical previous
+              : this.writingDirection === WritingDirection.LTR
+              ? isIncrementalDirection
+                ? siblingCutoffCoordinate >= currentCutoffCoordinate // horizontal LTR next
+                : siblingCutoffCoordinate <= currentCutoffCoordinate // horizontal LTR previous
+              : isIncrementalDirection
+              ? siblingCutoffCoordinate <= currentCutoffCoordinate // horizontal RTL next
+              : siblingCutoffCoordinate >= currentCutoffCoordinate; // horizontal RTL previous
+          }
+
+          return false;
+        });
+
+        if (this.debug) {
+          this.log(
+            'smartNavigate',
+            'currentCutoffCoordinate',
+            currentCutoffCoordinate
+          );
+          this.log(
+            'smartNavigate',
+            'siblings',
+            `${siblings.length} elements:`,
+            siblings.map((sibling) => sibling.focusKey).join(', '),
+            siblings.map((sibling) => sibling.node),
+            siblings.map((sibling) => sibling)
+          );
         }
 
-        return false;
-      });
+        if (this.visualDebugger) {
+          const refCorners = SpatialNavigationService.getRefCorners(
+            direction,
+            false,
+            layout
+          );
 
-      if (this.debug) {
-        this.log(
-          'smartNavigate',
-          'currentCutoffCoordinate',
-          currentCutoffCoordinate
-        );
-        this.log(
-          'smartNavigate',
-          'siblings',
-          `${siblings.length} elements:`,
-          siblings.map((sibling) => sibling.focusKey).join(', '),
-          siblings.map((sibling) => sibling.node),
-          siblings.map((sibling) => sibling)
-        );
-      }
+          this.visualDebugger.drawPoint(refCorners.a.x, refCorners.a.y);
+          this.visualDebugger.drawPoint(refCorners.b.x, refCorners.b.y);
+        }
 
-      if (this.visualDebugger) {
-        const refCorners = SpatialNavigationService.getRefCorners(
+        const sortedSiblings = this.sortSiblingsByPriority(
+          siblings,
+          layout,
           direction,
-          false,
-          layout
+          focusKey
         );
 
-        this.visualDebugger.drawPoint(refCorners.a.x, refCorners.a.y);
-        this.visualDebugger.drawPoint(refCorners.b.x, refCorners.b.y);
+        nextComponent = first(sortedSiblings);
       }
-
-      const sortedSiblings = this.sortSiblingsByPriority(
-        siblings,
-        layout,
-        direction,
-        focusKey
-      );
-
-      const nextComponent = first(sortedSiblings);
 
       this.log(
         'smartNavigate',
@@ -1405,7 +1439,8 @@ export class SpatialNavigationService {
     focusable,
     isFocusBoundary,
     focusBoundaryDirections,
-    accessibilityLabel
+    accessibilityLabel,
+    navigationStrategy
   }: FocusableComponent) {
     this.focusableComponents[focusKey] = {
       focusKey,
@@ -1419,6 +1454,7 @@ export class SpatialNavigationService {
       onBlur,
       onUpdateFocus,
       onUpdateHasFocusedChild,
+      navigationStrategy,
       saveLastFocusedChild,
       trackChildren,
       preferredChildFocusKey,
@@ -1857,7 +1893,8 @@ export class SpatialNavigationService {
       onArrowPress,
       onFocus,
       onBlur,
-      accessibilityLabel
+      accessibilityLabel,
+      navigationStrategy
     }: FocusableComponentUpdatePayload
   ) {
     const component = this.focusableComponents[focusKey];
@@ -1873,6 +1910,7 @@ export class SpatialNavigationService {
       component.onFocus = onFocus;
       component.onBlur = onBlur;
       component.accessibilityLabel = accessibilityLabel;
+      component.navigationStrategy = navigationStrategy;
       // Reset layout updated at to force a layout update
       component.layoutUpdatedAt = 0;
 
