@@ -53,6 +53,12 @@ For more detailed documentation and usage examples, visit our [Developer Portal]
 
 1. Use & benefits of using the Norigin Spatial Navigation library on Smart TVs [here](https://medium.com/p/77ed944d7be7).
 
+## Agentic Skill for Norigin Spatial Navigation
+
+```bash
+npx skills add NoriginMedia/Norigin-Spatial-Navigation
+```
+
 ## Contributing
 
 Please follow the [Contribution Guide](https://github.com/NoriginMedia/Norigin-Spatial-Navigation/blob/master/CONTRIBUTING.md)
