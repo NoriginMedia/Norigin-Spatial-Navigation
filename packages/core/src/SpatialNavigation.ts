@@ -1159,6 +1159,12 @@ export class SpatialNavigationService {
         );
 
         if (this.debug) {
+          if (nextComponent != null && !siblings.includes(nextComponent)) {
+            console.warn(
+              `nextFocusResolver returned an invalid component. This will result in lost focus. Check the "nextFocusResolver" implementation in component with focusKey: ${parentFocusKey}`
+            );
+          }
+
           this.log(
             'smartNavigate',
             'navigation overrided by nextFocusResolver',
