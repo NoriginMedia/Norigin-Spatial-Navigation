@@ -37,7 +37,7 @@ export type NodeType = NodeTypeOverrides extends { node: infer N }
 
 export type Direction = 'up' | 'down' | 'left' | 'right';
 
-export type NavigationStrategy = (
+export type NextFocusResolver = (
   direction: Direction,
   focusKey: string,
   siblings: FocusableComponent[]
@@ -118,7 +118,7 @@ export interface FocusableComponent {
   focusBoundaryDirections?: Direction[];
   autoRestoreFocus: boolean;
   forceFocus: boolean;
-  navigationStrategy?: NavigationStrategy;
+  nextFocusResolver?: NextFocusResolver;
   lastFocusedChildKey?: string;
   layout?: FocusableComponentLayout;
   layoutUpdatedAt?: number;
@@ -138,7 +138,7 @@ interface FocusableComponentUpdatePayload {
   onFocus: (layout: FocusableComponentLayout, details: FocusDetails) => void;
   onBlur: (layout: FocusableComponentLayout, details: FocusDetails) => void;
   accessibilityLabel?: string;
-  navigationStrategy?: NavigationStrategy;
+  nextFocusResolver?: NextFocusResolver;
 }
 
 interface FocusableComponentRemovePayload {
@@ -1143,16 +1143,16 @@ export class SpatialNavigationService {
 
       let nextComponent: FocusableComponent | null = null;
 
-      const { navigationStrategy } =
+      const { nextFocusResolver } =
         this.focusableComponents[parentFocusKey] ?? {};
 
-      if (navigationStrategy) {
+      if (nextFocusResolver) {
         const siblings = filter(
           this.focusableComponents,
           (component) =>
             component.parentFocusKey === parentFocusKey && component.focusable
         );
-        nextComponent = navigationStrategy(
+        nextComponent = nextFocusResolver(
           direction as Direction,
           focusKey,
           siblings
@@ -1161,7 +1161,7 @@ export class SpatialNavigationService {
         if (this.debug) {
           this.log(
             'smartNavigate',
-            'navigation overrided by navigationStrategy',
+            'navigation overrided by nextFocusResolver',
             nextComponent
           );
         }
@@ -1440,7 +1440,7 @@ export class SpatialNavigationService {
     isFocusBoundary,
     focusBoundaryDirections,
     accessibilityLabel,
-    navigationStrategy
+    nextFocusResolver
   }: FocusableComponent) {
     this.focusableComponents[focusKey] = {
       focusKey,
@@ -1454,7 +1454,7 @@ export class SpatialNavigationService {
       onBlur,
       onUpdateFocus,
       onUpdateHasFocusedChild,
-      navigationStrategy,
+      nextFocusResolver,
       saveLastFocusedChild,
       trackChildren,
       preferredChildFocusKey,
@@ -1894,7 +1894,7 @@ export class SpatialNavigationService {
       onFocus,
       onBlur,
       accessibilityLabel,
-      navigationStrategy
+      nextFocusResolver
     }: FocusableComponentUpdatePayload
   ) {
     const component = this.focusableComponents[focusKey];
@@ -1910,7 +1910,7 @@ export class SpatialNavigationService {
       component.onFocus = onFocus;
       component.onBlur = onBlur;
       component.accessibilityLabel = accessibilityLabel;
-      component.navigationStrategy = navigationStrategy;
+      component.nextFocusResolver = nextFocusResolver;
       // Reset layout updated at to force a layout update
       component.layoutUpdatedAt = 0;
 

@@ -13,7 +13,7 @@ import {
   FocusDetails,
   KeyPressDetails,
   Direction,
-  NavigationStrategy
+  NextFocusResolver
 } from '@noriginmedia/norigin-spatial-navigation-core';
 import { useFocusContext } from './useFocusContext';
 
@@ -57,7 +57,7 @@ export interface UseFocusableConfig<P = object> {
   focusBoundaryDirections?: Direction[];
   focusKey?: string;
   preferredChildFocusKey?: string;
-  navigationStrategy?: NavigationStrategy;
+  nextFocusResolver?: NextFocusResolver;
   onEnterPress?: EnterPressHandler<P>;
   onEnterRelease?: EnterReleaseHandler<P>;
   onArrowPress?: ArrowPressHandler<P>;
@@ -92,7 +92,7 @@ const useFocusableHook = <P, E = any>({
   focusBoundaryDirections,
   focusKey: propFocusKey,
   preferredChildFocusKey,
-  navigationStrategy,
+  nextFocusResolver,
   onEnterPress = noop,
   onEnterRelease = noop,
   onArrowPress = () => true,
@@ -170,7 +170,7 @@ const useFocusableHook = <P, E = any>({
       node,
       parentFocusKey,
       preferredChildFocusKey,
-      navigationStrategy,
+      nextFocusResolver,
       onEnterPress: onEnterPressHandler,
       onEnterRelease: onEnterReleaseHandler,
       onArrowPress: onArrowPressHandler,
@@ -206,7 +206,7 @@ const useFocusableHook = <P, E = any>({
       focusable,
       isFocusBoundary,
       focusBoundaryDirections,
-      navigationStrategy,
+      nextFocusResolver,
       onEnterPress: onEnterPressHandler,
       onEnterRelease: onEnterReleaseHandler,
       onArrowPress: onArrowPressHandler,
@@ -221,7 +221,7 @@ const useFocusableHook = <P, E = any>({
     focusable,
     isFocusBoundary,
     focusBoundaryDirections,
-    navigationStrategy,
+    nextFocusResolver,
     onEnterPressHandler,
     onEnterReleaseHandler,
     onArrowPressHandler,
