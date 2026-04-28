@@ -1167,7 +1167,7 @@ export class SpatialNavigationService {
 
           this.log(
             'smartNavigate',
-            'navigation overrided by nextFocusResolver',
+            'navigation overridden by nextFocusResolver',
             nextComponent
           );
         }
