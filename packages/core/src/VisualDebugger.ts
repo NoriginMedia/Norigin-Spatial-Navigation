@@ -15,6 +15,9 @@ interface NodeLayout {
   height: number;
 }
 
+const DEBUG_CANVAS_ID = 'sn-debug';
+const LAYOUTS_CANVAS_ID = 'sn-layouts';
+
 class VisualDebugger {
   private debugCtx: CanvasRenderingContext2D;
 
@@ -25,12 +28,12 @@ class VisualDebugger {
   constructor(writingDirection: WritingDirection) {
     if (hasDOM) {
       this.debugCtx = VisualDebugger.createCanvas(
-        'sn-debug',
+        DEBUG_CANVAS_ID,
         '1010',
         writingDirection
       );
       this.layoutsCtx = VisualDebugger.createCanvas(
-        'sn-layouts',
+        LAYOUTS_CANVAS_ID,
         '1000',
         writingDirection
       );
@@ -81,6 +84,24 @@ class VisualDebugger {
     }
 
     this.layoutsCtx.clearRect(0, 0, WIDTH, HEIGHT);
+  }
+
+  destroy() {
+    this.clear();
+    this.clearLayouts();
+
+    this.debugCtx = null;
+    this.layoutsCtx = null;
+
+    const debugCanvas = document.getElementById(DEBUG_CANVAS_ID);
+    if (debugCanvas) {
+      debugCanvas.parentNode.removeChild(debugCanvas);
+    }
+
+    const layoutsCanvas = document.getElementById(LAYOUTS_CANVAS_ID);
+    if (layoutsCanvas) {
+      layoutsCanvas.parentNode.removeChild(layoutsCanvas);
+    }
   }
 
   drawLayout(layout: NodeLayout, focusKey: string, parentFocusKey: string) {

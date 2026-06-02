@@ -20,6 +20,20 @@ init({ debug: true, visualDebug: false });
 
 Disable this in production, it generates a significant volume of log output.
 
+### Enabling Debug Logger at Runtime
+
+Use `setDebug` to enable or disable logging navigation decisions to the browser console. This is useful when users can toggle debug mode while the application is running.
+
+```typescript
+import { setDebug } from '@noriginmedia/norigin-spatial-navigation-core';
+
+// Turn on logging navigation decisions to the browser console
+setDebug(true);
+
+// Turn off logging navigation decisions to the browser console
+setDebug(false);
+```
+
 ---
 
 ## Visual Debugger
@@ -35,6 +49,20 @@ init({ debug: false, visualDebug: true });
 ```
 
 The visual debugger is the fastest way to diagnose unexpected navigation behavior because you can see exactly what the library "sees" in terms of component positions.
+
+### Enabling Visual Debugger at Runtime
+
+Use `setVisualDebug` to enable or disable drawing a canvas overlay showing component bounding boxes and navigation paths. This is useful when users can toggle visual debugger while the application is running.
+
+```typescript
+import { setVisualDebug } from '@noriginmedia/norigin-spatial-navigation-core';
+
+// Turn on drawing a canvas overlay
+setVisualDebug(true);
+
+// Turn off drawing a canvas overlay
+setVisualDebug(false);
+```
 
 ---
 

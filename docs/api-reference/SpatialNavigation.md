@@ -24,6 +24,8 @@ import {
   setKeyMap,
   setThrottle,
   updateRtl,
+  setDebug,
+  setVisualDebug,
   ROOT_FOCUS_KEY
 } from '@noriginmedia/norigin-spatial-navigation-core';
 ```
@@ -307,6 +309,44 @@ updateRtl(false); // revert to LTR
 ```
 
 See [RTL Support](../guides/rtl-support.md) for more.
+
+---
+
+## `setDebug(debug)`
+
+Toggle debug mode at runtime. It logs navigation decisions to the browser console.
+
+```typescript
+setDebug(debug: boolean): void
+```
+
+```typescript
+import { setDebug } from '@noriginmedia/norigin-spatial-navigation-react';
+
+setDebug(true); // enable logging of navigation decisions
+setDebug(false); // disable logging of navigation decisions
+```
+
+See [Debugging](../guides/debugging.md) for more.
+
+---
+
+## `setVisualDebug(visualDebug)`
+
+Toggle visual debug mode at runtime. It draws a canvas overlay showing component bounding boxes and navigation paths.
+
+```typescript
+setVisualDebug(visualDebug: boolean): void
+```
+
+```typescript
+import { setVisualDebug } from '@noriginmedia/norigin-spatial-navigation-react';
+
+setVisualDebug(true); // enable visual debugger
+setVisualDebug(false); // disable visual debugger
+```
+
+See [Debugging](../guides/debugging.md) for more.
 
 ---
 

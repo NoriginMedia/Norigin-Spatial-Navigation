@@ -722,31 +722,14 @@ class SpatialNavigationService {
         customDistanceCalculationFunction;
       this.onUtterText = onUtterText ?? undefined;
 
-      this.debug = debug;
+      this.setDebug(debug);
 
       if (!this.nativeMode) {
         if (Number.isInteger(throttleParam) && throttleParam > 0) {
           this.throttle = throttleParam;
         }
         this.bindEventHandlers();
-        if (visualDebug) {
-          this.visualDebugger = new VisualDebugger(this.writingDirection);
-          const draw = () => {
-            requestAnimationFrame(() => {
-              this.visualDebugger.clearLayouts();
-              forOwn(this.focusableComponents, (component, focusKey) => {
-                this.visualDebugger.drawLayout(
-                  component.layout,
-                  focusKey,
-                  component.parentFocusKey
-                );
-              });
-              draw();
-            });
-          };
-
-          draw();
-        }
+        this.setVisualDebug(visualDebug);
       } else {
         console.warn(
           'nativeMode option is deprecated and will be removed in the next version.'
@@ -783,6 +766,7 @@ class SpatialNavigationService {
       this.keyMap = DEFAULT_KEY_MAP;
       this.onUtterText = undefined;
 
+      this.setVisualDebug(false);
       this.unbindEventHandlers();
     }
   }
@@ -1898,6 +1882,49 @@ class SpatialNavigationService {
   updateRtl(rtl: boolean) {
     this.writingDirection = rtl ? WritingDirection.RTL : WritingDirection.LTR;
   }
+
+  setDebug(debug: boolean) {
+    if (!this.enabled) {
+      return;
+    }
+
+    this.debug = debug;
+  }
+
+  setVisualDebug(visualDebug: boolean) {
+    if (!this.enabled) {
+      return;
+    }
+    if (visualDebug === !!this.visualDebugger) {
+      return;
+    }
+
+    if (visualDebug) {
+      this.visualDebugger = new VisualDebugger(this.writingDirection);
+      const draw = () => {
+        requestAnimationFrame(() => {
+          if (!this.visualDebugger) {
+            return;
+          }
+
+          this.visualDebugger.clearLayouts();
+          forOwn(this.focusableComponents, (component, focusKey) => {
+            this.visualDebugger.drawLayout(
+              component.layout,
+              focusKey,
+              component.parentFocusKey
+            );
+          });
+          draw();
+        });
+      };
+
+      draw();
+    } else {
+      this.visualDebugger.destroy();
+      this.visualDebugger = null;
+    }
+  }
 }
 
 /**
@@ -1917,5 +1944,7 @@ export const {
   updateAllLayouts,
   getCurrentFocusKey,
   doesFocusableExist,
-  updateRtl
+  updateRtl,
+  setDebug,
+  setVisualDebug
 } = SpatialNavigation;
