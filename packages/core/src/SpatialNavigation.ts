@@ -208,6 +208,8 @@ class SpatialNavigationService {
 
   private visualDebugger: VisualDebugger;
 
+  private animationFrameRequestId: number;
+
   /**
    * Focus key of the currently focused element
    */
@@ -683,6 +685,7 @@ class SpatialNavigationService {
 
     this.debug = false;
     this.visualDebugger = null;
+    this.animationFrameRequestId = -1;
 
     this.logIndex = 0;
 
@@ -1902,7 +1905,7 @@ class SpatialNavigationService {
     if (visualDebug) {
       this.visualDebugger = new VisualDebugger(this.writingDirection);
       const draw = () => {
-        requestAnimationFrame(() => {
+        this.animationFrameRequestId = requestAnimationFrame(() => {
           if (!this.visualDebugger) {
             return;
           }
@@ -1921,6 +1924,10 @@ class SpatialNavigationService {
 
       draw();
     } else {
+      if (this.animationFrameRequestId > -1) {
+        cancelAnimationFrame(this.animationFrameRequestId);
+        this.animationFrameRequestId = -1;
+      }
       this.visualDebugger.destroy();
       this.visualDebugger = null;
     }
