@@ -214,28 +214,31 @@ describe('SpatialNavigation', () => {
       });
     };
 
-    it('focuses a component on add when its key was pre-set as current focus (enabled by default)', () => {
+    it('focuses a component on add when its key was pre-set as current focus (enabled by default)', async () => {
       createRootNode();
 
       // Pre-set focus to a component that has not mounted yet
       SpatialNavigation.setFocus('preset-child');
+      await settle();
       expect(SpatialNavigation.getCurrentFocusKey()).toBe('preset-child');
 
       const onUpdateFocus = jest.fn();
       addPresetChild(onUpdateFocus);
+      await settle();
 
       // The component is auto-focused on add, so its focus callback fires
       expect(onUpdateFocus).toHaveBeenCalledWith(true);
       expect(SpatialNavigation.getCurrentFocusKey()).toBe('preset-child');
     });
 
-    it('does not focus a component on add when focusOnPresetKey is false', () => {
+    it('does not focus a component on add when focusOnPresetKey is false', async () => {
       destroy();
       init({ focusOnPresetKey: false });
       createRootNode();
 
       // Pre-set focus to a component that has not mounted yet
       SpatialNavigation.setFocus('preset-child');
+      await settle();
       expect(SpatialNavigation.getCurrentFocusKey()).toBe('preset-child');
 
       const onUpdateFocus = jest.fn();

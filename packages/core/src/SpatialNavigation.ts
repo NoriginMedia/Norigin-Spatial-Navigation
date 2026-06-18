@@ -341,7 +341,7 @@ export class SpatialNavigationService {
    * (e.g. setFocus was called before the component mounted), automatically focus it.
    * Enabled by default for backward compatibility.
    */
-  private focusOnPresetKey: boolean;
+  private focusOnPresetKey: boolean = true;
 
   /**
    * Used to determine the coordinate that will be used to filter items that are over the "edge"
