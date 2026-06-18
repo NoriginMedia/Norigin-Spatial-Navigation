@@ -54,6 +54,7 @@ init(config?: {
     distanceCalculationMethod: string
   ) => number;
   onUtterText?: (text: string) => void;
+  focusOnPresetKey?: boolean;
 }): void
 ```
 
@@ -74,6 +75,7 @@ init(config?: {
 | `distanceCalculationMethod`         | `'center' \| 'edges' \| 'corners'` | `'corners'` | Algorithm used to calculate distance between components. See [Distance Calculation](../guides/distance-calculation.md).                                                                                                     |
 | `customDistanceCalculationFunction` | `function`                         | `undefined` | Override the secondary-axis distance calculation. See [Distance Calculation](../guides/distance-calculation.md).                                                                                                            |
 | `onUtterText`                       | `(text: string) => void`           | `undefined` | Global callback invoked with a concatenated accessibility label string whenever focus changes. Wire this to your platform's Text-To-Speech engine. See the [Accessibility Labels](../guides/accessibility-labels.md) guide. |
+| `focusOnPresetKey`                  | `boolean`                          | `true`      | When a component is added whose focus key was already set as the current focus key (via `setFocus` before it mounted), automatically focus it. Set to `false` to disable this implicit refocus on add.                      |
 
 ### Example
 

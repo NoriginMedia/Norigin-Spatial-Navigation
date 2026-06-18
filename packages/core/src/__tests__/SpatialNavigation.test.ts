@@ -4,7 +4,11 @@ import {
   destroy,
   init
 } from '../SpatialNavigation';
-import { createHorizontalLayout, createVerticalLayout } from './domNodes';
+import {
+  createHorizontalLayout,
+  createRootNode,
+  createVerticalLayout
+} from './domNodes';
 
 describe('SpatialNavigation', () => {
   beforeEach(() => {
@@ -160,5 +164,80 @@ describe('SpatialNavigation', () => {
     SpatialNavigation.navigateByDirection('right', {});
 
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-3');
+  });
+
+  describe('focusOnPresetKey', () => {
+    const addPresetChild = (onUpdateFocus: (focused: boolean) => void) => {
+      SpatialNavigation.addFocusable({
+        focusKey: 'preset-child',
+        node: {
+          offsetLeft: 100,
+          offsetTop: 100,
+          offsetWidth: 400,
+          offsetHeight: 200,
+          parentElement: {
+            offsetLeft: 0,
+            offsetTop: 0,
+            offsetWidth: 1920,
+            offsetHeight: 1280
+          } as HTMLElement,
+          offsetParent: {
+            offsetLeft: 0,
+            offsetTop: 0,
+            scrollLeft: 0,
+            scrollTop: 0,
+            offsetWidth: 1920,
+            offsetHeight: 1280,
+            nodeType: Node.ELEMENT_NODE
+          } as HTMLElement
+        } as unknown as HTMLElement,
+        isFocusBoundary: false,
+        parentFocusKey: ROOT_FOCUS_KEY,
+        focusable: true,
+        trackChildren: false,
+        forceFocus: false,
+        autoRestoreFocus: true,
+        saveLastFocusedChild: false,
+        onEnterPress: () => {},
+        onEnterRelease: () => {},
+        onFocus: () => {},
+        onBlur: () => {},
+        onArrowPress: () => true,
+        onArrowRelease: () => {},
+        onUpdateFocus,
+        onUpdateHasFocusedChild: () => {}
+      });
+    };
+
+    it('focuses a component on add when its key was pre-set as current focus (enabled by default)', () => {
+      createRootNode();
+
+      // Pre-set focus to a component that has not mounted yet
+      SpatialNavigation.setFocus('preset-child');
+      expect(SpatialNavigation.getCurrentFocusKey()).toBe('preset-child');
+
+      const onUpdateFocus = jest.fn();
+      addPresetChild(onUpdateFocus);
+
+      // The component is auto-focused on add, so its focus callback fires
+      expect(onUpdateFocus).toHaveBeenCalledWith(true);
+      expect(SpatialNavigation.getCurrentFocusKey()).toBe('preset-child');
+    });
+
+    it('does not focus a component on add when focusOnPresetKey is false', () => {
+      destroy();
+      init({ focusOnPresetKey: false });
+      createRootNode();
+
+      // Pre-set focus to a component that has not mounted yet
+      SpatialNavigation.setFocus('preset-child');
+      expect(SpatialNavigation.getCurrentFocusKey()).toBe('preset-child');
+
+      const onUpdateFocus = jest.fn();
+      addPresetChild(onUpdateFocus);
+
+      // The implicit refocus is disabled, so the focus callback does not fire on add
+      expect(onUpdateFocus).not.toHaveBeenCalled();
+    });
   });
 });

@@ -48,6 +48,7 @@ export interface SpatialNavigationServiceInit {
   distanceCalculationMethod?: DistanceCalculationMethod;
   customDistanceCalculationFunction?: DistanceCalculationFunction;
   onUtterText?: (text: string) => void;
+  focusOnPresetKey?: boolean;
 }
 
 const DEFAULT_KEY_MAP = {
@@ -289,6 +290,13 @@ class SpatialNavigationService {
    * Parent region labels are included only when entering a new region for the first time.
    */
   private onUtterText: ((text: string) => void) | undefined;
+
+  /**
+   * When a focusable is added whose focus key was already set as the current focus key
+   * (e.g. setFocus was called before the component mounted), automatically focus it.
+   * Enabled by default for backward compatibility.
+   */
+  private focusOnPresetKey: boolean;
 
   /**
    * Used to determine the coordinate that will be used to filter items that are over the "edge"
@@ -706,7 +714,8 @@ class SpatialNavigationService {
     rtl = false,
     distanceCalculationMethod = 'corners' as DistanceCalculationMethod,
     customDistanceCalculationFunction = undefined as DistanceCalculationFunction,
-    onUtterText
+    onUtterText,
+    focusOnPresetKey = true
   }: SpatialNavigationServiceInit = {}) {
     if (!this.enabled) {
       this.domNodeFocusOptions = domNodeFocusOptions;
@@ -721,6 +730,7 @@ class SpatialNavigationService {
       this.customDistanceCalculationFunction =
         customDistanceCalculationFunction;
       this.onUtterText = onUtterText ?? undefined;
+      this.focusOnPresetKey = focusOnPresetKey;
 
       this.debug = debug;
 
@@ -1438,9 +1448,11 @@ class SpatialNavigationService {
     );
 
     /**
-     * If for some reason this component was already focused before it was added, call the update
+     * If for some reason this component was already focused before it was added, call the update.
+     * Gated behind the focusOnPresetKey option (enabled by default) so this implicit refocus can
+     * be opted out of.
      */
-    if (focusKey === this.focusKey) {
+    if (this.focusOnPresetKey && focusKey === this.focusKey) {
       this.setFocus(preferredChildFocusKey || focusKey);
     }
 
