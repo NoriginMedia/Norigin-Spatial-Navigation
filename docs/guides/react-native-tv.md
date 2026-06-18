@@ -16,7 +16,7 @@ Call **`init`** once before your UI mounts (for example in your root module), an
 
 ```typescript
 import { init } from '@noriginmedia/norigin-spatial-navigation-core';
-import { ReactNativeLayoutAdapter } from '@noriginmedia/norigin-spatial-navigation-react-native';
+import { ReactNativeLayoutAdapter } from '@noriginmedia/norigin-spatial-navigation-react-native-tvos';
 
 init({
   layoutAdapter: ReactNativeLayoutAdapter
@@ -25,7 +25,7 @@ init({
 
 ## Imports and hooks
 
-Import **`useFocusable`**, **`FocusContext`**, and the rest of the React API from **`@noriginmedia/norigin-spatial-navigation-react-native`**. That package re-exports everything from `@noriginmedia/norigin-spatial-navigation-react`, so you can keep a single import path in TV code.
+Import **`useFocusable`**, **`FocusContext`**, and the rest of the React API from **`@noriginmedia/norigin-spatial-navigation-react-native-tvos`**. That package re-exports everything from `@noriginmedia/norigin-spatial-navigation-react`, so you can keep a single import path in TV code.
 
 ```typescript
 import {
@@ -33,7 +33,7 @@ import {
   useFocusable,
   FocusContext,
   ROOT_FOCUS_KEY
-} from '@noriginmedia/norigin-spatial-navigation-react-native';
+} from '@noriginmedia/norigin-spatial-navigation-react-native-tvos';
 import { init, setFocus } from '@noriginmedia/norigin-spatial-navigation-core';
 ```
 

@@ -25,11 +25,11 @@ This package exports `useFocusable`, `FocusContext`, and all type definitions yo
 For React Native TV apps (Android TV, Apple TV, and similar targets), install the package that bundles the React hooks and the TV layout adapter:
 
 ```bash
-npm install @noriginmedia/norigin-spatial-navigation-react-native
+npm install @noriginmedia/norigin-spatial-navigation-react-native-tvos
 ```
 
 ```bash
-yarn add @noriginmedia/norigin-spatial-navigation-react-native
+yarn add @noriginmedia/norigin-spatial-navigation-react-native-tvos
 ```
 
 **Peer dependencies:** React >= 16.8.0 and React Native >= 0.73.7.
