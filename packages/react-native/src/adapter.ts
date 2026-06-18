@@ -63,14 +63,14 @@ const DEFAULT_KEY_MAP: Record<string, Key> = {
 };
 
 const EMPTY_LAYOUT: FocusableComponentLayout = {
-  x: 0,
-  y: 0,
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  width: 0,
-  height: 0,
+  x: undefined,
+  y: undefined,
+  top: undefined,
+  left: undefined,
+  right: undefined,
+  bottom: undefined,
+  width: undefined,
+  height: undefined,
   node: null as any
 };
 
@@ -236,6 +236,8 @@ class ReactNativeLayoutAdapter implements LayoutAdapter {
 }
 
 // Conditionally export the appropriate adapter based on the platform
-export default Platform.OS === 'web'
+export default (Platform.OS === 'web'
   ? BaseWebAdapter
-  : ReactNativeLayoutAdapter;
+  : ReactNativeLayoutAdapter) as new (
+  service: SpatialNavigationService
+) => LayoutAdapter;
