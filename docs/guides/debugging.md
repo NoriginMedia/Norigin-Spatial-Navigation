@@ -135,16 +135,15 @@ useEffect(() => {
 
 **Cause:** The component is CSS-transformed or inside a scaled container, and the default `offsetLeft/Top` measurement does not account for the transform.
 
-**Solution:** Use the `getBoundingClientRect` layout adapter (replaces the deprecated `useGetBoundingClientRect: true` init flag):
+**Solution:** Use the bundled viewport-relative adapter:
 
 ```typescript
-import {
-  init,
-  getBoundingClientRectAdapter
-} from '@noriginmedia/norigin-spatial-navigation-core';
+import { init, GetBoundingClientRectAdapter } from '@noriginmedia/norigin-spatial-navigation-core';
 
-init({ layoutAdapter: getBoundingClientRectAdapter });
+init({ layoutAdapter: GetBoundingClientRectAdapter });
 ```
+
+Or use a **partial** `layoutAdapter`, or temporarily use the deprecated `useGetBoundingClientRect: true` flag until you migrate. See [SpatialNavigation: Layout adapter](../api-reference/SpatialNavigation.md#layout-adapter).
 
 ---
 

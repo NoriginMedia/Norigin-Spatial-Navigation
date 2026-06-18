@@ -59,21 +59,29 @@ The library measures each component's position and size to calculate navigation 
 
 By default the library reads `element.offsetLeft`, `element.offsetTop`, `element.offsetWidth`, and `element.offsetHeight`. This is fast and unaffected by CSS transforms.
 
-### `layoutAdapter: getBoundingClientRectAdapter` (viewport-relative)
+### Viewport-relative measurement (`getBoundingClientRect`)
+
+Pass the bundled **`GetBoundingClientRectAdapter`** class to `init` (see [Layout adapter](../api-reference/SpatialNavigation.md#layout-adapter) in the API reference):
 
 ```typescript
-import { init, getBoundingClientRectAdapter } from '@noriginmedia/norigin-spatial-navigation-core';
+import { init, GetBoundingClientRectAdapter } from '@noriginmedia/norigin-spatial-navigation-core';
 
-init({ layoutAdapter: getBoundingClientRectAdapter });
+init({ layoutAdapter: GetBoundingClientRectAdapter });
 ```
 
-Switches measurement to `element.getBoundingClientRect()`. Use this when:
+Alternatively, use a **partial** `layoutAdapter` with a custom `measureLayout`, or temporarily keep the deprecated `useGetBoundingClientRect: true` init flag until you migrate.
+
+Use viewport-relative layout when:
 
 - Elements are CSS-transformed (e.g., `transform: scale(0.9)`)
 - Elements are inside a scaled or rotated container
 - You need coordinates relative to the viewport rather than the document
 
 `getBoundingClientRect` is slightly slower because it triggers a layout reflow, but it accounts for CSS transforms that `offsetLeft/Top` ignores.
+
+### Async work ordering
+
+The core engine runs navigation- and layout-related async work through an internal **scheduler**, so operations are serialized instead of interleaving arbitrarily. When you need logic to run after focus or navigation completes, use **`await setFocus`** / **`await navigateByDirection`** (see [Programmatic focus](./programmatic-focus.md)).
 
 ---
 
