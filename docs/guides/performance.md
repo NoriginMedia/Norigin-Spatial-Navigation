@@ -59,10 +59,12 @@ The library measures each component's position and size to calculate navigation 
 
 By default the library reads `element.offsetLeft`, `element.offsetTop`, `element.offsetWidth`, and `element.offsetHeight`. This is fast and unaffected by CSS transforms.
 
-### `useGetBoundingClientRect: true` (viewport-relative)
+### `layoutAdapter: getBoundingClientRectAdapter` (viewport-relative)
 
 ```typescript
-init({ useGetBoundingClientRect: true });
+import { init, getBoundingClientRectAdapter } from '@noriginmedia/norigin-spatial-navigation-core';
+
+init({ layoutAdapter: getBoundingClientRectAdapter });
 ```
 
 Switches measurement to `element.getBoundingClientRect()`. Use this when:
