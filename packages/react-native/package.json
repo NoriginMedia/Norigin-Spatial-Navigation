@@ -1,0 +1,64 @@
+{
+  "name": "@noriginmedia/norigin-spatial-navigation-react-native",
+  "version": "3.0.0",
+  "description": "React hooks based Spatial Navigation solution",
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "eslint": "eslint src",
+    "build": "rm -rf dist && rollup -c && tsc --emitDeclarationOnly"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NoriginMedia/norigin-spatial-navigation.git"
+  },
+  "keywords": [
+    "react",
+    "react-hooks",
+    "spatial-navigation",
+    "remote-control-navigation",
+    "tv-navigation"
+  ],
+  "author": "Norigin Media",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/NoriginMedia/norigin-spatial-navigation/issues"
+  },
+  "homepage": "https://devportal.noriginmedia.com/docs/Norigin-Spatial-Navigation/",
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-native": ">=0.73.7"
+  },
+  "dependencies": {
+    "@noriginmedia/norigin-spatial-navigation-core": "^3.0.0",
+    "@noriginmedia/norigin-spatial-navigation-react": "^3.0.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^29.0.0",
+    "@rollup/plugin-node-resolve": "^16.0.0",
+    "@rollup/plugin-typescript": "^12.1.2",
+    "@types/lodash-es": "^4.17.12",
+    "@types/react": "^18.0.18",
+    "@types/react-dom": "^18.0.6",
+    "@types/styled-components": "^5.1.24",
+    "react-native": "^0.73.7",
+    "react-native-tvos": "^0.73.7-1",
+    "prettier": "^2.5.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "rollup": "^4.28.1",
+    "styled-components": "^5.3.3",
+    "typescript": "^5.9.3"
+  }
+}

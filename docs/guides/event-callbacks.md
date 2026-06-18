@@ -35,9 +35,11 @@ interface FocusableComponentLayout {
   y: number; // Same as top
   readonly right: number; // left + width
   readonly bottom: number; // top + height
-  node: HTMLElement; // The actual DOM node
+  node: NodeType;
 }
 ```
+
+`NodeType` is exported from `@noriginmedia/norigin-spatial-navigation-core` and defaults to **`HTMLElement`** on the web. On React Native TV, types are augmented so `node` matches the native host ref. See [SpatialNavigation](../api-reference/SpatialNavigation.md#node-type-and-node-type-overrides) and [React Native TV](./react-native-tv.md).
 
 ### `FocusDetails`
 

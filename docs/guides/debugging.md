@@ -138,7 +138,10 @@ useEffect(() => {
 **Solution:** Use the bundled viewport-relative adapter:
 
 ```typescript
-import { init, GetBoundingClientRectAdapter } from '@noriginmedia/norigin-spatial-navigation-core';
+import {
+  init,
+  GetBoundingClientRectAdapter
+} from '@noriginmedia/norigin-spatial-navigation-core';
 
 init({ layoutAdapter: GetBoundingClientRectAdapter });
 ```

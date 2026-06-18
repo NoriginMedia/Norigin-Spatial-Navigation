@@ -64,7 +64,10 @@ By default the library reads `element.offsetLeft`, `element.offsetTop`, `element
 Pass the bundled **`GetBoundingClientRectAdapter`** class to `init` (see [Layout adapter](../api-reference/SpatialNavigation.md#layout-adapter) in the API reference):
 
 ```typescript
-import { init, GetBoundingClientRectAdapter } from '@noriginmedia/norigin-spatial-navigation-core';
+import {
+  init,
+  GetBoundingClientRectAdapter
+} from '@noriginmedia/norigin-spatial-navigation-core';
 
 init({ layoutAdapter: GetBoundingClientRectAdapter });
 ```

@@ -29,6 +29,12 @@ const DIRECTION_UP = 'up';
 const DIRECTION_DOWN = 'down';
 const KEY_ENTER = 'enter';
 
+// Use this interface to allow node type to be overridden by the adapter
+export interface NodeTypeOverrides {}
+export type NodeType = NodeTypeOverrides extends { node: infer N }
+  ? N
+  : HTMLElement;
+
 export type Direction = 'up' | 'down' | 'left' | 'right';
 
 type DistanceCalculationMethod = 'center' | 'edges' | 'corners';
@@ -103,12 +109,12 @@ export interface FocusableComponentLayout {
   height: number;
   x: number;
   y: number;
-  node: HTMLElement;
+  node: NodeType;
 }
 
 export interface FocusableComponent {
   focusKey: string;
-  node: HTMLElement;
+  node: NodeType;
   parentFocusKey: string;
   onEnterPress: (details?: KeyPressDetails) => void;
   onEnterRelease: () => void;
@@ -133,7 +139,7 @@ export interface FocusableComponent {
 }
 
 interface FocusableComponentUpdatePayload {
-  node: HTMLElement;
+  node: NodeType;
   preferredChildFocusKey?: string;
   focusable: boolean;
   isFocusBoundary: boolean;
@@ -218,11 +224,6 @@ const normalizeKeyMap = (keyMap: BackwardsCompatibleKeyMap) => {
 export type SpatialNavigationServiceOptions = {
   debug: boolean;
   visualDebug: boolean;
-  /**
-   * @deprecated
-   * Native mode will be removed in the next version
-   */
-  nativeMode: boolean;
   throttle: number;
   throttleKeypresses: boolean;
   /**
@@ -250,7 +251,6 @@ const DEFAULT_SPATIAL_NAVIGATION_SERVICE_OPTIONS: SpatialNavigationServiceOption
   {
     debug: false,
     visualDebug: false,
-    nativeMode: false,
     throttle: 0,
     throttleKeypresses: false,
     useGetBoundingClientRect: false,
@@ -289,13 +289,6 @@ export class SpatialNavigationService {
   private domNodeFocusOptions: FocusOptions;
 
   private enabled: boolean;
-
-  /**
-   * Used in the React Native environment
-   * In this mode, the library works as a "read-only" helper to sync focused
-   * states for the components when they are focused by the native focus engine
-   */
-  private nativeMode: boolean;
 
   /**
    * Throttling delay for key presses in milliseconds
@@ -713,7 +706,6 @@ export class SpatialNavigationService {
 
     this.domNodeFocusOptions = {};
     this.enabled = false;
-    this.nativeMode = false;
     this.throttle = 0;
     this.throttleKeypresses = false;
     this.shouldFocusDOMNode = false;
@@ -768,7 +760,6 @@ export class SpatialNavigationService {
   init({
     debug,
     visualDebug,
-    nativeMode,
     throttle: throttleParam,
     throttleKeypresses,
     useGetBoundingClientRect,
@@ -786,8 +777,6 @@ export class SpatialNavigationService {
       this.domNodeFocusOptions =
         domNodeFocusOptions ??
         DEFAULT_SPATIAL_NAVIGATION_SERVICE_OPTIONS.domNodeFocusOptions;
-      this.nativeMode =
-        nativeMode ?? DEFAULT_SPATIAL_NAVIGATION_SERVICE_OPTIONS.nativeMode;
       this.throttleKeypresses =
         throttleKeypresses ??
         DEFAULT_SPATIAL_NAVIGATION_SERVICE_OPTIONS.throttleKeypresses;
@@ -815,7 +804,7 @@ export class SpatialNavigationService {
         }
       }
 
-      this.shouldFocusDOMNode = shouldFocusDOMNode && !nativeMode;
+      this.shouldFocusDOMNode = shouldFocusDOMNode;
       this.shouldUseNativeEvents =
         shouldUseNativeEvents ??
         DEFAULT_SPATIAL_NAVIGATION_SERVICE_OPTIONS.shouldUseNativeEvents;
@@ -830,34 +819,29 @@ export class SpatialNavigationService {
 
       this.debug = debug ?? DEFAULT_SPATIAL_NAVIGATION_SERVICE_OPTIONS.debug;
 
-      if (!this.nativeMode) {
-        this.throttle =
-          throttleParam ?? DEFAULT_SPATIAL_NAVIGATION_SERVICE_OPTIONS.throttle;
+      this.throttle =
+        throttleParam ?? DEFAULT_SPATIAL_NAVIGATION_SERVICE_OPTIONS.throttle;
 
-        this.bindEventHandlers();
-        if (visualDebug) {
-          this.visualDebugger = new VisualDebugger(this.writingDirection);
-          const draw = () => {
-            requestAnimationFrame(() => {
-              this.visualDebugger.clearLayouts();
-              forOwn(this.focusableComponents, (component, focusKey) => {
-                this.visualDebugger.drawLayout(
-                  component.layout,
-                  focusKey,
-                  component.parentFocusKey
-                );
-              });
-              draw();
+      this.bindEventHandlers();
+      if (visualDebug) {
+        this.visualDebugger = new VisualDebugger(this.writingDirection);
+        const draw = () => {
+          requestAnimationFrame(() => {
+            this.visualDebugger.clearLayouts();
+            forOwn(this.focusableComponents, (component, focusKey) => {
+              this.visualDebugger.drawLayout(
+                component.layout,
+                focusKey,
+                component.parentFocusKey
+              );
             });
-          };
+            draw();
+          });
+        };
 
-          draw();
-        }
-      } else {
-        console.warn(
-          'nativeMode option is deprecated and will be removed in the next version.'
-        );
+        draw();
       }
+
       this.enabled = true;
     }
   }
@@ -869,19 +853,16 @@ export class SpatialNavigationService {
   } = {}) {
     this.throttleKeypresses = throttleKeypresses;
 
-    if (!this.nativeMode) {
-      this.unbindEventHandlers();
-      if (Number.isInteger(throttleParam)) {
-        this.throttle = throttleParam;
-      }
-      this.bindEventHandlers();
+    this.unbindEventHandlers();
+    if (Number.isInteger(throttleParam)) {
+      this.throttle = throttleParam;
     }
+    this.bindEventHandlers();
   }
 
   destroy() {
     if (this.enabled) {
       this.enabled = false;
-      this.nativeMode = false;
       this.throttle = 0;
       this.throttleKeypresses = false;
       this.focusKey = null;
@@ -1080,7 +1061,7 @@ export class SpatialNavigationService {
     direction: string,
     focusDetails: FocusDetails = {}
   ) {
-    if (this.paused === true || !this.enabled || this.nativeMode) {
+    if (this.paused === true || !this.enabled) {
       return;
     }
 
@@ -1112,10 +1093,6 @@ export class SpatialNavigationService {
     fromParentFocusKey: string,
     focusDetails: FocusDetails
   ) {
-    if (this.nativeMode) {
-      return;
-    }
-
     const isVerticalDirection =
       direction === DIRECTION_DOWN || direction === DIRECTION_UP;
     const isIncrementalDirection =
@@ -1358,7 +1335,7 @@ export class SpatialNavigationService {
     /**
      * Security check, if component doesn't exist, stay on the same focusKey
      */
-    if (!targetComponent || this.nativeMode) {
+    if (!targetComponent) {
       return targetFocusKey;
     }
 
@@ -1509,10 +1486,6 @@ export class SpatialNavigationService {
       );
     }
 
-    if (this.nativeMode) {
-      return;
-    }
-
     this.updateLayout(focusKey);
 
     this.log(
@@ -1571,10 +1544,6 @@ export class SpatialNavigationService {
        */
       if (parentComponent && parentComponent.lastFocusedChildKey === focusKey) {
         parentComponent.lastFocusedChildKey = null;
-      }
-
-      if (this.nativeMode) {
-        return;
       }
 
       /**
@@ -1900,7 +1869,7 @@ export class SpatialNavigationService {
   async updateLayout(focusKey: string) {
     const component = this.focusableComponents[focusKey];
 
-    if (!component || this.nativeMode) {
+    if (!component) {
       return;
     }
 
@@ -1924,10 +1893,6 @@ export class SpatialNavigationService {
       accessibilityLabel
     }: FocusableComponentUpdatePayload
   ) {
-    if (this.nativeMode) {
-      return;
-    }
-
     const component = this.focusableComponents[focusKey];
 
     if (component) {
@@ -1948,14 +1913,6 @@ export class SpatialNavigationService {
         component.node = node;
       }
     }
-  }
-
-  /**
-   * @deprecated
-   * Native mode will be removed in the next version
-   */
-  isNativeMode() {
-    return this.nativeMode;
   }
 
   doesFocusableExist(focusKey: string) {
