@@ -714,7 +714,8 @@ export class SpatialNavigationService {
 
     this.pause = this.pause.bind(this);
     this.resume = this.resume.bind(this);
-    this.setFocus = this.setFocus.bind(this);
+    this.setImmediateFocus = this.setFocus.bind(this);
+    this.setFocus = this.scheduler.bind(this.setFocus, this);
     this.updateAllLayouts = this.scheduler.bind(this.updateAllLayouts, this);
     this.navigateByDirection = this.scheduler.bind(
       this.navigateByDirection,
@@ -1104,7 +1105,7 @@ export class SpatialNavigationService {
       const forcedKey = this.getForcedFocusKey();
 
       if (forcedKey) {
-        this.setFocus(forcedKey);
+        this.setImmediateFocus(forcedKey);
       } else {
         this.log(
           'smartNavigate',
@@ -1261,7 +1262,7 @@ export class SpatialNavigationService {
       );
 
       if (nextComponent) {
-        this.setFocus(nextComponent.focusKey, focusDetails);
+        this.setImmediateFocus(nextComponent.focusKey, focusDetails);
       } else {
         const parentComponent = this.focusableComponents[parentFocusKey];
 
@@ -1522,7 +1523,7 @@ export class SpatialNavigationService {
      * be opted out of.
      */
     if (this.focusOnPresetKey && focusKey === this.focusKey) {
-      this.setFocus(preferredChildFocusKey || focusKey);
+      this.setImmediateFocus(preferredChildFocusKey || focusKey);
     }
 
     /**
@@ -1833,6 +1834,12 @@ export class SpatialNavigationService {
       this.onUtterText(labels.join(', '));
     }
   }
+
+  // setImmediateFocus has the same signature as setFocus
+  private setImmediateFocus: (
+    focusKey: string,
+    focusDetails?: FocusDetails
+  ) => void;
 
   async setFocus(focusKey: string, focusDetails: FocusDetails = {}) {
     // Cancel any pending auto-restore focus calls if we are setting focus manually
