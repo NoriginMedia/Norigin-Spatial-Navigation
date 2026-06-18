@@ -6,9 +6,9 @@ type Task = () => unknown | Promise<unknown>;
  * - Priority tasks are added to a separate queue and will be executed before any remaining regular tasks.
  */
 export default class Scheduler {
-  private currentTask: Task;
+  private currentTask?: Task;
 
-  private nextTask: Task;
+  private nextTask?: Task;
 
   private nextPriorityTasks: Array<Task> = [];
 
@@ -17,8 +17,8 @@ export default class Scheduler {
       await this.currentTask?.();
     } finally {
       if (this.nextPriorityTasks.length > 0) {
-        this.currentTask = () =>
-          Promise.all(this.nextPriorityTasks.map((task) => task()));
+        const nextTasks = this.nextPriorityTasks.map((task) => task());
+        this.currentTask = () => Promise.all(nextTasks);
         this.nextPriorityTasks = [];
         await this.tick();
       } else if (this.nextTask) {
