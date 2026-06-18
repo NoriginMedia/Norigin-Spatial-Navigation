@@ -30,6 +30,18 @@ npm install @noriginmedia/norigin-spatial-navigation-core
 
 This package exports the `SpatialNavigation` singleton and its types. You manage component registration yourself by calling `addFocusable` and `removeFocusable` directly.
 
+## Svelte 5 Package
+
+For Svelte 5 applications, install the component-based package:
+
+```bash
+npm install @noriginmedia/norigin-spatial-navigation-core @noriginmedia/norigin-spatial-navigation-svelte
+```
+
+**Peer dependency:** Svelte >= 5.0.0
+
+This package exports `SpatialRoot`, `SpatialNode`, `Focusable`, and all type definitions you need.
+
 ## Legacy Combined Package
 
 If you are upgrading from an older version of the library:

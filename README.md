@@ -49,6 +49,26 @@ For more detailed documentation and usage examples, visit our [Developer Portal]
 
 [Example Source](https://github.com/NoriginMedia/Norigin-Spatial-Navigation/blob/master/apps/react-demo/src/App.tsx)
 
+## Packages
+
+| Package                                                                | Description                          |
+| ---------------------------------------------------------------------- | ------------------------------------ |
+| [`@noriginmedia/norigin-spatial-navigation-core`](./packages/core)     | Framework-agnostic navigation engine |
+| [`@noriginmedia/norigin-spatial-navigation-react`](./packages/react)   | React hooks binding                  |
+| [`@noriginmedia/norigin-spatial-navigation-svelte`](./packages/svelte) | Svelte 5 components binding          |
+
+### React
+
+```bash
+npm install @noriginmedia/norigin-spatial-navigation-core @noriginmedia/norigin-spatial-navigation-react
+```
+
+### Svelte 5
+
+```bash
+npm install @noriginmedia/norigin-spatial-navigation-core @noriginmedia/norigin-spatial-navigation-svelte
+```
+
 ## Links
 
 1. Use & benefits of using the Norigin Spatial Navigation library on Smart TVs [here](https://medium.com/p/77ed944d7be7).
