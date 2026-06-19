@@ -1,6 +1,6 @@
 ---
 '@noriginmedia/norigin-spatial-navigation-core': minor
-'@noriginmedia/norigin-spatial-navigation-react-native': minor
+'@noriginmedia/norigin-spatial-navigation-react-native-tvos': major
 ---
 
 - Add NodeTypeOverrides interface to allow node type to be overridden by the adapter

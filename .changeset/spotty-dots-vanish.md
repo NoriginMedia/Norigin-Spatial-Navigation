@@ -1,5 +1,5 @@
 ---
-'@noriginmedia/norigin-spatial-navigation-core': minor
+'@noriginmedia/norigin-spatial-navigation-core': major
 ---
 
 - Measure layout methods are now async
