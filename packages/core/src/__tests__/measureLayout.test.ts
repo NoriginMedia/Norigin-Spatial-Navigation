@@ -1,4 +1,4 @@
-import measureLayout, { getBoundingClientRect } from '../measureLayout';
+import { measureLayout, getBoundingClientRect } from '../measureLayout';
 
 const node = {
   offsetLeft: 400,

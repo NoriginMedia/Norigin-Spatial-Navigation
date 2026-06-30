@@ -8,13 +8,15 @@ In addition to automatic directional navigation, you can move focus manually fro
 
 ## Methods Available
 
-| Method                           | Source                   | Description                                         |
-| -------------------------------- | ------------------------ | --------------------------------------------------- |
-| `setFocus(focusKey)`             | Named export / singleton | Move focus to any component by focus key            |
-| `focusSelf()`                    | `useFocusable` result    | Focus the current component without knowing its key |
-| `navigateByDirection(direction)` | Named export / singleton | Simulate an arrow key press                         |
-| `getCurrentFocusKey()`           | Named export / singleton | Get the currently focused component's key           |
-| `doesFocusableExist(focusKey)`   | Named export / singleton | Check if a component is mounted before focusing it  |
+| Method                           | Source                   | Description                                                    |
+| -------------------------------- | ------------------------ | -------------------------------------------------------------- |
+| `setFocus(focusKey)`             | Named export / singleton | Move focus by key. Returns **`Promise<void>`** (async layout). |
+| `focusSelf()`                    | `useFocusable` result    | Focus this component.                                          |
+| `navigateByDirection(direction)` | Named export / singleton | Simulate an arrow key. Returns **`Promise<void>`**.            |
+| `getCurrentFocusKey()`           | Named export / singleton | Get the currently focused component's key                      |
+| `doesFocusableExist(focusKey)`   | Named export / singleton | Check if a component is mounted before focusing it             |
+
+Core **`setFocus`** and **`navigateByDirection`** are asynchronous because the engine may await layout from your `layoutAdapter`. Use **`await`** when something must run after focus or navigation completes. In `useEffect` or other fire-and-forget call sites, **`void setFocus(...)`** is a common way to satisfy linters that flag floating promises.
 
 ---
 
@@ -23,16 +25,17 @@ In addition to automatic directional navigation, you can move focus manually fro
 The most direct way to move focus. You must know the target's focus key.
 
 ```typescript
+setFocus(focusKey: string, focusDetails?: FocusDetails): Promise<void>
+```
+
+```typescript
 import {
   setFocus,
   ROOT_FOCUS_KEY
 } from '@noriginmedia/norigin-spatial-navigation-core';
 
-// Move focus to a specific component
-setFocus('PLAY_BUTTON');
-
-// Boot navigation at app start (routes to first eligible child)
-setFocus(ROOT_FOCUS_KEY);
+await setFocus('PLAY_BUTTON');
+await setFocus(ROOT_FOCUS_KEY);
 ```
 
 ### Setting Initial Focus on Mount
@@ -135,10 +138,16 @@ function Menu() {
 Simulate a directional arrow key press from the current focus position. Useful for gamepad buttons, virtual remote controls, or custom navigation triggers.
 
 ```typescript
+navigateByDirection(
+  direction: 'up' | 'down' | 'left' | 'right',
+  focusDetails?: FocusDetails
+): Promise<void>
+```
+
+```typescript
 import { navigateByDirection } from '@noriginmedia/norigin-spatial-navigation-core';
 
-// Simulate pressing right arrow
-navigateByDirection('right');
+await navigateByDirection('right');
 
 // Can also be used in response to gamepad input
 window.addEventListener('gamepadconnected', () => {
