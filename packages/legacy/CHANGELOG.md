@@ -1,5 +1,15 @@
 # @noriginmedia/norigin-spatial-navigation
 
+## 3.2.1
+
+### Patch Changes
+
+- Updated dependencies [54353b0]
+- Updated dependencies [54353b0]
+- Updated dependencies [54353b0]
+  - @noriginmedia/norigin-spatial-navigation-core@4.0.0
+  - @noriginmedia/norigin-spatial-navigation-react@3.2.1
+
 ## 3.2.0
 
 ### Minor Changes

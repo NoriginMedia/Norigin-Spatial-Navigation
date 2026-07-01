@@ -1,5 +1,29 @@
 # @noriginmedia/norigin-spatial-navigation-core
 
+## 4.0.0
+
+### Major Changes
+
+- 54353b0: - Measure layout methods are now async
+  - Deprecated `useGetBoundingClientRect` option in `init` method. Prefer `init({ layoutAdapter: GetBoundingClientRectAdapter })` or keep the flag until you migrate
+  - Added `Scheduler` class to manage asynchronous tasks in a strict sequence
+  - Export `BaseWebAdapter` and `GetBoundingClientRectAdapter` from `@noriginmedia/norigin-spatial-navigation-core`
+
+### Minor Changes
+
+- 54353b0: - Add NodeTypeOverrides interface to allow node type to be overridden by the adapter
+
+  - Added `ReactNativeLayoutAdapter` for React Native TV support
+
+  **BREAKING CHANGES**
+
+  - Removed `nativeMode` option from `SpatialNavigationServiceOptions`
+  - Removed `isNativeMode` method from `SpatialNavigationService`
+
+### Patch Changes
+
+- 54353b0: - Add `nextFocusResolver` to override default behavior
+
 ## 3.2.0
 
 ### Minor Changes
