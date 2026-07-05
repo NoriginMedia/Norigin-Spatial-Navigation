@@ -32,11 +32,6 @@
     autoRestoreFocus?: boolean;
     /** Force focus to this container if nothing else is focused */
     forceFocus?: boolean;
-    /**
-     * Automatically focus this node after it registers with the navigation system.
-     * Use for modals, dynamic views, or any component that should grab focus on mount.
-     */
-    autoFocus?: boolean;
     /** Prevent navigation from leaving this container */
     isFocusBoundary?: boolean;
     /** Directions in which navigation is blocked (when isFocusBoundary) */
@@ -83,7 +78,6 @@
     trackChildren = false,
     autoRestoreFocus = true,
     forceFocus = false,
-    autoFocus = false,
     isFocusBoundary = false,
     focusBoundaryDirections,
     preferredChildFocusKey,
@@ -215,13 +209,6 @@
         focusable,
         accessibilityLabel
       });
-
-      // Auto-focus this node after registration if requested
-      if (autoFocus) {
-        setTimeout(() => {
-          SpatialNavigation.setFocus(key);
-        }, 0);
-      }
     });
 
     return () => {

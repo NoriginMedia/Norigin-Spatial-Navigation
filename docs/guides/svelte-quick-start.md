@@ -26,9 +26,7 @@ The `initialFocusKey` prop tells the library which node to focus on startup.
 
 ## Step 2: Create Focusable Components
 
-Use `<SpatialNode>` for full control, or `<Focusable>` for simple leaf nodes.
-
-### Using `<SpatialNode>` (advanced — full control)
+Use `<SpatialNode>` to register any focusable node in the tree.
 
 ```svelte
 <!-- Menu.svelte -->
@@ -54,23 +52,21 @@ Key points:
 - Destructure `focused`, `hasFocusedChild`, `active`, `focusSelf` from the snippet state
 - Parent context is **automatic** — children inherit the parent key without any Provider
 
-### Using `<Focusable>` (simple — element rendered for you)
+For a leaf node, apply `use:spatial` directly to the element you render:
 
 ```svelte
 <!-- MenuItem.svelte -->
 <script>
-  import { Focusable } from '@noriginmedia/norigin-spatial-navigation-svelte';
+  import { SpatialNode } from '@noriginmedia/norigin-spatial-navigation-svelte';
   let { label } = $props();
 </script>
 
-<Focusable class="menu-item">
-  {#snippet content({ focused })}
-    <span class:focused>{label}</span>
+<SpatialNode>
+  {#snippet children({ focused, spatial })}
+    <div use:spatial class="menu-item" class:focused>{label}</div>
   {/snippet}
-</Focusable>
+</SpatialNode>
 ```
-
-`<Focusable>` renders a `<div>` (configurable via `as` prop) and handles the `use:spatial` action internally. Use it for leaf nodes that just need focus state.
 
 ## Step 3: Style Focused State
 
@@ -125,14 +121,6 @@ The library automatically sets `data-focused="true"` on the element when focused
   }
 </script>
 ```
-
-## Two-Tier API Summary
-
-| Use Case                           | Component       | When to Use                                             |
-| ---------------------------------- | --------------- | ------------------------------------------------------- |
-| Leaf nodes (buttons, cards, items) | `<Focusable>`   | Simple — just need focused state                        |
-| Containers (menus, rows, sections) | `<SpatialNode>` | Need `trackChildren`, `hasFocusedChild`, custom element |
-| Full control (complex layouts)     | `<SpatialNode>` | Need multiple elements, custom DOM structure            |
 
 ## Next Steps
 

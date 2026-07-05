@@ -38,5 +38,4 @@ npm install @noriginmedia/norigin-spatial-navigation-core @noriginmedia/norigin-
 
 - **`<SpatialRoot>`** — Initializes the navigation system. Wrap your app in this.
 - **`<SpatialNode>`** — Renderless component for focusable nodes. Exposes a `spatial` action.
-- **`<Focusable>`** — Convenience component that renders an element with spatial navigation built-in.
 - **Imperative API** — `setFocus`, `navigateByDirection`, `pause`, `resume`, etc.

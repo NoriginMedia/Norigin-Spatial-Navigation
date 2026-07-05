@@ -54,7 +54,6 @@ A renderless component that registers a focusable node in the navigation tree. P
 | `trackChildren`           | `boolean`                          | `false`        | Track child focus state               |
 | `autoRestoreFocus`        | `boolean`                          | `true`         | Restore focus on unmount              |
 | `forceFocus`              | `boolean`                          | `false`        | Force focus when nothing focused      |
-| `autoFocus`               | `boolean`                          | `false`        | Focus this node after registration    |
 | `isFocusBoundary`         | `boolean`                          | `false`        | Block navigation exit                 |
 | `focusBoundaryDirections` | `Direction[]`                      | `undefined`    | Specific blocked directions           |
 | `preferredChildFocusKey`  | `string`                           | `undefined`    | Preferred child to focus              |
@@ -95,45 +94,6 @@ A renderless component that registers a focusable node in the navigation tree. P
     </nav>
   {/snippet}
 </SpatialNode>
-```
-
----
-
-## `<Focusable>`
-
-A convenience component for simple focusable elements. Renders a DOM element (default `<div>`) with the spatial action applied internally. Use for leaf nodes.
-
-### Props
-
-Accepts all `<SpatialNode>` props plus:
-
-| Prop      | Type     | Default | Description                      |
-| --------- | -------- | ------- | -------------------------------- |
-| `as`      | `string` | `'div'` | HTML element tag to render       |
-| `class`   | `string` | —       | CSS class (passed through)       |
-| `style`   | `string` | —       | Inline style (passed through)    |
-| `...rest` | any      | —       | All HTML attributes pass through |
-
-### Snippet State (`FocusableState`)
-
-| Field             | Type                 | Description                       |
-| ----------------- | -------------------- | --------------------------------- |
-| `focused`         | `boolean`            | Whether this node is focused      |
-| `hasFocusedChild` | `boolean`            | Whether any descendant is focused |
-| `active`          | `boolean`            | `focused \|\| hasFocusedChild`    |
-| `navKey`          | `string`             | Resolved navigation key           |
-| `focusSelf`       | `(details?) => void` | Imperatively focus this node      |
-
-Note: Uses `content` snippet name (not `children`) to avoid internal naming conflicts.
-
-### Example
-
-```svelte
-<Focusable navKey="play-btn" as="button" class="btn" onEnterPress={handlePlay}>
-  {#snippet content({ focused })}
-    <span class:focused>Play</span>
-  {/snippet}
-</Focusable>
 ```
 
 ---

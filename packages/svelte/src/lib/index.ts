@@ -1,12 +1,10 @@
 // ─── Components ──────────────────────────────────────────────
 export { default as SpatialRoot } from './SpatialRoot.svelte';
 export { default as SpatialNode } from './SpatialNode.svelte';
-export { default as Focusable } from './Focusable.svelte';
 
 // ─── Types ───────────────────────────────────────────────────
 export type {
   SpatialNodeState,
-  FocusableState,
   EnterPressHandler,
   EnterReleaseHandler,
   ArrowPressHandler,

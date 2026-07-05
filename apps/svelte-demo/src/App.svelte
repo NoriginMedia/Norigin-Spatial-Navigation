@@ -5,7 +5,6 @@
   import {
     SpatialRoot,
     SpatialNode,
-    Focusable,
     setFocus,
     type FocusableComponentLayout,
     type FocusDetails,

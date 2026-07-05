@@ -29,23 +29,6 @@ export type SpatialNodeState = {
 };
 
 /**
- * State exposed to snippet children of Focusable (simple convenience API).
- * No `spatial` action — the element is managed internally.
- */
-export type FocusableState = {
-  /** Whether this node currently has spatial focus */
-  focused: boolean;
-  /** Whether any descendant of this node has spatial focus */
-  hasFocusedChild: boolean;
-  /** focused OR hasFocusedChild — convenience shorthand */
-  active: boolean;
-  /** The resolved navigation key for this node */
-  navKey: string;
-  /** Imperatively move spatial focus to this node */
-  focusSelf: (details?: FocusDetails) => void;
-};
-
-/**
  * Callback type for Enter key press
  */
 export type EnterPressHandler<P = object> = (
