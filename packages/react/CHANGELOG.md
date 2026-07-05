@@ -1,5 +1,26 @@
 # @noriginmedia/norigin-spatial-navigation-react
 
+## 3.2.1
+
+### Patch Changes
+
+- 54353b0: - Add `nextFocusResolver` to override default behavior
+- Updated dependencies [54353b0]
+- Updated dependencies [54353b0]
+- Updated dependencies [54353b0]
+  - @noriginmedia/norigin-spatial-navigation-core@4.0.0
+
+## 3.2.0
+
+### Minor Changes
+
+- a18ed66: Add `focusOnPresetKey` init option (default `true`) to control whether a component is automatically focused when it is added and its focus key was already set as the current focus key (e.g. `setFocus` was called before the component mounted). Set it to `false` to disable this implicit refocus on add.
+
+### Patch Changes
+
+- Updated dependencies [a18ed66]
+  - @noriginmedia/norigin-spatial-navigation-core@3.2.0
+
 ## 3.1.0
 
 ### Minor Changes

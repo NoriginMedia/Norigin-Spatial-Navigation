@@ -21,7 +21,7 @@ const getRect = (node: HTMLElement) => {
   };
 };
 
-const measureLayout = (node: HTMLElement) => {
+export const measureLayout = (node: HTMLElement) => {
   const relativeNode = node && node.parentElement;
 
   if (node && relativeNode) {
@@ -57,8 +57,6 @@ const measureLayout = (node: HTMLElement) => {
     bottom: 0
   };
 };
-
-export default measureLayout;
 
 export const getBoundingClientRect = (node: HTMLElement) => {
   if (node && node.getBoundingClientRect) {

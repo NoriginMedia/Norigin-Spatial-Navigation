@@ -4,6 +4,8 @@
     "project": "./tsconfig.json"
   },
   "rules": {
-    "no-nested-ternary": "off"
+    "no-nested-ternary": "off",
+    "no-underscore-dangle": "off",
+    "class-methods-use-this": "off"
   }
 }

@@ -15,33 +15,23 @@ The missing piece between your app and the TV remote.
 - **Light and low-dependency**: Simple API, minimal footprint, no runtime surprises
   on constrained TV hardware.
 
-<a href="https://github.com/NoriginMedia/Norigin-Spatial-Navigation/blob/next/docs/guides/react-native-tv.md">
-<div align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://devportal.noriginmedia.com/img/RN-dark.png">
-    <source media="(prefers-color-scheme: light)" srcset="https://devportal.noriginmedia.com/img/RN-light.png">
-    <img alt="Norigin Spatial Navigation now supports React Native" src="https://devportal.noriginmedia.com/img/RN-light.png">
-  </picture>
-</div>
-</a>
-
 ## [Documentation](https://devportal.noriginmedia.com/docs/Norigin-Spatial-Navigation/)
 
 For more detailed documentation and usage examples, visit our [Developer Portal](https://devportal.noriginmedia.com/docs/Norigin-Spatial-Navigation/)
 
 ## Supported Devices
 
-| Platform                                          | Support                |
-| ------------------------------------------------- | ---------------------- |
-| Chrome, Firefox, Safari                           | ✅ Fully supported     |
-| Samsung Tizen                                     | ✅ Fully supported     |
-| LG webOS                                          | ✅ Fully supported     |
-| Hisense VIDAA                                     | ✅ Fully supported     |
-| Vizio OS                                          | ✅ Fully supported     |
-| Titan OS                                          | ✅ Fully supported     |
-| Chromium, Eikoh, and WebKit-based STBs            | ✅ Fully supported     |
-| Android TV · React Native via `react-native-tvos` | ⚠️ Partially supported |
-| Apple TV · React Native via `react-native-tvos`   | ⚠️ Partially supported |
+| Platform                                                                            | Support                                                                                                              |
+| ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Chrome, Firefox, Safari                                                             | ✅ Fully supported                                                                                                   |
+| Samsung Tizen                                                                       | ✅ Fully supported                                                                                                   |
+| LG webOS                                                                            | ✅ Fully supported                                                                                                   |
+| Hisense VIDAA                                                                       | ✅ Fully supported                                                                                                   |
+| Vizio OS                                                                            | ✅ Fully supported                                                                                                   |
+| Titan OS                                                                            | ✅ Fully supported                                                                                                   |
+| Chromium, Eikoh, and WebKit-based STBs                                              | ✅ Fully supported                                                                                                   |
+| Android TV · React Native (`@noriginmedia/norigin-spatial-navigation-react-native`) | ✅ Supported ([see docs](https://devportal.noriginmedia.com/docs/Norigin-Spatial-Navigation/guides/react-native-tv)) |
+| Apple TV · React Native (`@noriginmedia/norigin-spatial-navigation-react-native`)   | ✅ Supported ([see docs](https://devportal.noriginmedia.com/docs/Norigin-Spatial-Navigation/guides/react-native-tv)) |
 
 ## Demo
 
