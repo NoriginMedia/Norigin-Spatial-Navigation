@@ -42,5 +42,5 @@ export type {
   PressedKeys,
   KeyMap,
   BackwardsCompatibleKeyMap,
-  SpatialNavigationServiceInit
+  SpatialNavigationServiceOptions
 } from '@noriginmedia/norigin-spatial-navigation-core';

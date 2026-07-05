@@ -3,7 +3,9 @@
   import type { Snippet } from 'svelte';
   import {
     SpatialNavigation,
-    ROOT_FOCUS_KEY
+    ROOT_FOCUS_KEY,
+    GetBoundingClientRectAdapter,
+    type LayoutAdapter
   } from '@noriginmedia/norigin-spatial-navigation-core';
   import {
     setSpatialRootContext,
@@ -29,7 +31,20 @@
     throttle?: number;
     /** Keep throttling between keypresses */
     throttleKeypresses?: boolean;
-    /** Use getBoundingClientRect for layout measurement */
+    /**
+     * Layout measurement adapter. Pass a class (constructor) or a partial
+     * LayoutAdapter implementation. Defaults to the core web adapter.
+     * Use `GetBoundingClientRectAdapter` (re-exported) for getBoundingClientRect
+     * based measurement.
+     */
+    layoutAdapter?:
+      | (new (...args: any[]) => LayoutAdapter)
+      | Partial<LayoutAdapter>;
+    /**
+     * @deprecated Use `layoutAdapter={GetBoundingClientRectAdapter}` instead.
+     * When true (and no `layoutAdapter` is provided), the
+     * `GetBoundingClientRectAdapter` is used for layout measurement.
+     */
     useGetBoundingClientRect?: boolean;
     /** Focus the DOM node when spatial focus changes */
     shouldFocusDOMNode?: boolean;
@@ -50,6 +65,12 @@
     ) => number;
     /** Accessibility callback — invoked with concatenated labels on focus change */
     onUtterText?: (text: string) => void;
+    /**
+     * Control whether a component is automatically focused when it is added
+     * and its focus key was already set as the current focus key
+     * (e.g. `setFocus` was called before the component mounted). Default `true`.
+     */
+    focusOnPresetKey?: boolean;
   };
 
   let {
@@ -59,6 +80,7 @@
     visualDebug = false,
     throttle = 0,
     throttleKeypresses = false,
+    layoutAdapter,
     useGetBoundingClientRect = false,
     shouldFocusDOMNode = false,
     domNodeFocusOptions = {},
@@ -66,7 +88,8 @@
     rtl = false,
     distanceCalculationMethod = 'corners',
     customDistanceCalculationFunction,
-    onUtterText
+    onUtterText,
+    focusOnPresetKey = true
   }: Props = $props();
 
   // ─── Context Setup ─────────────────────────────────────────
@@ -80,19 +103,25 @@
   // ─── Lifecycle ─────────────────────────────────────────────
 
   onMount(() => {
+    // Prefer the new layoutAdapter API. Fall back to the deprecated
+    // useGetBoundingClientRect flag for backwards compatibility.
+    const resolvedLayoutAdapter =
+      layoutAdapter ?? (useGetBoundingClientRect ? GetBoundingClientRectAdapter : undefined);
+
     SpatialNavigation.init({
       debug,
       visualDebug,
       throttle,
       throttleKeypresses,
-      useGetBoundingClientRect,
+      layoutAdapter: resolvedLayoutAdapter,
       shouldFocusDOMNode,
       domNodeFocusOptions,
       shouldUseNativeEvents,
       rtl,
       distanceCalculationMethod,
       customDistanceCalculationFunction,
-      onUtterText
+      onUtterText,
+      focusOnPresetKey
     });
 
     rootContext.initialized = true;

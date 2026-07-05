@@ -4,12 +4,10 @@
 
 Initial release of Svelte 5 spatial navigation components.
 
-Adds `<SpatialRoot>`, `<SpatialNode>`, and `<Focusable>` components with full feature parity to the React binding. Key features:
+Adds `<SpatialRoot>` and `<SpatialNode>` components with full feature parity to the React binding. Key features:
 
-- Renderless `<SpatialNode>` with `use:spatial` action (no wrapper div)
+- Renderless `<SpatialNode>` with `use:spatial` action (no wrapper div), a 1:1 port of `useFocusable`
 - Automatic parent context (no manual Provider needed)
-- `<Focusable>` convenience component for simple leaf nodes
 - `initialFocusKey` prop on `<SpatialRoot>` for timing-safe initial focus
-- `autoFocus` prop on `<SpatialNode>` for dynamic content
 - Full TypeScript types
-- All core features: boundaries, callbacks, accessibility labels, RTL, throttle
+- All core features: boundaries, callbacks, `nextFocusResolver`, accessibility labels, RTL, throttle, `focusOnPresetKey`, and the `layoutAdapter` API

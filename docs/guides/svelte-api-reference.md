@@ -14,21 +14,23 @@ Initializes the spatial navigation system. Must wrap your entire app. Renders no
 
 ### Props
 
-| Prop                                | Type                               | Default     | Description                                                |
-| ----------------------------------- | ---------------------------------- | ----------- | ---------------------------------------------------------- |
-| `initialFocusKey`                   | `string`                           | `undefined` | Focus key to set initial focus on after all nodes register |
-| `debug`                             | `boolean`                          | `false`     | Enable console debug logging                               |
-| `visualDebug`                       | `boolean`                          | `false`     | Enable visual debug overlay                                |
-| `throttle`                          | `number`                           | `0`         | Throttle key events in ms                                  |
-| `throttleKeypresses`                | `boolean`                          | `false`     | Keep throttling between keypresses                         |
-| `useGetBoundingClientRect`          | `boolean`                          | `false`     | Use getBoundingClientRect for layout                       |
-| `shouldFocusDOMNode`                | `boolean`                          | `false`     | Call element.focus() on spatial focus                      |
-| `domNodeFocusOptions`               | `FocusOptions`                     | `{}`        | Options for element.focus()                                |
-| `shouldUseNativeEvents`             | `boolean`                          | `false`     | Don't preventDefault/stopPropagation                       |
-| `rtl`                               | `boolean`                          | `false`     | Right-to-left navigation                                   |
-| `distanceCalculationMethod`         | `'center' \| 'edges' \| 'corners'` | `'corners'` | Distance algorithm                                         |
-| `customDistanceCalculationFunction` | `Function`                         | `undefined` | Custom distance function                                   |
-| `onUtterText`                       | `(text: string) => void`           | `undefined` | Accessibility text callback                                |
+| Prop                                | Type                               | Default     | Description                                                         |
+| ----------------------------------- | ---------------------------------- | ----------- | ------------------------------------------------------------------- |
+| `initialFocusKey`                   | `string`                           | `undefined` | Focus key to set initial focus on after all nodes register          |
+| `debug`                             | `boolean`                          | `false`     | Enable console debug logging                                        |
+| `visualDebug`                       | `boolean`                          | `false`     | Enable visual debug overlay                                         |
+| `throttle`                          | `number`                           | `0`         | Throttle key events in ms                                           |
+| `throttleKeypresses`                | `boolean`                          | `false`     | Keep throttling between keypresses                                  |
+| `layoutAdapter`                     | `LayoutAdapter \| class`           | `undefined` | Layout measurement adapter (defaults to core web adapter)           |
+| `useGetBoundingClientRect`          | `boolean`                          | `false`     | **Deprecated** — use `layoutAdapter={GetBoundingClientRectAdapter}` |
+| `focusOnPresetKey`                  | `boolean`                          | `true`      | Auto-focus a node added with an already-current focus key           |
+| `shouldFocusDOMNode`                | `boolean`                          | `false`     | Call element.focus() on spatial focus                               |
+| `domNodeFocusOptions`               | `FocusOptions`                     | `{}`        | Options for element.focus()                                         |
+| `shouldUseNativeEvents`             | `boolean`                          | `false`     | Don't preventDefault/stopPropagation                                |
+| `rtl`                               | `boolean`                          | `false`     | Right-to-left navigation                                            |
+| `distanceCalculationMethod`         | `'center' \| 'edges' \| 'corners'` | `'corners'` | Distance algorithm                                                  |
+| `customDistanceCalculationFunction` | `Function`                         | `undefined` | Custom distance function                                            |
+| `onUtterText`                       | `(text: string) => void`           | `undefined` | Accessibility text callback                                         |
 
 ### Example
 
@@ -46,25 +48,26 @@ A renderless component that registers a focusable node in the navigation tree. P
 
 ### Props
 
-| Prop                      | Type                               | Default        | Description                           |
-| ------------------------- | ---------------------------------- | -------------- | ------------------------------------- |
-| `navKey`                  | `string`                           | auto-generated | Unique navigation key                 |
-| `focusable`               | `boolean`                          | `true`         | Can receive focus                     |
-| `saveLastFocusedChild`    | `boolean`                          | `true`         | Remember last focused child           |
-| `trackChildren`           | `boolean`                          | `false`        | Track child focus state               |
-| `autoRestoreFocus`        | `boolean`                          | `true`         | Restore focus on unmount              |
-| `forceFocus`              | `boolean`                          | `false`        | Force focus when nothing focused      |
-| `isFocusBoundary`         | `boolean`                          | `false`        | Block navigation exit                 |
-| `focusBoundaryDirections` | `Direction[]`                      | `undefined`    | Specific blocked directions           |
-| `preferredChildFocusKey`  | `string`                           | `undefined`    | Preferred child to focus              |
-| `extraProps`              | `object`                           | `{}`           | Extra props passed to callbacks       |
-| `accessibilityLabel`      | `string`                           | `undefined`    | A11y label for utterance              |
-| `onEnterPress`            | `(props, details) => void`         | —              | Enter key handler                     |
-| `onEnterRelease`          | `(props) => void`                  | —              | Enter release handler                 |
-| `onArrowPress`            | `(dir, props, details) => boolean` | —              | Arrow handler (return false to block) |
-| `onArrowRelease`          | `(dir, props) => void`             | —              | Arrow release handler                 |
-| `onFocus`                 | `(layout, props, details) => void` | —              | Focus gained handler                  |
-| `onBlur`                  | `(layout, props, details) => void` | —              | Focus lost handler                    |
+| Prop                      | Type                               | Default        | Description                            |
+| ------------------------- | ---------------------------------- | -------------- | -------------------------------------- |
+| `navKey`                  | `string`                           | auto-generated | Unique navigation key                  |
+| `focusable`               | `boolean`                          | `true`         | Can receive focus                      |
+| `saveLastFocusedChild`    | `boolean`                          | `true`         | Remember last focused child            |
+| `trackChildren`           | `boolean`                          | `false`        | Track child focus state                |
+| `autoRestoreFocus`        | `boolean`                          | `true`         | Restore focus on unmount               |
+| `forceFocus`              | `boolean`                          | `false`        | Force focus when nothing focused       |
+| `isFocusBoundary`         | `boolean`                          | `false`        | Block navigation exit                  |
+| `focusBoundaryDirections` | `Direction[]`                      | `undefined`    | Specific blocked directions            |
+| `preferredChildFocusKey`  | `string`                           | `undefined`    | Preferred child to focus               |
+| `nextFocusResolver`       | `NextFocusResolver`                | `undefined`    | Override default next-focus resolution |
+| `extraProps`              | `object`                           | `{}`           | Extra props passed to callbacks        |
+| `accessibilityLabel`      | `string`                           | `undefined`    | A11y label for utterance               |
+| `onEnterPress`            | `(props, details) => void`         | —              | Enter key handler                      |
+| `onEnterRelease`          | `(props) => void`                  | —              | Enter release handler                  |
+| `onArrowPress`            | `(dir, props, details) => boolean` | —              | Arrow handler (return false to block)  |
+| `onArrowRelease`          | `(dir, props) => void`             | —              | Arrow release handler                  |
+| `onFocus`                 | `(layout, props, details) => void` | —              | Focus gained handler                   |
+| `onBlur`                  | `(layout, props, details) => void` | —              | Focus lost handler                     |
 
 ### Bindable State
 

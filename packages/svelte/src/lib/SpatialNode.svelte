@@ -7,7 +7,8 @@
     type FocusableComponentLayout,
     type FocusDetails,
     type KeyPressDetails,
-    type Direction
+    type Direction,
+    type NextFocusResolver
   } from '@noriginmedia/norigin-spatial-navigation-core';
   import {
     getSpatialRootContext,
@@ -38,6 +39,8 @@
     focusBoundaryDirections?: Direction[];
     /** Preferred child to focus when entering this container */
     preferredChildFocusKey?: string;
+    /** Override the default next-focus resolution for this node */
+    nextFocusResolver?: NextFocusResolver;
     /** Extra props passed to callbacks */
     extraProps?: ExtraProps;
     /** Accessibility label for screen reader announcement */
@@ -81,6 +84,7 @@
     isFocusBoundary = false,
     focusBoundaryDirections,
     preferredChildFocusKey,
+    nextFocusResolver,
     extraProps = {} as ExtraProps,
     accessibilityLabel,
 
@@ -207,6 +211,7 @@
         autoRestoreFocus,
         forceFocus,
         focusable,
+        nextFocusResolver,
         accessibilityLabel
       });
     });
@@ -229,7 +234,7 @@
     // Read all prop dependencies so this effect reruns on prop changes
     const _deps = [
       preferredChildFocusKey, focusable, isFocusBoundary,
-      focusBoundaryDirections, accessibilityLabel,
+      focusBoundaryDirections, accessibilityLabel, nextFocusResolver,
       onEnterPress, onEnterRelease, onArrowPress, onArrowRelease,
       onFocus, onBlur, extraProps
     ];
@@ -240,6 +245,7 @@
       focusable,
       isFocusBoundary,
       focusBoundaryDirections,
+      nextFocusResolver,
       onEnterPress: (details?: KeyPressDetails) => {
         onEnterPress?.(extraProps, details!);
       },
