@@ -1,5 +1,11 @@
 # @noriginmedia/norigin-spatial-navigation-core
 
+## 4.1.0
+
+### Minor Changes
+
+- b816f56: Add `measureChildrenLayout` option to `useFocusable` (default `true`) to control whether a container's direct children are measured during navigation and `updateAllLayouts`. Set it to `false` on containers driven by their own `nextFocusResolver` to skip layout measurement that the resolver doesn't need.
+
 ## 4.0.0
 
 ### Major Changes
