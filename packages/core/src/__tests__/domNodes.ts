@@ -1,6 +1,16 @@
-import { SpatialNavigation, ROOT_FOCUS_KEY } from '../SpatialNavigation';
+import {
+  SpatialNavigation,
+  ROOT_FOCUS_KEY,
+  type NextFocusResolver
+} from '../SpatialNavigation';
 
-export const createRootNode = () => {
+export const createRootNode = ({
+  nextFocusResolver,
+  measureChildrenLayout
+}: {
+  nextFocusResolver?: NextFocusResolver;
+  measureChildrenLayout?: boolean;
+} = {}) => {
   SpatialNavigation.addFocusable({
     focusKey: ROOT_FOCUS_KEY,
     node: {
@@ -31,6 +41,8 @@ export const createRootNode = () => {
     forceFocus: true,
     autoRestoreFocus: true,
     saveLastFocusedChild: false,
+    nextFocusResolver,
+    measureChildrenLayout,
     onEnterPress: () => {},
     onEnterRelease: () => {},
     onFocus: () => {},
@@ -44,6 +56,136 @@ export const createRootNode = () => {
 
 export const createHorizontalLayout = () => {
   createRootNode();
+
+  SpatialNavigation.addFocusable({
+    focusKey: 'child-1',
+    node: {
+      offsetLeft: 100,
+      offsetTop: 100,
+      offsetWidth: 400,
+      offsetHeight: 200,
+      parentElement: {
+        offsetLeft: 0,
+        offsetTop: 0,
+        offsetWidth: 1920,
+        offsetHeight: 1280
+      } as HTMLElement,
+      offsetParent: {
+        offsetLeft: 0,
+        offsetTop: 0,
+        scrollLeft: 0,
+        scrollTop: 0,
+        offsetWidth: 1920,
+        offsetHeight: 1280,
+        nodeType: Node.ELEMENT_NODE
+      } as HTMLElement
+    } as unknown as HTMLElement,
+    isFocusBoundary: false,
+    parentFocusKey: ROOT_FOCUS_KEY,
+    focusable: true,
+    trackChildren: false,
+    forceFocus: false,
+    autoRestoreFocus: true,
+    saveLastFocusedChild: false,
+    onEnterPress: () => {},
+    onEnterRelease: () => {},
+    onFocus: () => {},
+    onBlur: () => {},
+    onArrowPress: () => true,
+    onArrowRelease: () => {},
+    onUpdateFocus: () => {},
+    onUpdateHasFocusedChild: () => {}
+  });
+
+  SpatialNavigation.addFocusable({
+    focusKey: 'child-2',
+    node: {
+      offsetLeft: 600,
+      offsetTop: 100,
+      offsetWidth: 400,
+      offsetHeight: 200,
+      parentElement: {
+        offsetLeft: 0,
+        offsetTop: 0,
+        offsetWidth: 1920,
+        offsetHeight: 1280
+      } as HTMLElement,
+      offsetParent: {
+        offsetLeft: 0,
+        offsetTop: 0,
+        scrollLeft: 0,
+        scrollTop: 0,
+        offsetWidth: 1920,
+        offsetHeight: 1280,
+        nodeType: Node.ELEMENT_NODE
+      } as HTMLElement
+    } as unknown as HTMLElement,
+    isFocusBoundary: false,
+    parentFocusKey: ROOT_FOCUS_KEY,
+    focusable: true,
+    trackChildren: false,
+    forceFocus: false,
+    autoRestoreFocus: true,
+    saveLastFocusedChild: false,
+    onEnterPress: () => {},
+    onEnterRelease: () => {},
+    onFocus: () => {},
+    onBlur: () => {},
+    onArrowPress: () => true,
+    onArrowRelease: () => {},
+    onUpdateFocus: () => {},
+    onUpdateHasFocusedChild: () => {}
+  });
+
+  SpatialNavigation.addFocusable({
+    focusKey: 'child-3',
+    node: {
+      offsetLeft: 1100,
+      offsetTop: 100,
+      offsetWidth: 400,
+      offsetHeight: 200,
+      parentElement: {
+        offsetLeft: 0,
+        offsetTop: 0,
+        offsetWidth: 1920,
+        offsetHeight: 1280
+      } as HTMLElement,
+      offsetParent: {
+        offsetLeft: 0,
+        offsetTop: 0,
+        scrollLeft: 0,
+        scrollTop: 0,
+        offsetWidth: 1920,
+        offsetHeight: 1280,
+        nodeType: Node.ELEMENT_NODE
+      } as HTMLElement
+    } as unknown as HTMLElement,
+    isFocusBoundary: false,
+    parentFocusKey: ROOT_FOCUS_KEY,
+    focusable: true,
+    trackChildren: false,
+    forceFocus: false,
+    autoRestoreFocus: true,
+    saveLastFocusedChild: false,
+    onEnterPress: () => {},
+    onEnterRelease: () => {},
+    onFocus: () => {},
+    onBlur: () => {},
+    onArrowPress: () => true,
+    onArrowRelease: () => {},
+    onUpdateFocus: () => {},
+    onUpdateHasFocusedChild: () => {}
+  });
+};
+
+export const createHorizontalLayoutWithResolver = ({
+  nextFocusResolver,
+  measureChildrenLayout
+}: {
+  nextFocusResolver: NextFocusResolver;
+  measureChildrenLayout?: boolean;
+}) => {
+  createRootNode({ nextFocusResolver, measureChildrenLayout });
 
   SpatialNavigation.addFocusable({
     focusKey: 'child-1',

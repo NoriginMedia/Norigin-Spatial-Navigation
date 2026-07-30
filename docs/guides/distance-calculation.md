@@ -156,3 +156,12 @@ init({
 ```
 
 This makes it easy to understand why a particular element wins or loses the distance calculation. See [Debugging](./debugging.md) for more.
+
+---
+
+## Overriding the Algorithm
+
+When distance-based scoring isn't the right fit for a container — for example, a carousel that
+should always move by exactly one item — a `nextFocusResolver` lets that container supply its own
+navigation logic entirely, bypassing this algorithm. See
+[Next Focus Resolver](./next-focus-resolver.md).
