@@ -119,6 +119,13 @@ export interface FocusableComponent {
   autoRestoreFocus: boolean;
   forceFocus: boolean;
   nextFocusResolver?: NextFocusResolver;
+  /**
+   * When false, direct children of this component are not measured during
+   * navigation (`smartNavigate`) or `updateAllLayouts`. Only meaningful
+   * alongside `nextFocusResolver`, since default coordinate-based navigation
+   * requires fresh child layouts. Defaults to true when undefined.
+   */
+  measureChildrenLayout?: boolean;
   lastFocusedChildKey?: string;
   layout?: FocusableComponentLayout;
   layoutUpdatedAt?: number;
@@ -139,6 +146,7 @@ interface FocusableComponentUpdatePayload {
   onBlur: (layout: FocusableComponentLayout, details: FocusDetails) => void;
   accessibilityLabel?: string;
   nextFocusResolver?: NextFocusResolver;
+  measureChildrenLayout?: boolean;
 }
 
 interface FocusableComponentRemovePayload {
@@ -1126,8 +1134,17 @@ export class SpatialNavigationService {
     );
 
     if (currentComponent) {
-      await this.updateLayout(currentComponent.focusKey);
-      const { parentFocusKey, focusKey, layout } = currentComponent;
+      const { parentFocusKey, focusKey } = currentComponent;
+
+      const parentComponent = this.focusableComponents[parentFocusKey];
+      const { nextFocusResolver, measureChildrenLayout = true } =
+        parentComponent ?? {};
+
+      if (measureChildrenLayout) {
+        await this.updateLayout(currentComponent.focusKey);
+      }
+
+      const { layout } = currentComponent;
 
       const currentCutoffCoordinate =
         SpatialNavigationService.getCutoffCoordinate(
@@ -1138,25 +1155,24 @@ export class SpatialNavigationService {
           this.writingDirection
         );
 
-      /**
-       * Get only the siblings with the coords on the way of our moving direction
-       */
-      const threshold = Date.now() - LAYOUT_STALE_TIME;
-      await Promise.all(
-        Object.values(this.focusableComponents)
-          .filter(
-            (component) =>
-              component.parentFocusKey === parentFocusKey &&
-              component.focusable &&
-              component.layoutUpdatedAt <= threshold
-          )
-          .map((component) => this.updateLayout(component.focusKey))
-      );
+      if (measureChildrenLayout) {
+        /**
+         * Get only the siblings with the coords on the way of our moving direction
+         */
+        const threshold = Date.now() - LAYOUT_STALE_TIME;
+        await Promise.all(
+          Object.values(this.focusableComponents)
+            .filter(
+              (component) =>
+                component.parentFocusKey === parentFocusKey &&
+                component.focusable &&
+                component.layoutUpdatedAt <= threshold
+            )
+            .map((component) => this.updateLayout(component.focusKey))
+        );
+      }
 
       let nextComponent: FocusableComponent | null = null;
-
-      const { nextFocusResolver } =
-        this.focusableComponents[parentFocusKey] ?? {};
 
       if (nextFocusResolver) {
         const siblings = filter(
@@ -1184,6 +1200,20 @@ export class SpatialNavigationService {
           );
         }
       } else {
+        if (this.debug && !measureChildrenLayout) {
+          const focusableSiblingCount = filter(
+            this.focusableComponents,
+            (component) =>
+              component.parentFocusKey === parentFocusKey && component.focusable
+          ).length;
+
+          if (focusableSiblingCount >= 2) {
+            console.warn(
+              `measureChildrenLayout is false but no nextFocusResolver is set for component with focusKey: ${parentFocusKey}. Default coordinate-based navigation requires fresh layout data and may behave incorrectly.`
+            );
+          }
+        }
+
         const siblings = filter(this.focusableComponents, (component) => {
           if (
             component.parentFocusKey === parentFocusKey &&
@@ -1458,7 +1488,8 @@ export class SpatialNavigationService {
     isFocusBoundary,
     focusBoundaryDirections,
     accessibilityLabel,
-    nextFocusResolver
+    nextFocusResolver,
+    measureChildrenLayout
   }: FocusableComponent) {
     this.focusableComponents[focusKey] = {
       focusKey,
@@ -1473,6 +1504,7 @@ export class SpatialNavigationService {
       onUpdateFocus,
       onUpdateHasFocusedChild,
       nextFocusResolver,
+      measureChildrenLayout,
       saveLastFocusedChild,
       trackChildren,
       preferredChildFocusKey,
@@ -1889,9 +1921,13 @@ export class SpatialNavigationService {
     }
 
     await Promise.all(
-      Object.keys(this.focusableComponents).map((focusKey) =>
-        this.updateLayout(focusKey)
-      )
+      Object.values(this.focusableComponents)
+        .filter(
+          (component) =>
+            this.focusableComponents[component.parentFocusKey]
+              ?.measureChildrenLayout !== false
+        )
+        .map((component) => this.updateLayout(component.focusKey))
     );
   }
 
@@ -1920,7 +1956,8 @@ export class SpatialNavigationService {
       onFocus,
       onBlur,
       accessibilityLabel,
-      nextFocusResolver
+      nextFocusResolver,
+      measureChildrenLayout
     }: FocusableComponentUpdatePayload
   ) {
     const component = this.focusableComponents[focusKey];
@@ -1937,6 +1974,7 @@ export class SpatialNavigationService {
       component.onBlur = onBlur;
       component.accessibilityLabel = accessibilityLabel;
       component.nextFocusResolver = nextFocusResolver;
+      component.measureChildrenLayout = measureChildrenLayout;
       // Reset layout updated at to force a layout update
       component.layoutUpdatedAt = 0;
 

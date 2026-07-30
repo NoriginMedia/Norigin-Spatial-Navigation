@@ -58,6 +58,13 @@ export interface UseFocusableConfig<P = object> {
   focusKey?: string;
   preferredChildFocusKey?: string;
   nextFocusResolver?: NextFocusResolver;
+  /**
+   * When false, direct children of this component are not measured during
+   * navigation or `updateAllLayouts`. Only meaningful together with
+   * `nextFocusResolver`, since default coordinate-based navigation requires
+   * fresh child layouts.
+   */
+  measureChildrenLayout?: boolean;
   onEnterPress?: EnterPressHandler<P>;
   onEnterRelease?: EnterReleaseHandler<P>;
   onArrowPress?: ArrowPressHandler<P>;
@@ -93,6 +100,7 @@ const useFocusableHook = <P, E = any>({
   focusKey: propFocusKey,
   preferredChildFocusKey,
   nextFocusResolver,
+  measureChildrenLayout = true,
   onEnterPress = noop,
   onEnterRelease = noop,
   onArrowPress = () => true,
@@ -171,6 +179,7 @@ const useFocusableHook = <P, E = any>({
       parentFocusKey,
       preferredChildFocusKey,
       nextFocusResolver,
+      measureChildrenLayout,
       onEnterPress: onEnterPressHandler,
       onEnterRelease: onEnterReleaseHandler,
       onArrowPress: onArrowPressHandler,
@@ -207,6 +216,7 @@ const useFocusableHook = <P, E = any>({
       isFocusBoundary,
       focusBoundaryDirections,
       nextFocusResolver,
+      measureChildrenLayout,
       onEnterPress: onEnterPressHandler,
       onEnterRelease: onEnterReleaseHandler,
       onArrowPress: onArrowPressHandler,
@@ -222,6 +232,7 @@ const useFocusableHook = <P, E = any>({
     isFocusBoundary,
     focusBoundaryDirections,
     nextFocusResolver,
+    measureChildrenLayout,
     onEnterPressHandler,
     onEnterReleaseHandler,
     onArrowPressHandler,
