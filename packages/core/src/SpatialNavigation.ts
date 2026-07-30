@@ -1136,9 +1136,9 @@ export class SpatialNavigationService {
     if (currentComponent) {
       const { parentFocusKey, focusKey } = currentComponent;
 
-      const parentComponent = this.focusableComponents[parentFocusKey];
+      const currentParentComponent = this.focusableComponents[parentFocusKey];
       const { nextFocusResolver, measureChildrenLayout = true } =
-        parentComponent ?? {};
+        currentParentComponent ?? {};
 
       if (measureChildrenLayout) {
         await this.updateLayout(currentComponent.focusKey);
