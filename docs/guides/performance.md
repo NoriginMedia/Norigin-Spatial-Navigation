@@ -1,5 +1,5 @@
 ---
-sidebar_position: 11
+sidebar_position: 12
 ---
 
 # Performance Tuning
@@ -81,6 +81,33 @@ Use viewport-relative layout when:
 - You need coordinates relative to the viewport rather than the document
 
 `getBoundingClientRect` is slightly slower because it triggers a layout reflow, but it accounts for CSS transforms that `offsetLeft/Top` ignores.
+
+### Skipping Layout Measurement
+
+Coordinate-based navigation needs a fresh position for every candidate on each keypress, which is
+the most expensive part of layout measurement — on React Native TV in particular, each measurement
+is a bridge round-trip. A container driven by its own [`nextFocusResolver`](./next-focus-resolver.md)
+already knows the next component without consulting coordinates, so that measurement is pure
+overhead.
+
+Set `measureChildrenLayout: false` on such a container to skip measuring its **direct children**
+in two places:
+
+- The per-keypress sibling measurement inside navigation.
+- The bulk `updateAllLayouts()` call.
+
+Children are still measured once on mount, and still measured on focus/blur (so `onFocus`/`onBlur`
+continue to receive accurate layout) — only the navigation-time re-measurement is skipped.
+
+```typescript
+const { ref, focusKey } = useFocusable({
+  nextFocusResolver: resolver,
+  measureChildrenLayout: false
+});
+```
+
+See [Next Focus Resolver](./next-focus-resolver.md#measurechildrenlayout) for the full contract,
+including the staleness caveat for resolvers that read `sibling.layout`.
 
 ### Async work ordering
 
