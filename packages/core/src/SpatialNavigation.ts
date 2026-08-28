@@ -1776,7 +1776,7 @@ export class SpatialNavigationService {
   ) {
     if (this.isParticipatingFocusableComponent(focusKey)) {
       this.getNodeLayoutByFocusKey(focusKey).then((layout) => {
-        this.focusableComponents[focusKey].onFocus(layout, focusDetails);
+        this.focusableComponents[focusKey]?.onFocus(layout, focusDetails);
       });
     }
   }
@@ -1787,7 +1787,7 @@ export class SpatialNavigationService {
   ) {
     if (this.isParticipatingFocusableComponent(focusKey)) {
       this.getNodeLayoutByFocusKey(focusKey).then((layout) => {
-        this.focusableComponents[focusKey].onBlur(layout, focusDetails);
+        this.focusableComponents[focusKey]?.onBlur(layout, focusDetails);
       });
     }
   }
