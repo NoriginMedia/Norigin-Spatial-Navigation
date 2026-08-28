@@ -1,5 +1,11 @@
 # @noriginmedia/norigin-spatial-navigation-core
 
+## 4.1.1
+
+### Patch Changes
+
+- 3d33d5f: Fix for a race condition where `onIntermediateNodeBecameBlurred` and `onIntermediateNodeBecameFocused` functions could throw a _TypeError_ if the component no longer existed once promises resolve.
+
 ## 4.1.0
 
 ### Minor Changes
