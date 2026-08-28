@@ -2,4 +2,4 @@
 "@noriginmedia/norigin-spatial-navigation-core": patch
 ---
 
-Fixed a small race condition in  `onIntermediateNodeBecameBlurred` and `onIntermediateNodeBecameFocused` by checking the component still exists inside promise resolve.
+Fix for a race condition where `onIntermediateNodeBecameBlurred` and `onIntermediateNodeBecameFocused` functions could throw a _TypeError_ if the component no longer existed once promises resolve.
