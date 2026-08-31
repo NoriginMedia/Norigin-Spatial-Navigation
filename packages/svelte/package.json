@@ -1,0 +1,64 @@
+{
+  "name": "@noriginmedia/norigin-spatial-navigation-svelte",
+  "version": "3.1.0",
+  "description": "Svelte 5 spatial navigation components for TV and remote-control apps",
+  "type": "module",
+  "svelte": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "svelte": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "svelte-package -i src/lib -o dist",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "peerDependencies": {
+    "svelte": "^5.0.0",
+    "@noriginmedia/norigin-spatial-navigation-core": "^3.1.0"
+  },
+  "dependencies": {
+    "lodash-es": "^4.17.21"
+  },
+  "devDependencies": {
+    "@sveltejs/package": "^2.5.8",
+    "@sveltejs/vite-plugin-svelte": "^7.1.2",
+    "@testing-library/svelte": "^5.0.0",
+    "@types/lodash-es": "^4.17.12",
+    "eslint-plugin-svelte": "^3.9.0",
+    "jsdom": "^24.0.0",
+    "svelte": "^5.56.3",
+    "svelte-check": "^4.6.0",
+    "svelte-eslint-parser": "^1.1.0",
+    "typescript": "^5.9.3",
+    "vite": "^8.0.16",
+    "vitest": "^4.1.9",
+    "@noriginmedia/norigin-spatial-navigation-core": "^3.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NoriginMedia/norigin-spatial-navigation.git"
+  },
+  "keywords": [
+    "svelte",
+    "svelte5",
+    "spatial-navigation",
+    "remote-control-navigation",
+    "tv-navigation"
+  ],
+  "author": "Norigin Media",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/NoriginMedia/norigin-spatial-navigation/issues"
+  },
+  "homepage": "https://devportal.noriginmedia.com/docs/Norigin-Spatial-Navigation/"
+}

@@ -7,3 +7,5 @@ coverage
 package-lock.json
 CHANGELOG.md
 **/CHANGELOG.md
+*.svelte
+.svelte-kit
