@@ -69,7 +69,7 @@ function ConfirmButton({
       ref={ref}
       style={{
         padding: '12px 24px',
-        backgroundColor: focused ? '#0066cc' : '#444',
+        backgroundColor: focused ? '#7150DA' : '#444',
         color: 'white',
         border: 'none',
         borderRadius: '4px'
@@ -128,6 +128,94 @@ function Modal({ onConfirm, onCancel }: ModalProps) {
 ```
 
 When the modal mounts, it calls `focusSelf()` to claim focus. Because `isFocusBoundary: true`, pressing any arrow key keeps focus inside the modal. When the modal unmounts, `autoRestoreFocus` (enabled by default) returns focus to the previously focused component.
+
+**Try it live:** open the dialog, then mash the arrow keys — focus is trapped between Confirm/Cancel and can't escape to the trigger behind it. Press Enter to close and focus returns to the button.
+
+<Sandpack>
+```tsx
+import React, { useEffect, useState } from 'react';
+import { init, setFocus } from '@noriginmedia/norigin-spatial-navigation-core';
+import {
+  useFocusable,
+  FocusContext,
+} from '@noriginmedia/norigin-spatial-navigation-react';
+
+init({ debug: false, visualDebug: false });
+
+function ConfirmButton({ label, onPress }: { label: string; onPress: () => void }) {
+  const { ref, focused } = useFocusable({ onEnterPress: () => onPress() });
+  return (
+    <button
+      ref={ref}
+      onClick={onPress}
+      style={{
+        padding: '12px 24px', backgroundColor: focused ? '#7150DA' : '#444',
+        color: 'white', border: 'none', borderRadius: 4, cursor: 'pointer',
+      }}
+    >
+      {label}
+    </button>
+  );
+}
+
+function Modal({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }) {
+  const { ref, focusKey, focusSelf } = useFocusable({
+    focusKey: 'MODAL',
+    isFocusBoundary: true,
+    trackChildren: true,
+  });
+
+  useEffect(() => { focusSelf(); }, [focusSelf]);
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, display: 'flex',
+      alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.7)',
+    }}>
+      <FocusContext.Provider value={focusKey}>
+        <div ref={ref} style={{
+          backgroundColor: '#222', padding: 40, borderRadius: 8,
+          display: 'flex', flexDirection: 'column', gap: 24,
+        }}>
+          <p style={{ color: 'white', fontSize: 20 }}>Are you sure?</p>
+          <div style={{ display: 'flex', gap: 16 }}>
+            <ConfirmButton label="Confirm" onPress={onConfirm} />
+            <ConfirmButton label="Cancel" onPress={onCancel} />
+          </div>
+        </div>
+      </FocusContext.Provider>
+    </div>
+  );
+}
+
+function OpenButton({ onPress }: { onPress: () => void }) {
+  const { ref, focused } = useFocusable({ focusKey: 'OPEN', onEnterPress: () => onPress() });
+  return (
+    <button
+      ref={ref}
+      onClick={onPress}
+      style={{
+        padding: '12px 24px', backgroundColor: focused ? '#7150DA' : '#444',
+        color: 'white', border: 'none', borderRadius: 4, cursor: 'pointer',
+      }}
+    >
+      Open dialog
+    </button>
+  );
+}
+
+export default function App() {
+  const [open, setOpen] = useState(false);
+  useEffect(() => { if (!open) setFocus('OPEN'); }, [open]);
+  return (
+    <div style={{ padding: 40, backgroundColor: '#111', minHeight: '100vh' }}>
+      <OpenButton onPress={() => setOpen(true)} />
+      {open && <Modal onConfirm={() => setOpen(false)} onCancel={() => setOpen(false)} />}
+    </div>
+  );
+}
+```
+</Sandpack>
 
 ---
 

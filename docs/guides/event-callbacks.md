@@ -257,7 +257,7 @@ function Item({ id, title, isNew }: ItemProps) {
   });
 
   return (
-    <div ref={ref} style={{ outline: focused ? '2px solid white' : 'none' }}>
+    <div ref={ref} style={{ outline: focused ? '2px solid #42fdac' : 'none' }}>
       {title}
     </div>
   );
@@ -265,6 +265,85 @@ function Item({ id, title, isNew }: ItemProps) {
 ```
 
 Without `extraProps`, you would need to wrap each callback in `useCallback` with the relevant dependencies to avoid stale values.
+
+**Try it live:** use the arrow keys to move between items (fires `onFocus`) and press Enter to select one (fires `onEnterPress`). Each callback is logged on screen, with the latest `extraProps` values.
+
+<Sandpack>
+```tsx
+import React, { useState, useEffect } from 'react';
+import { init } from '@noriginmedia/norigin-spatial-navigation-core';
+import {
+  useFocusable,
+  FocusContext,
+} from '@noriginmedia/norigin-spatial-navigation-react';
+
+init({ debug: false, visualDebug: false });
+
+interface ItemProps {
+  id: string;
+  title: string;
+  isNew: boolean;
+  log: (msg: string) => void;
+}
+
+function Item({ id, title, isNew, log }: ItemProps) {
+  const { ref, focused } = useFocusable<ItemProps>({
+    extraProps: { id, title, isNew, log },
+    onFocus: (layout, props) => props.log(`onFocus → ${props.id}`),
+    onEnterPress: (props) =>
+      props.log(`onEnterPress → ${props.title} (isNew: ${props.isNew})`),
+  });
+
+  return (
+    <div
+      ref={ref}
+      style={{
+        padding: '16px 20px', minWidth: 110, textAlign: 'center', borderRadius: 6,
+        color: 'white', backgroundColor: focused ? '#7150DA' : '#333',
+        outline: focused ? '2px solid #42fdac' : 'none',
+      }}
+    >
+      {title}{isNew ? ' •' : ''}
+    </div>
+  );
+}
+
+const ITEMS = [
+  { id: 'a', title: 'Home', isNew: false },
+  { id: 'b', title: 'Movies', isNew: true },
+  { id: 'c', title: 'Series', isNew: false },
+];
+
+export default function App() {
+  const [logs, setLogs] = useState<string[]>([]);
+  const log = (msg: string) => setLogs((prev) => [msg, ...prev].slice(0, 6));
+
+  const { ref, focusKey, focusSelf } = useFocusable({ focusKey: 'ROOT' });
+  useEffect(() => { focusSelf(); }, [focusSelf]);
+
+  return (
+    <FocusContext.Provider value={focusKey}>
+      <div ref={ref} style={{ padding: 32, backgroundColor: '#221c35', minHeight: '100vh' }}>
+        <div style={{ display: 'flex', gap: 16, marginBottom: 24 }}>
+          {ITEMS.map((it) => (
+            <Item key={it.id} {...it} log={log} />
+          ))}
+        </div>
+        <p style={{ color: '#8a7fb0', margin: '0 0 8px' }}>
+          Arrow = onFocus, Enter = onEnterPress:
+        </p>
+        <pre style={{
+          background: '#1a1228', color: '#c9a6ff', padding: 16,
+          borderRadius: 6, minHeight: 120, margin: 0, whiteSpace: 'pre-wrap',
+        }}>
+          {logs.length ? logs.join('\n') : '(events will appear here)'}
+        </pre>
+      </div>
+    </FocusContext.Provider>
+  );
+}
+```
+</Sandpack>
 
 ---
 

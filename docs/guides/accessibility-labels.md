@@ -71,7 +71,7 @@ function Asset({ title }: { title: string }) {
   });
 
   return (
-    <div ref={ref} style={{ outline: focused ? '2px solid white' : 'none' }}>
+    <div ref={ref} style={{ outline: focused ? '2px solid #42fdac' : 'none' }}>
       {title}
     </div>
   );
@@ -93,6 +93,92 @@ function ContentRow({ title }: { title: string }) {
   );
 }
 ```
+
+**Try it live:** navigate the assets with the arrow keys. The panel shows exactly what `onUtterText` receives — region labels are announced the first time focus enters a region, then only the leaf label while you stay inside it.
+
+<Sandpack>
+```tsx
+import React, { useEffect, useState } from 'react';
+import { init, setFocus } from '@noriginmedia/norigin-spatial-navigation-core';
+import {
+  useFocusable,
+  FocusContext,
+} from '@noriginmedia/norigin-spatial-navigation-react';
+
+// The library calls onUtterText with the string to speak; forward it to React.
+let onUtter: ((text: string) => void) | null = null;
+init({
+  debug: false,
+  visualDebug: false,
+  onUtterText: (text) => onUtter?.(text),
+});
+
+function Asset({ title }: { title: string }) {
+  const { ref, focused } = useFocusable({ accessibilityLabel: title });
+  return (
+    <div ref={ref} style={{
+      width: 130, height: 70, display: 'flex', alignItems: 'center', justifyContent: 'center',
+      borderRadius: 6, color: 'white', textAlign: 'center', padding: 4,
+      backgroundColor: focused ? '#7150DA' : '#333',
+      outline: focused ? '2px solid #42fdac' : 'none',
+    }}>
+      {title}
+    </div>
+  );
+}
+
+function ContentRow({ title, rowKey, assets }: { title: string; rowKey: string; assets: string[] }) {
+  const { ref, focusKey } = useFocusable({ focusKey: rowKey, accessibilityLabel: title });
+  return (
+    <FocusContext.Provider value={focusKey}>
+      <section ref={ref} style={{ marginBottom: 20 }}>
+        <h3 style={{ margin: '0 0 8px', color: '#8a7fb0' }}>{title}</h3>
+        <div style={{ display: 'flex', gap: 12 }}>
+          {assets.map((a) => <Asset key={a} title={a} />)}
+        </div>
+      </section>
+    </FocusContext.Provider>
+  );
+}
+
+function Content() {
+  const { ref, focusKey } = useFocusable({ focusKey: 'CONTENT', accessibilityLabel: 'Recommended' });
+  return (
+    <FocusContext.Provider value={focusKey}>
+      <div ref={ref}>
+        <ContentRow title="Movies" rowKey="ROW_MOVIES" assets={['Inception', 'Interstellar']} />
+        <ContentRow title="Series" rowKey="ROW_SERIES" assets={['Breaking Bad', 'The Wire']} />
+      </div>
+    </FocusContext.Provider>
+  );
+}
+
+export default function App() {
+  const [log, setLog] = useState<string[]>([]);
+
+  useEffect(() => {
+    onUtter = (text) => setLog((prev) => [text, ...prev].slice(0, 6));
+    setFocus('CONTENT'); // initial focus, captured now that onUtter is wired up
+    return () => { onUtter = null; };
+  }, []);
+
+  return (
+    <div style={{ padding: 24, backgroundColor: '#221c35', minHeight: '100vh', color: 'white' }}>
+      <Content />
+      <p style={{ color: '#8a7fb0', margin: '8px 0' }}>
+        onUtterText output (what a TTS engine would speak):
+      </p>
+      <pre style={{
+        background: '#1a1228', color: '#c9a6ff', padding: 16,
+        borderRadius: 6, minHeight: 120, margin: 0, whiteSpace: 'pre-wrap',
+      }}>
+        {log.length ? log.join('\n') : '(navigate to hear regions announced)'}
+      </pre>
+    </div>
+  );
+}
+```
+</Sandpack>
 
 ### 3. Disable native `aria-*` if needed
 

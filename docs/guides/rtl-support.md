@@ -62,6 +62,68 @@ function App({ language }: { language: string }) {
 }
 ```
 
+**Try it live:** focus an item and press the arrows, then toggle the direction. In LTR, `ArrowRight` moves to a higher number; after switching to RTL, the layout flips and the same key moves the other way — with no change to the component code.
+
+<Sandpack>
+```tsx
+import React, { useEffect, useState } from 'react';
+import { init, updateRtl } from '@noriginmedia/norigin-spatial-navigation-core';
+import {
+  useFocusable,
+  FocusContext,
+} from '@noriginmedia/norigin-spatial-navigation-react';
+
+init({ rtl: false, debug: false, visualDebug: false });
+
+function Item({ label }: { label: string }) {
+  const { ref, focused } = useFocusable();
+  return (
+    <div ref={ref} style={{
+      width: 72, height: 72, display: 'flex', alignItems: 'center', justifyContent: 'center',
+      borderRadius: 6, color: 'white', fontSize: 20,
+      backgroundColor: focused ? '#7150DA' : '#333',
+      outline: focused ? '2px solid #42fdac' : 'none',
+    }}>
+      {label}
+    </div>
+  );
+}
+
+function Row() {
+  const { ref, focusKey, focusSelf } = useFocusable({ focusKey: 'ROW' });
+  useEffect(() => { focusSelf(); }, [focusSelf]);
+  return (
+    <FocusContext.Provider value={focusKey}>
+      <div ref={ref} style={{ display: 'flex', gap: 12 }}>
+        {['1', '2', '3', '4', '5'].map((n) => <Item key={n} label={n} />)}
+      </div>
+    </FocusContext.Provider>
+  );
+}
+
+export default function App() {
+  const [rtl, setRtl] = useState(false);
+
+  useEffect(() => {
+    updateRtl(rtl);
+    document.documentElement.dir = rtl ? 'rtl' : 'ltr';
+  }, [rtl]);
+
+  return (
+    <div dir={rtl ? 'rtl' : 'ltr'} style={{ padding: 24, backgroundColor: '#221c35', minHeight: '100vh', color: 'white' }}>
+      <button
+        onClick={() => setRtl((r) => !r)}
+        style={{ marginBottom: 16, padding: '8px 16px', cursor: 'pointer' }}
+      >
+        Direction: {rtl ? 'RTL' : 'LTR'} — toggle
+      </button>
+      <Row />
+    </div>
+  );
+}
+```
+</Sandpack>
+
 ## RTL and Focus Hierarchy
 
 RTL mode affects only the interpretation of arrow key directions. The focus hierarchy, `FocusContext`, boundaries, and all other features work identically. Your component code does not need to change.

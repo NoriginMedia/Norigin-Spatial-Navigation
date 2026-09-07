@@ -36,7 +36,7 @@ function Card({ title }: { title: string }) {
   const { ref, focused } = useFocusable();
 
   return (
-    <div ref={ref} style={{ outline: focused ? '2px solid white' : 'none' }}>
+    <div ref={ref} style={{ outline: focused ? '2px solid #42fdac' : 'none' }}>
       {title}
     </div>
   );
@@ -147,7 +147,7 @@ function ContentCard({ title }: { title: string }) {
         width: '160px',
         height: '90px',
         backgroundColor: '#714ADD',
-        outline: focused ? '3px solid white' : 'none',
+        outline: focused ? '3px solid #42fdac' : 'none',
         borderRadius: '4px',
         display: 'flex',
         alignItems: 'center',
@@ -199,3 +199,96 @@ In this example:
 - Arrow left/right navigates between the two containers.
 - Arrow up/down navigates within the active container.
 - `hasFocusedChild` highlights the active sidebar.
+
+**Try it live:** click into the preview and use the arrow keys. Notice how the sidebar
+highlights while any of its items is focused (`hasFocusedChild`), and how focus moves
+between the two sibling containers.
+
+<Sandpack>
+```tsx
+import React, { useEffect } from 'react';
+import { init, setFocus } from '@noriginmedia/norigin-spatial-navigation-core';
+import { useFocusable, FocusContext } from '@noriginmedia/norigin-spatial-navigation-react';
+
+init({ debug: false, visualDebug: false });
+
+function MenuItem({ label }: { label: string }) {
+  const { ref, focused } = useFocusable();
+  return (
+    <div ref={ref} style={{ padding: '8px 12px', color: focused ? 'white' : '#aaa' }}>
+      {label}
+    </div>
+  );
+}
+
+function Sidebar() {
+  const { ref, focusKey, hasFocusedChild } = useFocusable({
+    focusKey: 'SIDEBAR',
+    trackChildren: true,
+  });
+  return (
+    <FocusContext.Provider value={focusKey}>
+      <div
+        ref={ref}
+        style={{
+          width: 160,
+          padding: 16,
+          backgroundColor: hasFocusedChild ? '#4e4181' : '#362c56',
+        }}
+      >
+        <MenuItem label="Home" />
+        <MenuItem label="Movies" />
+        <MenuItem label="Series" />
+      </div>
+    </FocusContext.Provider>
+  );
+}
+
+function Card({ title }: { title: string }) {
+  const { ref, focused } = useFocusable();
+  return (
+    <div
+      ref={ref}
+      style={{
+        width: 120,
+        height: 72,
+        backgroundColor: '#714ADD',
+        borderRadius: 4,
+        outline: focused ? '3px solid #42fdac' : 'none',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: 'white',
+      }}
+    >
+      {title}
+    </div>
+  );
+}
+
+function ContentArea() {
+  const { ref, focusKey } = useFocusable({ focusKey: 'CONTENT' });
+  return (
+    <FocusContext.Provider value={focusKey}>
+      <div ref={ref} style={{ flex: 1, display: 'flex', gap: 12, padding: 16 }}>
+        <Card title="Movie 1" />
+        <Card title="Movie 2" />
+        <Card title="Movie 3" />
+      </div>
+    </FocusContext.Provider>
+  );
+}
+
+export default function App() {
+  useEffect(() => {
+    setFocus('SIDEBAR');
+  }, []);
+  return (
+    <div style={{ display: 'flex', backgroundColor: '#221c35', minHeight: '100vh' }}>
+      <Sidebar />
+      <ContentArea />
+    </div>
+  );
+}
+```
+</Sandpack>
