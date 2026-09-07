@@ -21,17 +21,18 @@ Core **`setFocus`** and **`navigateByDirection`** are asynchronous because the e
 **Try it live:** navigate the grid with the arrow keys, or use the buttons to call `setFocus` and `navigateByDirection` programmatically — the current focus key (`getCurrentFocusKey`) updates live.
 
 <Sandpack>
+
 ```tsx
 import React, { useEffect, useState } from 'react';
 import {
   init,
   setFocus,
   navigateByDirection,
-  getCurrentFocusKey,
+  getCurrentFocusKey
 } from '@noriginmedia/norigin-spatial-navigation-core';
 import {
   useFocusable,
-  FocusContext,
+  FocusContext
 } from '@noriginmedia/norigin-spatial-navigation-react';
 
 init({ debug: false, visualDebug: false });
@@ -39,11 +40,20 @@ init({ debug: false, visualDebug: false });
 function Tile({ focusKey, label }: { focusKey: string; label: string }) {
   const { ref, focused } = useFocusable({ focusKey });
   return (
-    <div ref={ref} style={{
-      width: 84, height: 60, display: 'flex', alignItems: 'center', justifyContent: 'center',
-      borderRadius: 6, color: 'white', backgroundColor: focused ? '#7150DA' : '#333',
-      outline: focused ? '2px solid #42fdac' : 'none',
-    }}>
+    <div
+      ref={ref}
+      style={{
+        width: 84,
+        height: 60,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 6,
+        color: 'white',
+        backgroundColor: focused ? '#7150DA' : '#333',
+        outline: focused ? '2px solid #42fdac' : 'none'
+      }}
+    >
       {label}
     </div>
   );
@@ -53,7 +63,14 @@ function Grid() {
   const { ref, focusKey } = useFocusable({ focusKey: 'GRID' });
   return (
     <FocusContext.Provider value={focusKey}>
-      <div ref={ref} style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 84px)', gap: 12 }}>
+      <div
+        ref={ref}
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 84px)',
+          gap: 12
+        }}
+      >
         {['A', 'B', 'C', 'D', 'E', 'F'].map((k) => (
           <Tile key={k} focusKey={`tile-${k}`} label={k} />
         ))}
@@ -66,30 +83,51 @@ export default function App() {
   const [current, setCurrent] = useState('(none)');
 
   // Set initial focus, then poll the current focus key so arrow navigation shows too.
-  useEffect(() => { setFocus('tile-A'); }, []);
   useEffect(() => {
-    const id = setInterval(() => setCurrent(getCurrentFocusKey() || '(none)'), 150);
+    setFocus('tile-A');
+  }, []);
+  useEffect(() => {
+    const id = setInterval(
+      () => setCurrent(getCurrentFocusKey() || '(none)'),
+      150
+    );
     return () => clearInterval(id);
   }, []);
 
   const btn = { padding: '6px 12px', cursor: 'pointer' } as const;
 
   return (
-    <div style={{ padding: 24, backgroundColor: '#221c35', minHeight: '100vh', color: 'white' }}>
+    <div
+      style={{
+        padding: 24,
+        backgroundColor: '#221c35',
+        minHeight: '100vh',
+        color: 'white'
+      }}
+    >
       <Grid />
       <p style={{ color: '#8a7fb0' }}>
         Current focus: <b style={{ color: '#c9a6ff' }}>{current}</b>
       </p>
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        <button style={btn} onClick={() => setFocus('tile-F')}>setFocus('tile-F')</button>
-        <button style={btn} onClick={() => navigateByDirection('left')}>← navigateByDirection</button>
-        <button style={btn} onClick={() => navigateByDirection('right')}>navigateByDirection →</button>
-        <button style={btn} onClick={() => navigateByDirection('down')}>navigateByDirection ↓</button>
+        <button style={btn} onClick={() => setFocus('tile-F')}>
+          setFocus('tile-F')
+        </button>
+        <button style={btn} onClick={() => navigateByDirection('left')}>
+          ← navigateByDirection
+        </button>
+        <button style={btn} onClick={() => navigateByDirection('right')}>
+          navigateByDirection →
+        </button>
+        <button style={btn} onClick={() => navigateByDirection('down')}>
+          navigateByDirection ↓
+        </button>
       </div>
     </div>
   );
 }
 ```
+
 </Sandpack>
 
 ---
@@ -136,7 +174,10 @@ function PlayButton() {
   const { ref, focused } = useFocusable({ focusKey: 'PLAY_BUTTON' });
 
   return (
-    <button ref={ref} style={{ outline: focused ? '2px solid #42fdac' : 'none' }}>
+    <button
+      ref={ref}
+      style={{ outline: focused ? '2px solid #42fdac' : 'none' }}
+    >
       Play
     </button>
   );

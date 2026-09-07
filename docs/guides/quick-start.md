@@ -102,57 +102,61 @@ export default App;
 **Try it live:**
 
 <Sandpack>
+
 ```tsx
 import { init } from '@noriginmedia/norigin-spatial-navigation-core';
-import { useFocusable, FocusContext } from '@noriginmedia/norigin-spatial-navigation-react';
+import {
+  useFocusable,
+  FocusContext
+} from '@noriginmedia/norigin-spatial-navigation-react';
 import { useEffect } from 'react';
 
 init({ debug: false, visualDebug: false });
 
 function Button({ label }: { label: string }) {
-const { ref, focused } = useFocusable();
-return (
-
-<div
-ref={ref}
-style={{
+  const { ref, focused } = useFocusable();
+  return (
+    <div
+      ref={ref}
+      style={{
         padding: '16px 32px',
         backgroundColor: focused ? '#7150DA' : '#333',
         color: 'white',
         borderRadius: '4px',
         cursor: 'pointer',
-        display: 'inline-block',
-      }} >
-{label}
-</div>
-);
+        display: 'inline-block'
+      }}
+    >
+      {label}
+    </div>
+  );
 }
 
 function ButtonRow() {
-const { ref, focusKey, focusSelf } = useFocusable({ focusKey: 'BUTTON_ROW' });
-useEffect(() => { focusSelf(); }, []);
-return (
-<FocusContext.Provider value={focusKey}>
-
-<div ref={ref} style={{ display: 'flex', gap: '16px' }}>
-<Button label="Play" />
-<Button label="Pause" />
-<Button label="Stop" />
-</div>
-</FocusContext.Provider>
-);
+  const { ref, focusKey, focusSelf } = useFocusable({ focusKey: 'BUTTON_ROW' });
+  useEffect(() => {
+    focusSelf();
+  }, []);
+  return (
+    <FocusContext.Provider value={focusKey}>
+      <div ref={ref} style={{ display: 'flex', gap: '16px' }}>
+        <Button label="Play" />
+        <Button label="Pause" />
+        <Button label="Stop" />
+      </div>
+    </FocusContext.Provider>
+  );
 }
 
 export default function App() {
-return (
-
-<div style={{ padding: 40, backgroundColor: '#111', minHeight: '100vh' }}>
-<ButtonRow />
-</div>
-);
+  return (
+    <div style={{ padding: 40, backgroundColor: '#111', minHeight: '100vh' }}>
+      <ButtonRow />
+    </div>
+  );
 }
-
 ```
+
 </Sandpack>
 
 ## What Happens Now
@@ -161,4 +165,7 @@ return (
 2. Pressing the right arrow key moves focus to the next `Button`.
 3. The focused `Button` renders with a blue background; unfocused ones render dark.
 4. Pressing enter on a focused `Button` would trigger `onEnterPress` if you configured it.
+
+```
+
 ```

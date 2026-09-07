@@ -269,12 +269,13 @@ Without `extraProps`, you would need to wrap each callback in `useCallback` with
 **Try it live:** use the arrow keys to move between items (fires `onFocus`) and press Enter to select one (fires `onEnterPress`). Each callback is logged on screen, with the latest `extraProps` values.
 
 <Sandpack>
+
 ```tsx
 import React, { useState, useEffect } from 'react';
 import { init } from '@noriginmedia/norigin-spatial-navigation-core';
 import {
   useFocusable,
-  FocusContext,
+  FocusContext
 } from '@noriginmedia/norigin-spatial-navigation-react';
 
 init({ debug: false, visualDebug: false });
@@ -291,19 +292,24 @@ function Item({ id, title, isNew, log }: ItemProps) {
     extraProps: { id, title, isNew, log },
     onFocus: (layout, props) => props.log(`onFocus → ${props.id}`),
     onEnterPress: (props) =>
-      props.log(`onEnterPress → ${props.title} (isNew: ${props.isNew})`),
+      props.log(`onEnterPress → ${props.title} (isNew: ${props.isNew})`)
   });
 
   return (
     <div
       ref={ref}
       style={{
-        padding: '16px 20px', minWidth: 110, textAlign: 'center', borderRadius: 6,
-        color: 'white', backgroundColor: focused ? '#7150DA' : '#333',
-        outline: focused ? '2px solid #42fdac' : 'none',
+        padding: '16px 20px',
+        minWidth: 110,
+        textAlign: 'center',
+        borderRadius: 6,
+        color: 'white',
+        backgroundColor: focused ? '#7150DA' : '#333',
+        outline: focused ? '2px solid #42fdac' : 'none'
       }}
     >
-      {title}{isNew ? ' •' : ''}
+      {title}
+      {isNew ? ' •' : ''}
     </div>
   );
 }
@@ -311,7 +317,7 @@ function Item({ id, title, isNew, log }: ItemProps) {
 const ITEMS = [
   { id: 'a', title: 'Home', isNew: false },
   { id: 'b', title: 'Movies', isNew: true },
-  { id: 'c', title: 'Series', isNew: false },
+  { id: 'c', title: 'Series', isNew: false }
 ];
 
 export default function App() {
@@ -319,11 +325,16 @@ export default function App() {
   const log = (msg: string) => setLogs((prev) => [msg, ...prev].slice(0, 6));
 
   const { ref, focusKey, focusSelf } = useFocusable({ focusKey: 'ROOT' });
-  useEffect(() => { focusSelf(); }, [focusSelf]);
+  useEffect(() => {
+    focusSelf();
+  }, [focusSelf]);
 
   return (
     <FocusContext.Provider value={focusKey}>
-      <div ref={ref} style={{ padding: 32, backgroundColor: '#221c35', minHeight: '100vh' }}>
+      <div
+        ref={ref}
+        style={{ padding: 32, backgroundColor: '#221c35', minHeight: '100vh' }}
+      >
         <div style={{ display: 'flex', gap: 16, marginBottom: 24 }}>
           {ITEMS.map((it) => (
             <Item key={it.id} {...it} log={log} />
@@ -332,10 +343,17 @@ export default function App() {
         <p style={{ color: '#8a7fb0', margin: '0 0 8px' }}>
           Arrow = onFocus, Enter = onEnterPress:
         </p>
-        <pre style={{
-          background: '#1a1228', color: '#c9a6ff', padding: 16,
-          borderRadius: 6, minHeight: 120, margin: 0, whiteSpace: 'pre-wrap',
-        }}>
+        <pre
+          style={{
+            background: '#1a1228',
+            color: '#c9a6ff',
+            padding: 16,
+            borderRadius: 6,
+            minHeight: 120,
+            margin: 0,
+            whiteSpace: 'pre-wrap'
+          }}
+        >
           {logs.length ? logs.join('\n') : '(events will appear here)'}
         </pre>
       </div>
@@ -343,6 +361,7 @@ export default function App() {
   );
 }
 ```
+
 </Sandpack>
 
 ---

@@ -205,17 +205,24 @@ highlights while any of its items is focused (`hasFocusedChild`), and how focus 
 between the two sibling containers.
 
 <Sandpack>
+
 ```tsx
 import React, { useEffect } from 'react';
 import { init, setFocus } from '@noriginmedia/norigin-spatial-navigation-core';
-import { useFocusable, FocusContext } from '@noriginmedia/norigin-spatial-navigation-react';
+import {
+  useFocusable,
+  FocusContext
+} from '@noriginmedia/norigin-spatial-navigation-react';
 
 init({ debug: false, visualDebug: false });
 
 function MenuItem({ label }: { label: string }) {
   const { ref, focused } = useFocusable();
   return (
-    <div ref={ref} style={{ padding: '8px 12px', color: focused ? 'white' : '#aaa' }}>
+    <div
+      ref={ref}
+      style={{ padding: '8px 12px', color: focused ? 'white' : '#aaa' }}
+    >
       {label}
     </div>
   );
@@ -224,7 +231,7 @@ function MenuItem({ label }: { label: string }) {
 function Sidebar() {
   const { ref, focusKey, hasFocusedChild } = useFocusable({
     focusKey: 'SIDEBAR',
-    trackChildren: true,
+    trackChildren: true
   });
   return (
     <FocusContext.Provider value={focusKey}>
@@ -233,7 +240,7 @@ function Sidebar() {
         style={{
           width: 160,
           padding: 16,
-          backgroundColor: hasFocusedChild ? '#4e4181' : '#362c56',
+          backgroundColor: hasFocusedChild ? '#4e4181' : '#362c56'
         }}
       >
         <MenuItem label="Home" />
@@ -258,7 +265,7 @@ function Card({ title }: { title: string }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        color: 'white',
+        color: 'white'
       }}
     >
       {title}
@@ -284,11 +291,19 @@ export default function App() {
     setFocus('SIDEBAR');
   }, []);
   return (
-    <div style={{ display: 'flex', backgroundColor: '#221c35', minHeight: '100vh' }}>
+    <div
+      style={{
+        display: 'flex',
+        backgroundColor: '#221c35',
+        minHeight: '100vh'
+      }}
+    >
       <Sidebar />
       <ContentArea />
     </div>
   );
 }
 ```
+
 </Sandpack>
+```
