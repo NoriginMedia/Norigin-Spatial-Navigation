@@ -165,7 +165,3 @@ export default function App() {
 2. Pressing the right arrow key moves focus to the next `Button`.
 3. The focused `Button` renders with a blue background; unfocused ones render dark.
 4. Pressing enter on a focused `Button` would trigger `onEnterPress` if you configured it.
-
-```
-
-```
