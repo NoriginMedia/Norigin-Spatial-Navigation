@@ -12,38 +12,46 @@ Common implementation patterns for TV and directional-navigation applications.
 
 A content row that automatically scrolls when a child card gains focus. This is the core pattern for Netflix-style content carousels.
 
-```typescript
-import React, { useCallback, useRef } from 'react';
+**Try it live:** focus a card and press the left/right arrows — the row scrolls to keep the focused card in view.
+
+<Sandpack alwaysOpen>
+
+```tsx
+import React, { useCallback, useRef, useEffect } from 'react';
+import { init } from '@noriginmedia/norigin-spatial-navigation-core';
 import {
   useFocusable,
   FocusContext,
   FocusableComponentLayout
 } from '@noriginmedia/norigin-spatial-navigation-react';
 
-interface CardProps {
+init({ debug: false, visualDebug: false });
+
+function Card({
+  title,
+  color,
+  onFocus
+}: {
   title: string;
   color: string;
   onFocus: (layout: FocusableComponentLayout) => void;
-}
-
-function Card({ title, color, onFocus }: CardProps) {
+}) {
   const { ref, focused } = useFocusable({ onFocus });
-
   return (
     <div
       ref={ref}
       style={{
-        width: '200px',
-        height: '120px',
+        width: 200,
+        height: 120,
         flexShrink: 0,
         backgroundColor: color,
-        borderRadius: '6px',
-        outline: focused ? '3px solid white' : 'none',
+        borderRadius: 6,
+        outline: focused ? '3px solid #42fdac' : 'none',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         color: 'white',
-        fontSize: '16px'
+        fontSize: 16
       }}
     >
       {title}
@@ -51,32 +59,26 @@ function Card({ title, color, onFocus }: CardProps) {
   );
 }
 
-interface ContentRowProps {
+function ContentRow({
+  title,
+  items
+}: {
   title: string;
   items: { title: string; color: string }[];
-}
-
-function ContentRow({ title, items }: ContentRowProps) {
+}) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const { ref, focusKey } = useFocusable();
 
   const onCardFocus = useCallback((layout: FocusableComponentLayout) => {
-    // Scroll so the focused card is visible
-    scrollRef.current?.scrollTo({
-      left: layout.x,
-      behavior: 'smooth'
-    });
+    scrollRef.current?.scrollTo({ left: layout.x, behavior: 'smooth' });
   }, []);
 
   return (
     <FocusContext.Provider value={focusKey}>
-      <div style={{ marginBottom: '32px' }}>
-        <h2 style={{ color: 'white', marginBottom: '12px' }}>{title}</h2>
+      <div style={{ marginBottom: 32 }}>
+        <h2 style={{ color: 'white', marginBottom: 12 }}>{title}</h2>
         <div ref={scrollRef} style={{ overflowX: 'auto', overflowY: 'hidden' }}>
-          <div
-            ref={ref}
-            style={{ display: 'flex', gap: '16px', padding: '4px' }}
-          >
+          <div ref={ref} style={{ display: 'flex', gap: 16, padding: 4 }}>
             {items.map((item) => (
               <Card
                 key={item.title}
@@ -91,7 +93,35 @@ function ContentRow({ title, items }: ContentRowProps) {
     </FocusContext.Provider>
   );
 }
+
+const ITEMS = [
+  { title: 'Card 1', color: '#714ADD' },
+  { title: 'Card 2', color: '#4e8cff' },
+  { title: 'Card 3', color: '#e0518a' },
+  { title: 'Card 4', color: '#3fb27f' },
+  { title: 'Card 5', color: '#d98b3a' },
+  { title: 'Card 6', color: '#8a5cf6' }
+];
+
+export default function App() {
+  const { ref, focusKey, focusSelf } = useFocusable({ focusKey: 'ROOT' });
+  useEffect(() => {
+    focusSelf();
+  }, [focusSelf]);
+  return (
+    <FocusContext.Provider value={focusKey}>
+      <div
+        ref={ref}
+        style={{ padding: 24, backgroundColor: '#221c35', minHeight: '100vh' }}
+      >
+        <ContentRow title="Trending Now" items={ITEMS} />
+      </div>
+    </FocusContext.Provider>
+  );
+}
 ```
+
+</Sandpack>
 
 ---
 
@@ -99,18 +129,24 @@ function ContentRow({ title, items }: ContentRowProps) {
 
 A sidebar that highlights when any of its items is focused, using `hasFocusedChild`.
 
-```typescript
+**Try it live:** press up/down to move between items — the whole sidebar tints while it holds focus (`hasFocusedChild`).
+
+<Sandpack alwaysOpen>
+
+```tsx
 import React, { useEffect } from 'react';
+import { init } from '@noriginmedia/norigin-spatial-navigation-core';
 import {
   useFocusable,
   FocusContext
 } from '@noriginmedia/norigin-spatial-navigation-react';
 
+init({ debug: false, visualDebug: false });
+
 const MENU_ITEMS = ['Home', 'Movies', 'Series', 'Sports', 'Settings'];
 
 function MenuItem({ label }: { label: string }) {
   const { ref, focused } = useFocusable();
-
   return (
     <div
       ref={ref}
@@ -118,9 +154,9 @@ function MenuItem({ label }: { label: string }) {
         padding: '14px 24px',
         color: focused ? 'white' : '#aaa',
         backgroundColor: focused ? '#6040a0' : 'transparent',
-        borderRadius: '4px',
+        borderRadius: 4,
         cursor: 'pointer',
-        fontSize: '18px'
+        fontSize: 18
       }}
     >
       {label}
@@ -138,20 +174,20 @@ function Sidebar() {
 
   useEffect(() => {
     focusSelf();
-  }, []);
+  }, [focusSelf]);
 
   return (
     <FocusContext.Provider value={focusKey}>
       <div
         ref={ref}
         style={{
-          width: '220px',
+          width: 220,
           padding: '24px 12px',
           backgroundColor: hasFocusedChild ? '#2d2050' : '#1a1228',
           transition: 'background-color 0.2s',
           display: 'flex',
           flexDirection: 'column',
-          gap: '8px'
+          gap: 8
         }}
       >
         {MENU_ITEMS.map((label) => (
@@ -161,7 +197,26 @@ function Sidebar() {
     </FocusContext.Provider>
   );
 }
+
+export default function App() {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        minHeight: '100vh',
+        backgroundColor: '#221c35'
+      }}
+    >
+      <Sidebar />
+      <div style={{ flex: 1, padding: 32, color: '#8a7fb0' }}>
+        Main content area
+      </div>
+    </div>
+  );
+}
 ```
+
+</Sandpack>
 
 ---
 
@@ -169,22 +224,30 @@ function Sidebar() {
 
 A confirmation modal that prevents focus from reaching the content behind it.
 
-```typescript
-import React, { useEffect } from 'react';
+**Try it live:** open the dialog, then try to arrow away — focus stays trapped between Confirm/Cancel, and returns to the trigger on close (`autoRestoreFocus`).
+
+<Sandpack alwaysOpen>
+
+```tsx
+import React, { useEffect, useState } from 'react';
+import { init, setFocus } from '@noriginmedia/norigin-spatial-navigation-core';
 import {
   useFocusable,
   FocusContext
 } from '@noriginmedia/norigin-spatial-navigation-react';
 
-interface ModalButtonProps {
+init({ debug: false, visualDebug: false });
+
+function ModalButton({
+  label,
+  primary,
+  onPress
+}: {
   label: string;
   primary?: boolean;
   onPress: () => void;
-}
-
-function ModalButton({ label, primary, onPress }: ModalButtonProps) {
+}) {
   const { ref, focused } = useFocusable({ onEnterPress: () => onPress() });
-
   return (
     <button
       ref={ref}
@@ -193,17 +256,17 @@ function ModalButton({ label, primary, onPress }: ModalButtonProps) {
         padding: '12px 32px',
         backgroundColor: focused
           ? primary
-            ? '#0055ff'
+            ? '#7150DA'
             : '#555'
           : primary
-          ? '#0044cc'
+          ? '#7e0ddb'
           : '#444',
         color: 'white',
         border: 'none',
-        borderRadius: '6px',
-        fontSize: '16px',
+        borderRadius: 6,
+        fontSize: 16,
         cursor: 'pointer',
-        outline: focused ? '2px solid white' : 'none'
+        outline: focused ? '2px solid #42fdac' : 'none'
       }}
     >
       {label}
@@ -211,18 +274,20 @@ function ModalButton({ label, primary, onPress }: ModalButtonProps) {
   );
 }
 
-interface ConfirmModalProps {
+function ConfirmModal({
+  message,
+  onConfirm,
+  onCancel
+}: {
   message: string;
   onConfirm: () => void;
   onCancel: () => void;
-}
-
-function ConfirmModal({ message, onConfirm, onCancel }: ConfirmModalProps) {
+}) {
   const { ref, focusKey, focusSelf } = useFocusable({
     focusKey: 'CONFIRM_MODAL',
     isFocusBoundary: true,
     trackChildren: true,
-    autoRestoreFocus: true // returns focus to the trigger when modal closes
+    autoRestoreFocus: true
   });
 
   useEffect(() => {
@@ -246,19 +311,19 @@ function ConfirmModal({ message, onConfirm, onCancel }: ConfirmModalProps) {
           ref={ref}
           style={{
             backgroundColor: '#222',
-            borderRadius: '12px',
-            padding: '48px',
+            borderRadius: 12,
+            padding: 48,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: '32px',
-            maxWidth: '480px'
+            gap: 32,
+            maxWidth: 480
           }}
         >
-          <p style={{ color: 'white', fontSize: '20px', textAlign: 'center' }}>
+          <p style={{ color: 'white', fontSize: 20, textAlign: 'center' }}>
             {message}
           </p>
-          <div style={{ display: 'flex', gap: '16px' }}>
+          <div style={{ display: 'flex', gap: 16 }}>
             <ModalButton label="Confirm" primary onPress={onConfirm} />
             <ModalButton label="Cancel" onPress={onCancel} />
           </div>
@@ -267,7 +332,55 @@ function ConfirmModal({ message, onConfirm, onCancel }: ConfirmModalProps) {
     </div>
   );
 }
+
+function TriggerButton({ onPress }: { onPress: () => void }) {
+  const { ref, focused } = useFocusable({
+    focusKey: 'TRIGGER',
+    onEnterPress: () => onPress()
+  });
+  return (
+    <button
+      ref={ref}
+      onClick={onPress}
+      style={{
+        padding: '12px 32px',
+        backgroundColor: focused ? '#7150DA' : '#0044cc',
+        color: 'white',
+        border: 'none',
+        borderRadius: 6,
+        fontSize: 16,
+        cursor: 'pointer',
+        outline: focused ? '2px solid #42fdac' : 'none'
+      }}
+    >
+      Delete account
+    </button>
+  );
+}
+
+export default function App() {
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (!open) setFocus('TRIGGER');
+  }, [open]);
+  return (
+    <div
+      style={{ padding: 40, backgroundColor: '#221c35', minHeight: '100vh' }}
+    >
+      <TriggerButton onPress={() => setOpen(true)} />
+      {open && (
+        <ConfirmModal
+          message="Are you sure you want to delete your account?"
+          onConfirm={() => setOpen(false)}
+          onCancel={() => setOpen(false)}
+        />
+      )}
+    </div>
+  );
+}
 ```
+
+</Sandpack>
 
 ---
 
@@ -275,58 +388,66 @@ function ConfirmModal({ message, onConfirm, onCancel }: ConfirmModalProps) {
 
 A seek bar that advances continuously while the right arrow key is held, and stops when released.
 
-```typescript
+**Try it live:** focus the bar, then hold the left/right arrow — the fill advances continuously and stops on release (`onArrowPress` / `onArrowRelease`).
+
+<Sandpack alwaysOpen>
+
+```tsx
 import React, { useEffect, useRef, useState } from 'react';
-import { useFocusable } from '@noriginmedia/norigin-spatial-navigation-react';
+import { init } from '@noriginmedia/norigin-spatial-navigation-core';
+import {
+  useFocusable,
+  FocusContext
+} from '@noriginmedia/norigin-spatial-navigation-react';
+
+init({ debug: false, visualDebug: false });
 
 function SeekBar() {
   const [percent, setPercent] = useState(0);
-  const timerRef = useRef<NodeJS.Timer | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const { ref, focused } = useFocusable({
     onArrowPress: (direction) => {
       if (direction === 'right' && timerRef.current === null) {
-        timerRef.current = setInterval(() => {
-          setPercent((p) => Math.min(p + 5, 100));
-        }, 100);
+        timerRef.current = setInterval(
+          () => setPercent((p) => Math.min(p + 5, 100)),
+          100
+        );
       }
       if (direction === 'left' && timerRef.current === null) {
-        timerRef.current = setInterval(() => {
-          setPercent((p) => Math.max(p - 5, 0));
-        }, 100);
+        timerRef.current = setInterval(
+          () => setPercent((p) => Math.max(p - 5, 0)),
+          100
+        );
       }
-      // Return false to prevent navigating away while seeking
       if (direction === 'left' || direction === 'right') return false;
       return true;
     },
-
     onArrowRelease: (direction) => {
       if (direction === 'left' || direction === 'right') {
-        clearInterval(timerRef.current);
+        if (timerRef.current) clearInterval(timerRef.current);
         timerRef.current = null;
       }
     }
   });
 
-  // Clean up on unmount
-  useEffect(() => {
-    return () => {
-      if (timerRef.current !== null) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
-    };
-  }, []);
+  useEffect(
+    () => () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+      timerRef.current = null;
+    },
+    []
+  );
 
   return (
     <div
       ref={ref}
       style={{
-        width: '400px',
-        height: '20px',
+        width: 400,
+        height: 20,
         backgroundColor: '#555',
-        borderRadius: '10px',
-        outline: focused ? '2px solid white' : 'none',
+        borderRadius: 10,
+        outline: focused ? '2px solid #42fdac' : 'none',
         overflow: 'hidden'
       }}
     >
@@ -334,15 +455,43 @@ function SeekBar() {
         style={{
           width: `${percent}%`,
           height: '100%',
-          backgroundColor: focused ? 'deepskyblue' : 'dodgerblue',
-          borderRadius: '10px',
+          backgroundColor: focused ? '#C64495' : '#74db',
+          borderRadius: 10,
           transition: 'background-color 0.15s'
         }}
       />
     </div>
   );
 }
+
+export default function App() {
+  const { ref, focusKey, focusSelf } = useFocusable({ focusKey: 'ROOT' });
+  useEffect(() => {
+    focusSelf();
+  }, [focusSelf]);
+  return (
+    <FocusContext.Provider value={focusKey}>
+      <div
+        ref={ref}
+        style={{
+          padding: 60,
+          backgroundColor: '#221c35',
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 20,
+          alignItems: 'center'
+        }}
+      >
+        <p style={{ color: '#aaa' }}>Hold ← / → to seek</p>
+        <SeekBar />
+      </div>
+    </FocusContext.Provider>
+  );
+}
 ```
+
+</Sandpack>
 
 ---
 
@@ -350,30 +499,35 @@ function SeekBar() {
 
 When a new item is added to a list, focus it immediately.
 
-```typescript
+**Try it live:** navigate the items with up/down, then click **Add Item** — focus jumps to the freshly mounted row once it exists (`doesFocusableExist` + `setFocus`).
+
+<Sandpack alwaysOpen>
+
+```tsx
 import React, { useState, useEffect } from 'react';
 import {
+  init,
   setFocus,
   doesFocusableExist
 } from '@noriginmedia/norigin-spatial-navigation-core';
-
 import {
   useFocusable,
   FocusContext
 } from '@noriginmedia/norigin-spatial-navigation-react';
 
+init({ debug: false, visualDebug: false });
+
 function ListItem({ id }: { id: string }) {
   const { ref, focused } = useFocusable({ focusKey: `item-${id}` });
-
   return (
     <div
       ref={ref}
       style={{
-        padding: '16px',
-        backgroundColor: focused ? '#4040cc' : '#333',
+        padding: 16,
+        backgroundColor: focused ? '#7150DA' : '#333',
         color: 'white',
-        marginBottom: '8px',
-        borderRadius: '4px'
+        marginBottom: 8,
+        borderRadius: 4
       }}
     >
       Item {id}
@@ -389,15 +543,14 @@ function DynamicList() {
   const addItem = () => {
     const newId = String(items.length + 1);
     setItems((prev) => [...prev, newId]);
-    setPendingFocusId(newId); // remember to focus after render
+    setPendingFocusId(newId);
   };
 
-  // Focus the new item once it has mounted
   useEffect(() => {
     if (pendingFocusId !== null) {
-      const focusKey = `item-${pendingFocusId}`;
-      if (doesFocusableExist(focusKey)) {
-        setFocus(focusKey);
+      const key = `item-${pendingFocusId}`;
+      if (doesFocusableExist(key)) {
+        setFocus(key);
         setPendingFocusId(null);
       }
     }
@@ -411,14 +564,37 @@ function DynamicList() {
             <ListItem key={id} id={id} />
           ))}
         </div>
-        <button onClick={addItem} style={{ marginTop: '16px' }}>
+        <button
+          onClick={addItem}
+          style={{ marginTop: 16, padding: '8px 16px', cursor: 'pointer' }}
+        >
           Add Item
         </button>
       </div>
     </FocusContext.Provider>
   );
 }
+
+export default function App() {
+  useEffect(() => {
+    setFocus('DYNAMIC_LIST');
+  }, []);
+  return (
+    <div
+      style={{
+        padding: 40,
+        backgroundColor: '#221c35',
+        minHeight: '100vh',
+        color: 'white'
+      }}
+    >
+      <DynamicList />
+    </div>
+  );
+}
 ```
+
+</Sandpack>
 
 ---
 
@@ -426,9 +602,14 @@ function DynamicList() {
 
 Save focus state when navigating forward, and restore it when going back.
 
-```typescript
+**Try it live:** focus a row and open the detail screen; pressing **Back** restores focus to where you left off. (The buttons are made focusable here so you can drive it with the keyboard.)
+
+<Sandpack alwaysOpen>
+
+```tsx
 import React, { useState, useEffect } from 'react';
 import {
+  init,
   getCurrentFocusKey,
   setFocus
 } from '@noriginmedia/norigin-spatial-navigation-core';
@@ -437,8 +618,46 @@ import {
   FocusContext
 } from '@noriginmedia/norigin-spatial-navigation-react';
 
-// Simple focus history stack
+init({ debug: false, visualDebug: false });
+
 const focusHistory: string[] = [];
+
+function Tile({
+  focusKey,
+  label,
+  autoFocus,
+  onEnterPress
+}: {
+  focusKey: string;
+  label: string;
+  autoFocus?: boolean;
+  onEnterPress?: () => void;
+}) {
+  const { ref, focused, focusSelf } = useFocusable({ focusKey, onEnterPress });
+
+  // Claim focus as soon as this tile mounts (e.g. the Back button on a new screen).
+  useEffect(() => {
+    if (autoFocus) focusSelf();
+  }, [autoFocus, focusSelf]);
+
+  return (
+    <div
+      ref={ref}
+      onClick={onEnterPress}
+      style={{
+        padding: '16px 20px',
+        marginBottom: 8,
+        borderRadius: 6,
+        cursor: 'pointer',
+        color: 'white',
+        backgroundColor: focused ? '#7150DA' : '#333',
+        outline: focused ? '2px solid #42fdac' : 'none'
+      }}
+    >
+      {label}
+    </div>
+  );
+}
 
 function Screen({
   screenKey,
@@ -447,12 +666,7 @@ function Screen({
   screenKey: string;
   children: React.ReactNode;
 }) {
-  const { ref, focusKey, focusSelf } = useFocusable({ focusKey: screenKey });
-
-  useEffect(() => {
-    focusSelf();
-  }, [screenKey]);
-
+  const { ref, focusKey } = useFocusable({ focusKey: screenKey });
   return (
     <FocusContext.Provider value={focusKey}>
       <div ref={ref}>{children}</div>
@@ -460,11 +674,10 @@ function Screen({
   );
 }
 
-function App() {
+export default function App() {
   const [screen, setScreen] = useState<'home' | 'detail'>('home');
 
   const navigateToDetail = () => {
-    // Save where we are before navigating away
     focusHistory.push(getCurrentFocusKey());
     setScreen('detail');
   };
@@ -473,27 +686,53 @@ function App() {
     setScreen('home');
     const previousKey = focusHistory.pop();
     if (previousKey) {
-      // Restore focus after the previous screen re-mounts
+      // Restore focus to where we were, once the home screen has re-mounted.
       setTimeout(() => setFocus(previousKey), 0);
     }
   };
 
-  if (screen === 'detail') {
-    return (
-      <Screen screenKey="DETAIL_SCREEN">
-        <button onClick={goBack}>← Back</button>
-        <p>Detail content here</p>
-      </Screen>
-    );
-  }
-
   return (
-    <Screen screenKey="HOME_SCREEN">
-      <button onClick={navigateToDetail}>Open Detail →</button>
-    </Screen>
+    <div
+      style={{
+        padding: 40,
+        backgroundColor: '#221c35',
+        minHeight: '100vh',
+        color: 'white'
+      }}
+    >
+      {screen === 'home' ? (
+        // `key` forces a clean remount so focus keys register from scratch.
+        <Screen key="home" screenKey="HOME_SCREEN">
+          <h3 style={{ marginTop: 0 }}>Home</h3>
+          <Tile focusKey="row-1" label="Row 1" autoFocus />
+          <Tile focusKey="row-2" label="Row 2" />
+          <Tile focusKey="row-3" label="Row 3" />
+          <Tile
+            focusKey="OPEN_DETAIL"
+            label="Open Detail →"
+            onEnterPress={navigateToDetail}
+          />
+        </Screen>
+      ) : (
+        <Screen key="detail" screenKey="DETAIL_SCREEN">
+          <h3 style={{ marginTop: 0 }}>Detail</h3>
+          <Tile
+            focusKey="BACK"
+            label="← Back"
+            autoFocus
+            onEnterPress={goBack}
+          />
+          <p style={{ color: '#8a7fb0' }}>
+            Press Enter on Back — focus returns to where you were.
+          </p>
+        </Screen>
+      )}
+    </div>
   );
 }
 ```
+
+</Sandpack>
 
 ---
 
@@ -501,84 +740,115 @@ function App() {
 
 A vertically scrolling page that auto-scrolls when the user navigates between rows.
 
-```typescript
+**Try it live:** press up/down to move between rows — the page scrolls vertically to keep the focused row in view (`onFocus` layout + `scrollTo`).
+
+<Sandpack alwaysOpen>
+
+```tsx
 import React, { useCallback, useRef, useEffect } from 'react';
+import { init } from '@noriginmedia/norigin-spatial-navigation-core';
 import {
   useFocusable,
   FocusContext,
-  FocusableComponentLayout
+  FocusableComponentLayout,
 } from '@noriginmedia/norigin-spatial-navigation-react';
 
-const ROWS = ['Recommended', 'Movies', 'Series', 'TV Channels', 'Sport'];
+init({ debug: false, visualDebug: false });
 
-function ContentRow({
-  title,
-  onFocus
-}: {
-  title: string;
-  onFocus: (layout: FocusableComponentLayout) => void;
+const ROWS = ['Recommended', 'Movies', 'Series', 'TV Channels', 'Sport', 'Clips', 'Sports', 'Continue Watching', 'News', 'Kids', 'Action', 'Drama'];
+
+function Card({ rowScrollRef, onCardFocus, autoFocus }: {
+rowScrollRef: React.RefObject<HTMLDivElement>;
+onCardFocus: (layout: FocusableComponentLayout) => void;
+autoFocus?: boolean;
 }) {
-  const { ref, focusKey } = useFocusable({ onFocus });
-  const scrollRef = useRef<HTMLDivElement>(null);
+const { ref, focused, focusSelf } = useFocusable({
+onFocus: (layout) => {
+rowScrollRef.current?.scrollTo({ left: Math.max(layout.x - 8, 0), behavior: 'smooth' });
+onCardFocus(layout);
+},
+});
 
-  const onCardFocus = useCallback((layout: FocusableComponentLayout) => {
-    scrollRef.current?.scrollTo({ left: layout.x, behavior: 'smooth' });
-  }, []);
+useEffect(() => { if (autoFocus) focusSelf(); }, [autoFocus, focusSelf]);
 
-  return (
-    <FocusContext.Provider value={focusKey}>
-      <div style={{ marginBottom: '40px' }}>
-        <h2 style={{ color: 'white', marginBottom: '12px' }}>{title}</h2>
-        <div ref={scrollRef} style={{ overflowX: 'auto' }}>
-          <div ref={ref} style={{ display: 'flex', gap: '16px' }}>
-            {Array.from({ length: 8 }, (_, i) => (
-              <div
-                key={i}
-                style={{
-                  width: '180px',
-                  height: '100px',
-                  flexShrink: 0,
-                  backgroundColor: '#714ADD',
-                  borderRadius: '6px'
-                }}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-    </FocusContext.Provider>
-  );
+return (
+
+<div ref={ref} style={{
+      width: 180, height: 100, flexShrink: 0, borderRadius: 6,
+      backgroundColor: '#714ADD',
+      outline: focused ? '3px solid #42fdac' : 'none',
+    }} />
+);
+}
+
+function ContentRow({ title, onCardFocus, firstRow }: {
+title: string;
+onCardFocus: (layout: FocusableComponentLayout) => void;
+firstRow?: boolean;
+}) {
+const { ref, focusKey } = useFocusable();
+const scrollRef = useRef<HTMLDivElement>(null);
+
+return (
+<FocusContext.Provider value={focusKey}>
+
+<div style={{ marginBottom: 40 }}>
+<h2 style={{ color: 'white', marginBottom: 12 }}>{title}</h2>
+<div ref={scrollRef} style={{ overflowX: 'auto' }}>
+<div ref={ref} style={{ display: 'flex', gap: 16, padding: 4 }}>
+{Array.from({ length: 8 }, (\_, i) => (
+<Card
+key={i}
+rowScrollRef={scrollRef}
+onCardFocus={onCardFocus}
+autoFocus={firstRow && i === 0}
+/>
+))}
+</div>
+</div>
+</div>
+</FocusContext.Provider>
+);
 }
 
 function Page() {
-  const pageRef = useRef<HTMLDivElement>(null);
-  const { ref, focusKey, focusSelf } = useFocusable({ focusKey: 'PAGE' });
+const pageRef = useRef<HTMLDivElement>(null);
+const { ref, focusKey } = useFocusable({ focusKey: 'PAGE' });
 
-  const onRowFocus = useCallback((layout: FocusableComponentLayout) => {
-    pageRef.current?.scrollTo({ top: layout.y, behavior: 'smooth' });
-  }, []);
+const onCardFocus = useCallback((layout: FocusableComponentLayout) => {
+const container = pageRef.current;
+const node = layout.node;
+if (!container || !node) return;
 
-  useEffect(() => {
-    focusSelf();
-  }, []);
+    const top =
+      node.getBoundingClientRect().top -
+      container.getBoundingClientRect().top +
+      container.scrollTop -
+      40;
 
-  return (
-    <FocusContext.Provider value={focusKey}>
-      <div
-        ref={pageRef}
-        style={{
-          overflowY: 'auto',
-          height: '100vh',
-          backgroundColor: '#221c35'
-        }}
-      >
-        <div ref={ref} style={{ padding: '40px' }}>
-          {ROWS.map((title) => (
-            <ContentRow key={title} title={title} onFocus={onRowFocus} />
-          ))}
-        </div>
-      </div>
-    </FocusContext.Provider>
-  );
+    container.scrollTo({ top, behavior: 'smooth' });
+
+}, []);
+
+return (
+<FocusContext.Provider value={focusKey}>
+
+<div ref={pageRef} style={{ overflowY: 'auto', height: '100vh', backgroundColor: '#221c35' }}>
+<div ref={ref} style={{ padding: 40 }}>
+{ROWS.map((title, idx) => (
+<ContentRow key={title} title={title} onCardFocus={onCardFocus} firstRow={idx === 0} />
+))}
+</div>
+</div>
+</FocusContext.Provider>
+);
 }
+
+export default function App() {
+return <Page />;
+}
+
+```
+
+</Sandpack>
 ```
