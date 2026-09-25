@@ -1,0 +1,23 @@
+{
+  "name": "@noriginmedia/norigin-spatial-navigation-svelte-demo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "vite dev --port 3001",
+    "build": "vite build",
+    "check": "svelte-check --tsconfig ./tsconfig.json"
+  },
+  "dependencies": {
+    "@noriginmedia/norigin-spatial-navigation-svelte": "^3.1.0",
+    "@noriginmedia/norigin-spatial-navigation-core": "^3.1.0",
+    "lodash-es": "^4.17.21"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^7.1.2",
+    "@types/lodash-es": "^4.17.12",
+    "svelte": "^5.56.3",
+    "svelte-check": "^4.6.0",
+    "typescript": "^5.9.3",
+    "vite": "^8.0.16"
+  }
+}

@@ -11,9 +11,11 @@ This repo is a [Turborepo](https://turbo.build/) monorepo managed with [npm work
 ```
 apps/
   react-demo/        # Example React app for trying changes end-to-end
+  svelte-demo/       # Example Svelte 5 app for trying changes end-to-end
 packages/
   core/              # @noriginmedia/norigin-spatial-navigation-core
   react/             # @noriginmedia/norigin-spatial-navigation-react
+  svelte/            # @noriginmedia/norigin-spatial-navigation-svelte
   legacy/            # @noriginmedia/norigin-spatial-navigation (legacy, pre-split)
 ```
 
