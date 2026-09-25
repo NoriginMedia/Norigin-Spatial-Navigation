@@ -1,5 +1,11 @@
 # @noriginmedia/norigin-spatial-navigation-core
 
+## 4.1.2
+
+### Patch Changes
+
+- 62bb920: Prevent preferredChildFocusKey from moving focus outside the current target’s subtree
+
 ## 4.1.1
 
 ### Patch Changes
