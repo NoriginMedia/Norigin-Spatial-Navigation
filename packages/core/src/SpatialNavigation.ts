@@ -1432,7 +1432,8 @@ export class SpatialNavigationService {
        */
       if (
         preferredChildFocusKey &&
-        this.isParticipatingFocusableComponent(preferredChildFocusKey)
+        this.isParticipatingFocusableComponent(preferredChildFocusKey) &&
+        this.isDescendantOf(preferredChildFocusKey, targetFocusKey)
       ) {
         this.log(
           'getNextFocusKey',
@@ -1768,6 +1769,24 @@ export class SpatialNavigationService {
       this.isFocusableComponent(focusKey) &&
       this.focusableComponents[focusKey].focusable
     );
+  }
+
+  /**
+   * Checks whether the focusableComponent is a descendant of another component.
+   * @param focusKey The focus key of the component to check
+   * @param ancestorFocusKey The focus key of the ancestor component
+   * @returns Whether the focusableComponent is a descendant of the ancestor component
+   */
+  isDescendantOf(focusKey: string, ancestorFocusKey: string): boolean {
+    let currentComponent = this.focusableComponents[focusKey];
+    while (currentComponent) {
+      if (currentComponent.parentFocusKey === ancestorFocusKey) {
+        return true;
+      }
+      currentComponent =
+        this.focusableComponents[currentComponent.parentFocusKey];
+    }
+    return false;
   }
 
   onIntermediateNodeBecameFocused(
