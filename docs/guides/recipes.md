@@ -19,10 +19,10 @@ A content row that automatically scrolls when a child card gains focus. This is 
 ```tsx
 import React, { useCallback, useRef, useEffect } from 'react';
 import { init } from '@noriginmedia/norigin-spatial-navigation-core';
+import type { FocusableComponentLayout } from '@noriginmedia/norigin-spatial-navigation-core';
 import {
   useFocusable,
-  FocusContext,
-  FocusableComponentLayout
+  FocusContext
 } from '@noriginmedia/norigin-spatial-navigation-react';
 
 init({ debug: false, visualDebug: false });
@@ -224,7 +224,7 @@ export default function App() {
 
 A confirmation modal that prevents focus from reaching the content behind it.
 
-**Try it live:** open the dialog, then try to arrow away — focus stays trapped between Confirm/Cancel, and returns to the trigger on close (`autoRestoreFocus`).
+**Try it live:** open the dialog, then try to arrow away — focus stays trapped between Confirm/Cancel. On close, `App` calls `setFocus('TRIGGER')` to return focus to the trigger.
 
 <Sandpack alwaysOpen>
 
@@ -455,7 +455,7 @@ function SeekBar() {
         style={{
           width: `${percent}%`,
           height: '100%',
-          backgroundColor: focused ? '#C64495' : '#74db',
+          backgroundColor: focused ? '#C64495' : '#7150DA',
           borderRadius: 10,
           transition: 'background-color 0.15s'
         }}
@@ -602,7 +602,7 @@ export default function App() {
 
 Save focus state when navigating forward, and restore it when going back.
 
-**Try it live:** focus a row and open the detail screen; pressing **Back** restores focus to where you left off. (The buttons are made focusable here so you can drive it with the keyboard.)
+**Try it live:** move to any row and press Enter to open the detail screen, then press Enter on **Back**: focus returns to the row you came from.
 
 <Sandpack alwaysOpen>
 
@@ -704,12 +704,20 @@ export default function App() {
         // `key` forces a clean remount so focus keys register from scratch.
         <Screen key="home" screenKey="HOME_SCREEN">
           <h3 style={{ marginTop: 0 }}>Home</h3>
-          <Tile focusKey="row-1" label="Row 1" autoFocus />
-          <Tile focusKey="row-2" label="Row 2" />
-          <Tile focusKey="row-3" label="Row 3" />
           <Tile
-            focusKey="OPEN_DETAIL"
-            label="Open Detail →"
+            focusKey="row-1"
+            label="Row 1"
+            autoFocus
+            onEnterPress={navigateToDetail}
+          />
+          <Tile
+            focusKey="row-2"
+            label="Row 2"
+            onEnterPress={navigateToDetail}
+          />
+          <Tile
+            focusKey="row-3"
+            label="Row 3"
             onEnterPress={navigateToDetail}
           />
         </Screen>
@@ -747,78 +755,108 @@ A vertically scrolling page that auto-scrolls when the user navigates between ro
 ```tsx
 import React, { useCallback, useRef, useEffect } from 'react';
 import { init } from '@noriginmedia/norigin-spatial-navigation-core';
+import type { FocusableComponentLayout } from '@noriginmedia/norigin-spatial-navigation-core';
 import {
   useFocusable,
-  FocusContext,
-  FocusableComponentLayout,
+  FocusContext
 } from '@noriginmedia/norigin-spatial-navigation-react';
 
 init({ debug: false, visualDebug: false });
 
-const ROWS = ['Recommended', 'Movies', 'Series', 'TV Channels', 'Sport', 'Clips', 'Sports', 'Continue Watching', 'News', 'Kids', 'Action', 'Drama'];
+const ROWS = [
+  'Recommended',
+  'Movies',
+  'Series',
+  'TV Channels',
+  'Sport',
+  'Clips',
+  'Sports',
+  'Continue Watching',
+  'News',
+  'Kids',
+  'Action',
+  'Drama'
+];
 
-function Card({ rowScrollRef, onCardFocus, autoFocus }: {
-rowScrollRef: React.RefObject<HTMLDivElement>;
-onCardFocus: (layout: FocusableComponentLayout) => void;
-autoFocus?: boolean;
+function Card({
+  rowScrollRef,
+  onCardFocus,
+  autoFocus
+}: {
+  rowScrollRef: React.RefObject<HTMLDivElement>;
+  onCardFocus: (layout: FocusableComponentLayout) => void;
+  autoFocus?: boolean;
 }) {
-const { ref, focused, focusSelf } = useFocusable({
-onFocus: (layout) => {
-rowScrollRef.current?.scrollTo({ left: Math.max(layout.x - 8, 0), behavior: 'smooth' });
-onCardFocus(layout);
-},
-});
+  const { ref, focused, focusSelf } = useFocusable({
+    onFocus: (layout) => {
+      rowScrollRef.current?.scrollTo({
+        left: Math.max(layout.x - 8, 0),
+        behavior: 'smooth'
+      });
+      onCardFocus(layout);
+    }
+  });
 
-useEffect(() => { if (autoFocus) focusSelf(); }, [autoFocus, focusSelf]);
+  useEffect(() => {
+    if (autoFocus) focusSelf();
+  }, [autoFocus, focusSelf]);
 
-return (
-
-<div ref={ref} style={{
-      width: 180, height: 100, flexShrink: 0, borderRadius: 6,
-      backgroundColor: '#714ADD',
-      outline: focused ? '3px solid #42fdac' : 'none',
-    }} />
-);
+  return (
+    <div
+      ref={ref}
+      style={{
+        width: 180,
+        height: 100,
+        flexShrink: 0,
+        borderRadius: 6,
+        backgroundColor: '#714ADD',
+        outline: focused ? '3px solid #42fdac' : 'none'
+      }}
+    />
+  );
 }
 
-function ContentRow({ title, onCardFocus, firstRow }: {
-title: string;
-onCardFocus: (layout: FocusableComponentLayout) => void;
-firstRow?: boolean;
+function ContentRow({
+  title,
+  onCardFocus,
+  firstRow
+}: {
+  title: string;
+  onCardFocus: (layout: FocusableComponentLayout) => void;
+  firstRow?: boolean;
 }) {
-const { ref, focusKey } = useFocusable();
-const scrollRef = useRef<HTMLDivElement>(null);
+  const { ref, focusKey } = useFocusable();
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-return (
-<FocusContext.Provider value={focusKey}>
-
-<div style={{ marginBottom: 40 }}>
-<h2 style={{ color: 'white', marginBottom: 12 }}>{title}</h2>
-<div ref={scrollRef} style={{ overflowX: 'auto' }}>
-<div ref={ref} style={{ display: 'flex', gap: 16, padding: 4 }}>
-{Array.from({ length: 8 }, (\_, i) => (
-<Card
-key={i}
-rowScrollRef={scrollRef}
-onCardFocus={onCardFocus}
-autoFocus={firstRow && i === 0}
-/>
-))}
-</div>
-</div>
-</div>
-</FocusContext.Provider>
-);
+  return (
+    <FocusContext.Provider value={focusKey}>
+      <div style={{ marginBottom: 40 }}>
+        <h2 style={{ color: 'white', marginBottom: 12 }}>{title}</h2>
+        <div ref={scrollRef} style={{ overflowX: 'auto' }}>
+          <div ref={ref} style={{ display: 'flex', gap: 16, padding: 4 }}>
+            {Array.from({ length: 8 }, (_, i) => (
+              <Card
+                key={i}
+                rowScrollRef={scrollRef}
+                onCardFocus={onCardFocus}
+                autoFocus={firstRow && i === 0}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </FocusContext.Provider>
+  );
 }
 
 function Page() {
-const pageRef = useRef<HTMLDivElement>(null);
-const { ref, focusKey } = useFocusable({ focusKey: 'PAGE' });
+  const pageRef = useRef<HTMLDivElement>(null);
+  const { ref, focusKey } = useFocusable({ focusKey: 'PAGE' });
 
-const onCardFocus = useCallback((layout: FocusableComponentLayout) => {
-const container = pageRef.current;
-const node = layout.node;
-if (!container || !node) return;
+  const onCardFocus = useCallback((layout: FocusableComponentLayout) => {
+    const container = pageRef.current;
+    const node = layout.node;
+    if (!container || !node) return;
 
     const top =
       node.getBoundingClientRect().top -
@@ -827,28 +865,36 @@ if (!container || !node) return;
       40;
 
     container.scrollTo({ top, behavior: 'smooth' });
+  }, []);
 
-}, []);
-
-return (
-<FocusContext.Provider value={focusKey}>
-
-<div ref={pageRef} style={{ overflowY: 'auto', height: '100vh', backgroundColor: '#221c35' }}>
-<div ref={ref} style={{ padding: 40 }}>
-{ROWS.map((title, idx) => (
-<ContentRow key={title} title={title} onCardFocus={onCardFocus} firstRow={idx === 0} />
-))}
-</div>
-</div>
-</FocusContext.Provider>
-);
+  return (
+    <FocusContext.Provider value={focusKey}>
+      <div
+        ref={pageRef}
+        style={{
+          overflowY: 'auto',
+          height: '100vh',
+          backgroundColor: '#221c35'
+        }}
+      >
+        <div ref={ref} style={{ padding: 40 }}>
+          {ROWS.map((title, idx) => (
+            <ContentRow
+              key={title}
+              title={title}
+              onCardFocus={onCardFocus}
+              firstRow={idx === 0}
+            />
+          ))}
+        </div>
+      </div>
+    </FocusContext.Provider>
+  );
 }
 
 export default function App() {
-return <Page />;
+  return <Page />;
 }
-
 ```
 
 </Sandpack>
-```

@@ -255,18 +255,16 @@ This matches how a screen reader treats `aria-label` on `role="region"`: the reg
 Given this focus tree:
 
 ```
-
 Menu (label="Main Menu")
-├── Home (label="Home")
-└── Library (label="Library")
+  ├── Home (label="Home")
+  └── Library (label="Library")
 Content (label="Recommended")
-├── Row 1 (label="Movies")
-│ ├── Asset 1 (label="Inception")
-│ └── Asset 2 (label="Interstellar")
-└── Row 2 (label="Series")
-├── Asset 3 (label="Breaking Bad")
-└── Asset 4 (label="The Wire")
-
+  ├── Row 1 (label="Movies")
+  │     ├── Asset 1 (label="Inception")
+  │     └── Asset 2 (label="Interstellar")
+  └── Row 2 (label="Series")
+        ├── Asset 3 (label="Breaking Bad")
+        └── Asset 4 (label="The Wire")
 ```
 
 Navigating `Home` → `Inception` → `Interstellar` → `Breaking Bad` produces:

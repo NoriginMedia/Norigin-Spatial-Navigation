@@ -136,7 +136,7 @@ function ButtonRow() {
   const { ref, focusKey, focusSelf } = useFocusable({ focusKey: 'BUTTON_ROW' });
   useEffect(() => {
     focusSelf();
-  }, []);
+  }, [focusSelf]);
   return (
     <FocusContext.Provider value={focusKey}>
       <div ref={ref} style={{ display: 'flex', gap: '16px' }}>
