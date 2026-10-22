@@ -20,6 +20,7 @@ import {
   resume,
   getCurrentFocusKey,
   doesFocusableExist,
+  clearLastFocusedChild,
   updateAllLayouts,
   setKeyMap,
   setThrottle,
@@ -315,6 +316,30 @@ import {
 if (doesFocusableExist('SIDEBAR_ITEM_2')) {
   await setFocus('SIDEBAR_ITEM_2');
 }
+```
+
+---
+
+## `clearLastFocusedChild(focusKey)`
+
+Make a container forget its last focused child. The next time focus enters the container, it goes to `preferredChildFocusKey` (or the first child) instead of the child that was focused last. Focus is not moved, and the container keeps remembering children as usual afterwards.
+
+Unlike `saveLastFocusedChild: false`, which disables the memory for good, this clears it once. Does nothing if no component is registered under `focusKey`.
+
+```typescript
+clearLastFocusedChild(focusKey: string): void
+```
+
+```typescript
+import {
+  clearLastFocusedChild,
+  setFocus
+} from '@noriginmedia/norigin-spatial-navigation-core';
+
+// Leaving a list for the header: pressing down from the header should start
+// at the top of the list again, not at the item focused before.
+await setFocus('HEADER_BACK_BUTTON');
+clearLastFocusedChild('CONTENT_LIST');
 ```
 
 ---

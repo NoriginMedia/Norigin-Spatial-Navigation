@@ -737,6 +737,7 @@ export class SpatialNavigationService {
     this.setKeyMap = this.setKeyMap.bind(this);
     this.getCurrentFocusKey = this.getCurrentFocusKey.bind(this);
     this.doesFocusableExist = this.doesFocusableExist.bind(this);
+    this.clearLastFocusedChild = this.clearLastFocusedChild.bind(this);
     this.updateRtl = this.updateRtl.bind(this);
 
     this.setFocusDebounced = debounce(this.setFocus, AUTO_RESTORE_FOCUS_DELAY, {
@@ -2008,6 +2009,18 @@ export class SpatialNavigationService {
   }
 
   /**
+   * Makes a container forget its last focused child, so the next time focus enters it,
+   * it goes to `preferredChildFocusKey` (or the first child) instead. Does not move focus.
+   */
+  clearLastFocusedChild(focusKey: string) {
+    const component = this.focusableComponents[focusKey];
+
+    if (component) {
+      component.lastFocusedChildKey = null;
+    }
+  }
+
+  /**
    * This function updates the writing direction
    * @param rtl whether the writing direction is right-to-left
    */
@@ -2033,5 +2046,6 @@ export const {
   updateAllLayouts,
   getCurrentFocusKey,
   doesFocusableExist,
+  clearLastFocusedChild,
   updateRtl
 } = SpatialNavigation;
