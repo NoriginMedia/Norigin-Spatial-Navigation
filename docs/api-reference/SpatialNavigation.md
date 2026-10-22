@@ -336,10 +336,12 @@ import {
   setFocus
 } from '@noriginmedia/norigin-spatial-navigation-core';
 
-// Leaving a list for the header: pressing down from the header should start
-// at the top of the list again, not at the item focused before.
-await setFocus('HEADER_BACK_BUTTON');
-clearLastFocusedChild('CONTENT_LIST');
+function onBackPressed() {
+  setFocus('HEADER_BACK_BUTTON');
+  // Pressing down from the header now enters CONTENT_LIST at its
+  // preferredChildFocusKey (or first child), not where focus was before.
+  clearLastFocusedChild('CONTENT_LIST');
+}
 ```
 
 ---
