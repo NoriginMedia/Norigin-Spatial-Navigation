@@ -1,5 +1,11 @@
 # @noriginmedia/norigin-spatial-navigation-core
 
+## 4.2.0
+
+### Minor Changes
+
+- 9a6d9fc: Add `clearLastFocusedChild(focusKey)` to make a container forget its last focused child, so focus next entering it goes to `preferredChildFocusKey` (or the first child). It does not move focus.
+
 ## 4.1.2
 
 ### Patch Changes
