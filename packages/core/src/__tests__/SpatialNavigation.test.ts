@@ -196,6 +196,117 @@ describe('SpatialNavigation', () => {
     expect(SpatialNavigation.getCurrentFocusKey()).toBe('child-3');
   });
 
+  describe('clearLastFocusedChild', () => {
+    const addNode = (
+      focusKey: string,
+      parentFocusKey: string,
+      offsetLeft: number,
+      { preferredChildFocusKey }: { preferredChildFocusKey?: string } = {}
+    ) => {
+      SpatialNavigation.addFocusable({
+        focusKey,
+        node: {
+          offsetLeft,
+          offsetTop: 100,
+          offsetWidth: 400,
+          offsetHeight: 200,
+          parentElement: {
+            offsetLeft: 0,
+            offsetTop: 0,
+            offsetWidth: 1920,
+            offsetHeight: 1280
+          } as HTMLElement,
+          offsetParent: {
+            offsetLeft: 0,
+            offsetTop: 0,
+            scrollLeft: 0,
+            scrollTop: 0,
+            offsetWidth: 1920,
+            offsetHeight: 1280,
+            nodeType: Node.ELEMENT_NODE
+          } as HTMLElement
+        } as unknown as HTMLElement,
+        isFocusBoundary: false,
+        parentFocusKey,
+        preferredChildFocusKey,
+        focusable: true,
+        trackChildren: false,
+        forceFocus: false,
+        autoRestoreFocus: true,
+        saveLastFocusedChild: true,
+        onEnterPress: () => {},
+        onEnterRelease: () => {},
+        onFocus: () => {},
+        onBlur: () => {},
+        onArrowPress: () => true,
+        onArrowRelease: () => {},
+        onUpdateFocus: () => {},
+        onUpdateHasFocusedChild: () => {}
+      });
+    };
+
+    const createContainer = (preferredChildFocusKey?: string) => {
+      createRootNode();
+      addNode('container', ROOT_FOCUS_KEY, 0, { preferredChildFocusKey });
+      addNode('item-1', 'container', 100);
+      addNode('item-2', 'container', 600);
+      addNode('item-3', 'container', 1100);
+    };
+
+    it('restores the last focused child when not cleared', async () => {
+      createContainer();
+
+      SpatialNavigation.setFocus('item-3');
+      await settle();
+
+      SpatialNavigation.setFocus('container');
+      await settle();
+      expect(SpatialNavigation.getCurrentFocusKey()).toBe('item-3');
+    });
+
+    it('makes the container fall back to its first child once cleared', async () => {
+      createContainer();
+
+      SpatialNavigation.setFocus('item-3');
+      await settle();
+
+      SpatialNavigation.clearLastFocusedChild('container');
+
+      SpatialNavigation.setFocus('container');
+      await settle();
+      expect(SpatialNavigation.getCurrentFocusKey()).toBe('item-1');
+    });
+
+    it('makes the container fall back to preferredChildFocusKey once cleared', async () => {
+      createContainer('item-2');
+
+      SpatialNavigation.setFocus('item-3');
+      await settle();
+
+      SpatialNavigation.clearLastFocusedChild('container');
+
+      SpatialNavigation.setFocus('container');
+      await settle();
+      expect(SpatialNavigation.getCurrentFocusKey()).toBe('item-2');
+    });
+
+    it('does not move focus', async () => {
+      createContainer();
+
+      SpatialNavigation.setFocus('item-3');
+      await settle();
+
+      SpatialNavigation.clearLastFocusedChild('container');
+      expect(SpatialNavigation.getCurrentFocusKey()).toBe('item-3');
+    });
+
+    it('ignores unknown focus keys', () => {
+      expect(() =>
+        SpatialNavigation.clearLastFocusedChild('missing')
+      ).not.toThrow();
+    });
+  });
+
   describe('focusOnPresetKey', () => {
     const addPresetChild = (onUpdateFocus: (focused: boolean) => void) => {
       SpatialNavigation.addFocusable({
