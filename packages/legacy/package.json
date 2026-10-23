@@ -1,6 +1,6 @@
 {
   "name": "@noriginmedia/norigin-spatial-navigation",
-  "version": "3.3.0",
+  "version": "3.4.0",
   "description": "React hooks based Spatial Navigation solution",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
@@ -37,7 +37,7 @@
   },
   "homepage": "https://devportal.noriginmedia.com/docs/Norigin-Spatial-Navigation/",
   "dependencies": {
-    "@noriginmedia/norigin-spatial-navigation-core": "^4.1.0",
+    "@noriginmedia/norigin-spatial-navigation-core": "^4.2.0",
     "@noriginmedia/norigin-spatial-navigation-react": "^3.3.0"
   },
   "devDependencies": {
