@@ -67,9 +67,7 @@ export default class BaseWebAdapter implements LayoutAdapter {
   });
 
   blurNode = (component: FocusableComponent) => {
-    if (component.node && this.service.options.shouldFocusDOMNode) {
-      component.node?.removeAttribute?.('data-focused');
-    }
+    component.node?.removeAttribute?.('data-focused');
   };
 
   focusNode = (component: FocusableComponent) => {
