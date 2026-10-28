@@ -56,49 +56,64 @@ The legacy format (a single value per direction instead of an array) is also acc
 
 ## Samsung Tizen Remote
 
-Samsung Tizen TVs use the same key codes as standard arrow keys for the directional pad, but have additional remote-specific keys:
+The directional pad and OK button send the standard codes (37–40 and 13), so the default key map already covers them.
 
-```typescript
-import {
-  init,
-  setKeyMap
-} from '@noriginmedia/norigin-spatial-navigation-react';
-
-init({ debug: false, visualDebug: false });
-
-setKeyMap({
-  left: [37, 'ArrowLeft'],
-  right: [39, 'ArrowRight'],
-  up: [38, 'ArrowUp'],
-  down: [40, 'ArrowDown'],
-  enter: [13, 'Enter'] // OK / Select button on Tizen
-});
-```
-
-For Tizen, you may also need to register the keys with the Tizen API:
+Tizen delivers six keys to an app without registration: `ArrowLeft`, `ArrowUp`, `ArrowRight`, `ArrowDown`, `Enter` and `Back`. These keys cannot be registered, so do not pass them to `registerKey`. Every other remote key, including the media and colour keys, reaches the app only after it is registered with the Tizen API:
 
 ```javascript
 // Tizen-specific key registration (not part of this library)
-tizen.tvinputdevice.registerKey('ArrowLeft');
-tizen.tvinputdevice.registerKey('ArrowRight');
-tizen.tvinputdevice.registerKey('ArrowUp');
-tizen.tvinputdevice.registerKey('ArrowDown');
-tizen.tvinputdevice.registerKey('Enter');
+tizen.tvinputdevice.registerKeyBatch(['MediaPlayPause', 'ColorF0Red']);
 ```
+
+| Key                  | `keyCode` |
+| -------------------- | --------- |
+| `Back`               | 10009     |
+| `MediaPlayPause`     | 10252     |
+| `MediaPlay`          | 415       |
+| `MediaPause`         | 19        |
+| `MediaStop`          | 413       |
+| `MediaFastForward`   | 417       |
+| `MediaRewind`        | 412       |
+| `MediaTrackPrevious` | 10232     |
+| `MediaTrackNext`     | 10233     |
+| `ColorF0Red`         | 403       |
+| `ColorF1Green`       | 404       |
+| `ColorF2Yellow`      | 405       |
+| `ColorF3Blue`        | 406       |
+
+Source: Samsung's [Remote Control](https://developer.samsung.com/smarttv/develop/guides/user-interaction/remote-control.html) guide and [TVInputDevice API](https://developer.samsung.com/smarttv/develop/api-references/tizen-web-device-api-references/tvinputdevice-api.html) reference.
 
 ---
 
 ## LG WebOS Remote
 
-LG WebOS uses the same standard key codes in most cases:
+The directional pad and OK button send the standard codes (37–40 and 13), so the default key map already covers them.
+
+| Key                      | `keyCode` |
+| ------------------------ | --------- |
+| Back                     | 461       |
+| Red, Green, Yellow, Blue | 403–406   |
+| Play                     | 415       |
+| Pause                    | 19        |
+| Stop                     | 413       |
+| Rewind                   | 412       |
+| Fast-forward             | 417       |
+
+Source: LG's [Magic Remote](https://webostv.developer.lge.com/develop/guides/magic-remote) guide, which lists the colour keys for the MR26GB Magic Remote and the media keys for conventional remotes.
+
+---
+
+## Back and Media Keys
+
+The key map has entries for `left`, `right`, `up`, `down` and `enter` only. Keys outside it, such as Back and the media keys, are not handled or prevented by the library, so listen for them yourself:
 
 ```typescript
-setKeyMap({
-  left: [37, 'ArrowLeft'],
-  right: [39, 'ArrowRight'],
-  up: [38, 'ArrowUp'],
-  down: [40, 'ArrowDown'],
-  enter: [13, 'Enter']
+const BACK_KEY_CODES = [10009, 461]; // Samsung Tizen, LG webOS
+
+window.addEventListener('keydown', (event) => {
+  if (BACK_KEY_CODES.includes(event.keyCode)) {
+    // Close the open overlay or go to the previous screen.
+  }
 });
 ```
 
