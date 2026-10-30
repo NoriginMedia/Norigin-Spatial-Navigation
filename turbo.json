@@ -3,6 +3,9 @@
   "ui": "tui",
   "tasks": {
     "eslint": {},
+    "check": {
+      "dependsOn": ["^build"]
+    },
     "build": {
       "dependsOn": ["^build"],
       "outputs": ["./dist", "./lib"]
