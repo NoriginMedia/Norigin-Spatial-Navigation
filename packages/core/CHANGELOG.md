@@ -1,5 +1,11 @@
 # @noriginmedia/norigin-spatial-navigation-core
 
+## 4.2.1
+
+### Patch Changes
+
+- 97c3299: Fix `data-focused` removal when `shouldFocusDOMNode` is not set
+
 ## 4.2.0
 
 ### Minor Changes
